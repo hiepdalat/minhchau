@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// MIDDLEWARE
 app.use(express.static('public'));
 app.use(express.json());
 
@@ -11,7 +12,7 @@ mongoose.connect('mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimb
   .then(() => console.log('✅ Đã kết nối MongoDB Atlas'))
   .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
 
-// SCHEMA + MODEL
+// ĐỊNH NGHĨA SCHEMA + MODEL
 const HangHoaSchema = new mongoose.Schema({
   noidung: String,
   soluong: Number,
@@ -19,25 +20,12 @@ const HangHoaSchema = new mongoose.Schema({
 }, { _id: false });
 
 const CongNoSchema = new mongoose.Schema({
-  ten: String,
-  ngay: String,
-  hanghoa: [HangHoaSchema]
+  ten: { type: String, required: true },
+  ngay: { type: String, required: true },
+  hanghoa: { type: [HangHoaSchema], required: true }
 });
 
 const CongNo = mongoose.model('CongNo', CongNoSchema);
-
-// API TÌM KIẾM
-app.get('/timkiem', async (req, res) => {
-  const keyword = (req.query.ten || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  try {
-    const data = await CongNo.find({
-      ten: { $regex: keyword, $options: 'i' }
-    });
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi server' });
-  }
-});
 
 // API THÊM MỚI
 app.post('/them', async (req, res) => {
@@ -49,22 +37,38 @@ app.post('/them', async (req, res) => {
   try {
     const newRecord = new CongNo({ ten, ngay, hanghoa });
     await newRecord.save();
-    res.json({ success: true });
+    res.json({ success: true, message: 'Đã lưu thành công' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ success: false, message: 'Lỗi lưu dữ liệu' });
   }
 });
 
-// API GHI ĐÈ TOÀN BỘ (nếu cần)
-app.post('/luu', async (req, res) => {
+// API TÌM KIẾM
+app.get('/timkiem', async (req, res) => {
+  const keyword = (req.query.ten || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
   try {
-    await CongNo.deleteMany({});
-    await CongNo.insertMany(req.body);
-    res.json({ success: true });
+    const data = await CongNo.find({
+      ten: { $regex: keyword, $options: 'i' }
+    });
+    res.json(data);
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi lưu toàn bộ' });
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Lỗi tìm kiếm' });
+  }
+});
+
+// API XEM TOÀN BỘ
+app.get('/danhsach', async (req, res) => {
+  try {
+    const data = await CongNo.find();
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy dữ liệu' });
   }
 });
 
 // CHẠY SERVER
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`));
