@@ -1,0 +1,6 @@
+cd /d D:\QuanLyCongNo
+npm init -y
+npm install express
+node server.js
+
+r7aVuSkE8DEXVEyU
