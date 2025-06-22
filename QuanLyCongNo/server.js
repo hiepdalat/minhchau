@@ -7,7 +7,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 // KẾT NỐI MONGODB ATLAS
-const MONGO_URI = 'mongodb+srv://xuanhiep1112:<YOUR_PASSWORD>@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority&appName=QuanLyCongNo';
+const MONGO_URI = 'mongodb+srv://xuanhiep1112:<r7aVuSkE8DEXVEyU>@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority&appName=QuanLyCongNo';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Đã kết nối MongoDB Atlas'))
