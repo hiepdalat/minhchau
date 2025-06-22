@@ -1,22 +1,17 @@
 let danhSachTam = [];
 
-function dangXuat() {
-  window.location.href = "index.html";
-}
-
 function themMon() {
   const nd = document.getElementById('nd').value.trim();
-  const sl = +document.getElementById('sl').value;
-  const dg = +document.getElementById('dg').value;
+  const sl = parseInt(document.getElementById('sl').value);
+  const dg = parseInt(document.getElementById('dg').value);
 
-  if (!nd || sl <= 0 || dg < 0) {
-    alert("Nhập đúng nội dung, số lượng, đơn giá!");
+  if (!nd || isNaN(sl) || sl <= 0 || isNaN(dg) || dg < 0) {
+    alert('Vui lòng nhập đúng nội dung, số lượng và đơn giá!');
     return;
   }
 
   danhSachTam.push({ noidung: nd, soluong: sl, dongia: dg });
   capNhatBangTam();
-
   document.getElementById('nd').value = '';
   document.getElementById('sl').value = '';
   document.getElementById('dg').value = '';
@@ -25,21 +20,21 @@ function themMon() {
 function capNhatBangTam() {
   const tbody = document.getElementById('bangTam');
   tbody.innerHTML = '';
-  danhSachTam.forEach((m, i) => {
+  danhSachTam.forEach((item, index) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${m.noidung}</td>
-      <td>${m.soluong}</td>
-      <td>${m.dongia}</td>
-      <td>${m.soluong * m.dongia}</td>
-      <td><button onclick="xoaMon(${i})">❌</button></td>
+      <td>${item.noidung}</td>
+      <td>${item.soluong}</td>
+      <td>${item.dongia}</td>
+      <td>${(item.soluong * item.dongia).toLocaleString()}</td>
+      <td><button onclick="xoaMon(${index})">❌</button></td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function xoaMon(i) {
-  danhSachTam.splice(i, 1);
+function xoaMon(index) {
+  danhSachTam.splice(index, 1);
   capNhatBangTam();
 }
 
@@ -47,7 +42,7 @@ async function luuTatCa() {
   const ten = document.getElementById('ten').value.trim();
   const ngay = document.getElementById('ngay').value;
   if (!ten || !ngay || danhSachTam.length === 0) {
-    alert('Nhập đầy đủ thông tin');
+    alert('Nhập tên, ngày, và ít nhất 1 món!');
     return;
   }
 
@@ -61,6 +56,8 @@ async function luuTatCa() {
     danhSachTam = [];
     capNhatBangTam();
     loadData();
+    document.getElementById('ten').value = '';
+    document.getElementById('ngay').value = '';
   } else {
     alert('Lưu thất bại!');
   }
@@ -69,6 +66,7 @@ async function luuTatCa() {
 async function loadData(keyword = '') {
   const res = await fetch('/timkiem?ten=' + encodeURIComponent(keyword));
   const data = await res.json();
+
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
   data.forEach(row => {
@@ -80,11 +78,17 @@ async function loadData(keyword = '') {
         <td>${mon.noidung}</td>
         <td>${mon.soluong}</td>
         <td>${mon.dongia}</td>
-        <td>${mon.soluong * mon.dongia}</td>
+        <td>${(mon.soluong * mon.dongia).toLocaleString()}</td>
       `;
       tbody.appendChild(tr);
     });
   });
 }
+
+document.getElementById('search').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    loadData(e.target.value.trim());
+  }
+});
 
 window.onload = () => loadData();
