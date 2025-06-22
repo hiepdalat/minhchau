@@ -13,7 +13,7 @@ mongoose.connect('mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimb
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Schema + Model
+// Schema
 const HangHoaSchema = new mongoose.Schema({
   noidung: String,
   soluong: Number,
@@ -30,38 +30,28 @@ const CongNo = mongoose.model('CongNo', CongNoSchema);
 
 // API
 app.post('/them', async (req, res) => {
+  const { ten, ngay, hanghoa } = req.body;
+  if (!ten || !ngay || !hanghoa || !Array.isArray(hanghoa) || hanghoa.length === 0) {
+    return res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ' });
+  }
   try {
-    const { ten, ngay, hanghoa } = req.body;
-    if (!ten || !ngay || !Array.isArray(hanghoa) || hanghoa.length === 0) {
-      return res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ' });
-    }
-    const record = new CongNo({ ten, ngay, hanghoa });
-    await record.save();
+    await new CongNo({ ten, ngay, hanghoa }).save();
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi server' });
+  } catch {
+    res.status(500).json({ success: false });
   }
 });
 
 app.get('/timkiem', async (req, res) => {
+  const keyword = req.query.ten || '';
   try {
-    const keyword = (req.query.ten || '').toLowerCase();
-    const data = await CongNo.find({ ten: { $regex: keyword, $options: 'i' } });
+    const data = await CongNo.find({
+      ten: { $regex: keyword, $options: 'i' }
+    });
     res.json(data);
-  } catch (err) {
+  } catch {
     res.status(500).json({ success: false });
   }
 });
 
-app.post('/luu', async (req, res) => {
-  try {
-    await CongNo.deleteMany({});
-    await CongNo.insertMany(req.body);
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ success: false });
-  }
-});
-
-// Run
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
