@@ -53,5 +53,5 @@ app.get('/danhsach', async (req, res) => {
 });
 
 // LẮNG NGHE PORT ĐÚNG CHUẨN RENDER
-const PORT = process.env.PORT || 10000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
