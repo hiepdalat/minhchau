@@ -4,64 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quản Lý Công Nợ</title>
-  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="congno-body">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h2>Quản Lý Công Nợ Cửa Hàng</h2>
-    <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
-  </div>
+<body>
+  <h2>Quản Lý Công Nợ</h2>
+  <button onclick="dangXuat()">Đăng xuất</button>
 
-  <input type="text" id="ten" placeholder="Tên khách" />
-  <input type="date" id="ngay" />
+  <input id="ten" placeholder="Tên khách">
+  <input id="ngay" type="date">
 
-  <div>
-    <input type="text" id="nd" placeholder="Nội dung món hàng" />
-    <input type="number" id="sl" placeholder="Số lượng" min="1" />
-    <input type="number" id="dg" placeholder="Đơn giá" min="0" />
-    <button onclick="themMon()">➕ Thêm món</button>
-    <button onclick="luuTatCa()">💾 Lưu tất cả</button>
-  </div>
+  <input id="nd" placeholder="Nội dung">
+  <input id="sl" type="number" placeholder="Số lượng">
+  <input id="dg" type="number" placeholder="Đơn giá">
+  <button onclick="themMon()">Thêm</button>
+  <button onclick="luuTatCa()">Lưu</button>
 
-  <h3>Danh sách món hàng tạm</h3>
-  <table>
+  <h3>Món tạm</h3>
+  <table border="1">
     <thead>
-      <tr>
-        <th>Nội dung</th>
-        <th>Số lượng</th>
-        <th>Đơn giá</th>
-        <th>Thành tiền</th>
-        <th>Xoá</th>
-      </tr>
+      <tr><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Xóa</th></tr>
     </thead>
     <tbody id="bangTam"></tbody>
   </table>
 
-  <h3>Dữ liệu đã lưu</h3>
-  <table>
+  <h3>Dữ liệu</h3>
+  <input id="search" placeholder="Tìm tên">
+  <button onclick="loadData(document.getElementById('search').value)">Tìm</button>
+  <table border="1">
     <thead>
-      <tr>
-        <th>Chọn</th>
-        <th>Tên khách</th>
-        <th>Ngày</th>
-        <th>Nội dung</th>
-        <th>Số lượng</th>
-        <th>Đơn giá</th>
-        <th>Thành tiền</th>
-      </tr>
+      <tr><th>Tên</th><th>Ngày</th><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
     </thead>
     <tbody id="ds"></tbody>
-    <tfoot>
-      <tr id="tongCongRow" style="display:none;">
-        <td colspan="6" style="text-align:right; font-weight:bold;">Tổng cộng:</td>
-        <td id="tongCongValue"></td>
-      </tr>
-    </tfoot>
   </table>
-
-  <input type="text" id="search" placeholder="Tìm theo tên khách hàng..." />
-  <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm kiếm</button>
-  <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
 
   <script src="script.js"></script>
 </body>
