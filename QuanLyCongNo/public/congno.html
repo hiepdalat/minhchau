@@ -1,41 +1,33 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Quản Lý Công Nợ</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <h2>Quản Lý Công Nợ</h2>
-  <button onclick="dangXuat()">Đăng xuất</button>
-
-  <input id="ten" placeholder="Tên khách">
-  <input id="ngay" type="date">
-
-  <input id="nd" placeholder="Nội dung">
-  <input id="sl" type="number" placeholder="Số lượng">
-  <input id="dg" type="number" placeholder="Đơn giá">
-  <button onclick="themMon()">Thêm</button>
-  <button onclick="luuTatCa()">Lưu</button>
+  <input type="text" id="ten" placeholder="Tên khách">
+  <input type="date" id="ngay">
+  <input type="text" id="nd" placeholder="Nội dung">
+  <input type="number" id="sl" placeholder="SL">
+  <input type="number" id="dg" placeholder="Đơn giá">
+  <button onclick="themMon()">➕ Thêm món</button>
+  <button onclick="luuTatCa()">💾 Lưu</button>
 
   <h3>Món tạm</h3>
-  <table border="1">
-    <thead>
-      <tr><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Xóa</th></tr>
-    </thead>
+  <table>
+    <thead><tr><th>Nội dung</th><th>SL</th><th>ĐG</th><th>TT</th><th>Xoá</th></tr></thead>
     <tbody id="bangTam"></tbody>
   </table>
 
   <h3>Dữ liệu</h3>
-  <input id="search" placeholder="Tìm tên">
-  <button onclick="loadData(document.getElementById('search').value)">Tìm</button>
-  <table border="1">
-    <thead>
-      <tr><th>Tên</th><th>Ngày</th><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
-    </thead>
+  <input type="text" id="search" placeholder="Tìm tên khách...">
+  <table>
+    <thead><tr><th>Tên</th><th>Ngày</th><th>Nội dung</th><th>SL</th><th>ĐG</th><th>TT</th></tr></thead>
     <tbody id="ds"></tbody>
   </table>
 
-  <script src="script.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>
