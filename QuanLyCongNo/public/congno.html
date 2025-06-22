@@ -2,18 +2,19 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quản Lý Công Nợ</title>
+  <title>Quản lý công nợ</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <h2>Quản Lý Công Nợ</h2>
   <input type="text" id="ten" placeholder="Tên khách">
   <input type="date" id="ngay">
+
   <input type="text" id="nd" placeholder="Nội dung">
-  <input type="number" id="sl" placeholder="SL">
+  <input type="number" id="sl" placeholder="Số lượng">
   <input type="number" id="dg" placeholder="Đơn giá">
   <button onclick="themMon()">➕ Thêm món</button>
-  <button onclick="luuTatCa()">💾 Lưu</button>
+  <button onclick="luuTatCa()">💾 Lưu tất cả</button>
 
   <h3>Món tạm</h3>
   <table>
@@ -21,7 +22,6 @@
     <tbody id="bangTam"></tbody>
   </table>
 
-  <h3>Dữ liệu</h3>
   <input type="text" id="search" placeholder="Tìm tên khách...">
   <table>
     <thead><tr><th>Tên</th><th>Ngày</th><th>Nội dung</th><th>SL</th><th>ĐG</th><th>TT</th></tr></thead>
