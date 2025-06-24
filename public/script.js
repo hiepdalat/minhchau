@@ -62,56 +62,61 @@ async function loadData(kw = '') {
   const data = await res.json();
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
-  data.forEach(khach => {
-    (khach.hanghoa || []).forEach(mon => {
-      if (!mon) return;
+  data.forEach(kh => {
+    kh.hanghoa.forEach((m, j) => {
       tbody.innerHTML += `
         <tr>
-          <td><input type="checkbox" onchange="tinhTongDaChon()"></td>
-          <td>${khach.ten}</td>
-          <td>${khach.ngay}</td>
-          <td>${mon.noidung}</td>
-          <td>${mon.soluong}</td>
-          <td>${mon.dongia}</td>
-          <td>${(mon.soluong * mon.dongia).toLocaleString()}</td>
+          <td><input type="checkbox" onchange="tinhTongDaChon()" data-id="${kh._id}" data-index="${j}"></td>
+          <td>${kh.ten}</td>
+          <td>${kh.ngay}</td>
+          <td>${m.noidung}</td>
+          <td>${m.soluong}</td>
+          <td>${m.dongia.toLocaleString()}</td>
+          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
         </tr>`;
     });
   });
+  document.getElementById('tongCongRow').style.display = 'none';
 }
 
 function tinhTongDaChon() {
-  const checks = document.querySelectorAll('#ds input[type=checkbox]:checked');
   let tong = 0;
-  checks.forEach(chk => {
-    const td = chk.closest('tr').lastElementChild;
-    tong += parseInt(td.innerText.replace(/,/g, '')) || 0;
+  document.querySelectorAll('#ds input[type="checkbox"]:checked').forEach(chk => {
+    const tr = chk.closest('tr');
+    tong += +(tr.querySelector('td:last-child').innerText.replace(/\./g, ''));
   });
-  document.getElementById('tongCongValue').innerText = tong.toLocaleString();
-  document.getElementById('tongCongRow').style.display = checks.length ? '' : 'none';
+  if (tong > 0) {
+    document.getElementById('tongCongValue').innerText = tong.toLocaleString();
+    document.getElementById('tongCongRow').style.display = '';
+  } else {
+    document.getElementById('tongCongRow').style.display = 'none';
+  }
 }
 
 async function xoaDaChon() {
-  const checks = document.querySelectorAll('#ds input[type=checkbox]:checked');
-  if (!checks.length) {
-    alert('Hãy chọn ít nhất 1 dòng để xóa');
+  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  if (checks.length === 0) {
+    alert('Chọn dòng cần xoá!');
     return;
   }
-  for (let chk of checks) {
-    const tr = chk.closest('tr');
-    const ten = tr.cells[1].innerText;
-    const ngay = tr.cells[2].innerText;
+  for (const chk of checks) {
     await fetch('/xoa', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ten, ngay })
+      body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
     });
   }
-  alert('Đã xóa thành công');
   loadData();
 }
 
+function dangXuat() {
+  window.location.href = '/index.html';
+}
+
 document.getElementById('search').addEventListener('keydown', e => {
-  if (e.key === 'Enter') loadData(e.target.value.trim());
+  if (e.key === 'Enter') {
+    loadData(e.target.value.trim());
+  }
 });
 
 window.onload = loadData;
