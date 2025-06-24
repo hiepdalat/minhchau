@@ -47,42 +47,59 @@ async function luuTatCa() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ten, ngay, hanghoa: danhSachTam })
   });
-  const data = await res.json();
-  if (res.ok && data.success) {
-    alert(data.message);
+  if (res.ok) {
+    alert('Lưu thành công');
     danhSachTam = [];
     capNhatBangTam();
-    document.getElementById('ten').value = '';
-    document.getElementById('ngay').value = '';
     loadData();
   } else {
-    alert(data.message || 'Lưu thất bại');
+    alert('Lưu thất bại');
   }
 }
 
 async function loadData(kw = '') {
-  const url = kw ? `/timkiem?ten=${encodeURIComponent(kw)}` : '/danhsach';
-  const res = await fetch(url);
+  const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
   const data = await res.json();
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
-  data.forEach(khach => {
-    khach.hanghoa.forEach(mon => {
+  data.forEach((khach, khachIdx) => {
+    khach.hanghoa.forEach((mon, monIdx) => {
+      const tt = mon.soluong * mon.dongia;
       tbody.innerHTML += `
         <tr>
+          <td><input type="checkbox" onchange="tinhTongDaChon()" data-khach="${khachIdx}" data-mon="${monIdx}"></td>
           <td>${khach.ten}</td>
           <td>${khach.ngay}</td>
           <td>${mon.noidung}</td>
           <td>${mon.soluong}</td>
           <td>${mon.dongia}</td>
-          <td>${(mon.soluong * mon.dongia).toLocaleString()}</td>
+          <td>${tt.toLocaleString()}</td>
         </tr>`;
     });
   });
+  document.getElementById('tongCongRow').style.display = 'none';
+}
+
+function tinhTongDaChon() {
+  let tong = 0;
+  document.querySelectorAll('#ds input[type=checkbox]:checked').forEach(chk => {
+    const tt = +chk.closest('tr').querySelector('td:last-child').innerText.replace(/\./g, '');
+    tong += tt;
+  });
+  if (tong > 0) {
+    document.getElementById('tongCongValue').innerText = tong.toLocaleString();
+    document.getElementById('tongCongRow').style.display = '';
+  } else {
+    document.getElementById('tongCongRow').style.display = 'none';
+  }
+}
+
+function dangXuat() {
+  window.location.href = 'index.html';
 }
 
 document.getElementById('search').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    loadData(e.target.value.trim());
-  }
+  if (e.key === 'Enter') loadData(e.target.value.trim());
 });
+
+window.onload = () => loadData();
