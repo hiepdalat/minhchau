@@ -1,4 +1,3 @@
-
 let danhSachTam = [];
 
 function themMon() {
@@ -64,10 +63,11 @@ async function loadData(kw = '') {
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
   data.forEach(khach => {
-    khach.hanghoa.forEach(mon => {
+    (khach.hanghoa || []).forEach(mon => {
+      if (!mon) return;
       tbody.innerHTML += `
         <tr>
-          <td><input type="checkbox" data-id="${khach._id}" onchange="tinhTongDaChon()"></td>
+          <td><input type="checkbox" onchange="tinhTongDaChon()"></td>
           <td>${khach.ten}</td>
           <td>${khach.ngay}</td>
           <td>${mon.noidung}</td>
@@ -77,45 +77,37 @@ async function loadData(kw = '') {
         </tr>`;
     });
   });
-  document.getElementById('tongCongRow').style.display = 'none';
 }
 
 function tinhTongDaChon() {
+  const checks = document.querySelectorAll('#ds input[type=checkbox]:checked');
   let tong = 0;
-  document.querySelectorAll('#ds input[type=checkbox]:checked').forEach(chk => {
-    const tt = +chk.closest('tr').querySelector('td:last-child').innerText.replace(/\./g, '');
-    tong += tt;
+  checks.forEach(chk => {
+    const td = chk.closest('tr').lastElementChild;
+    tong += parseInt(td.innerText.replace(/,/g, '')) || 0;
   });
-  if (tong > 0) {
-    document.getElementById('tongCongValue').innerText = tong.toLocaleString();
-    document.getElementById('tongCongRow').style.display = '';
-  } else {
-    document.getElementById('tongCongRow').style.display = 'none';
-  }
+  document.getElementById('tongCongValue').innerText = tong.toLocaleString();
+  document.getElementById('tongCongRow').style.display = checks.length ? '' : 'none';
 }
 
 async function xoaDaChon() {
-  const ids = Array.from(document.querySelectorAll('#ds input[type=checkbox]:checked'))
-    .map(chk => chk.getAttribute('data-id'));
-  if (ids.length === 0) {
-    alert('Chọn ít nhất 1 dòng để xoá');
+  const checks = document.querySelectorAll('#ds input[type=checkbox]:checked');
+  if (!checks.length) {
+    alert('Hãy chọn ít nhất 1 dòng để xóa');
     return;
   }
-  const res = await fetch('/xoa', {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ids })
-  });
-  if (res.ok) {
-    alert('Xoá thành công');
-    loadData();
-  } else {
-    alert('Xoá thất bại');
+  for (let chk of checks) {
+    const tr = chk.closest('tr');
+    const ten = tr.cells[1].innerText;
+    const ngay = tr.cells[2].innerText;
+    await fetch('/xoa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ten, ngay })
+    });
   }
-}
-
-function dangXuat() {
-  window.location.href = 'index.html';
+  alert('Đã xóa thành công');
+  loadData();
 }
 
 document.getElementById('search').addEventListener('keydown', e => {
