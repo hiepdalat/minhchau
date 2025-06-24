@@ -4,14 +4,14 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Kết nối MongoDB Atlas
+// Kết nối MongoDB
 mongoose.connect('mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority')
   .then(() => console.log('✅ Đã kết nối MongoDB Atlas'))
   .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
 
 // Middleware
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Schema
 const HangHoaSchema = new mongoose.Schema({
@@ -38,18 +38,27 @@ app.post('/them', async (req, res) => {
     await new CongNo({ ten, ngay, hanghoa }).save();
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi lưu dữ liệu' });
+    res.status(500).json({ success: false });
   }
 });
 
 app.get('/timkiem', async (req, res) => {
-  const keyword = (req.query.ten || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const keyword = req.query.ten || '';
   try {
-    const data = await CongNo.find();
-    const filtered = data.filter(item =>
-      item.ten.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(keyword)
-    );
-    res.json(filtered);
+    const data = await CongNo.find({
+      ten: { $regex: keyword, $options: 'i' }
+    });
+    res.json(data);
+  } catch {
+    res.status(500).json({ success: false });
+  }
+});
+
+app.delete('/xoa', async (req, res) => {
+  const { ids } = req.body;
+  try {
+    await Promise.all(ids.map(id => CongNo.findByIdAndDelete(id)));
+    res.json({ success: true });
   } catch {
     res.status(500).json({ success: false });
   }
