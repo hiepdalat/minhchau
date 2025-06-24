@@ -2,14 +2,15 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Quản lý công nợ</title>
+  <title>Quản Lý Công Nợ</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body class="congno-body">
-  <h2>Quản Lý Công Nợ <button class="btn-logout" onclick="dangXuat()">Đăng xuất</button></h2>
+  <h2>Quản Lý Công Nợ <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button></h2>
 
   <input type="text" id="ten" placeholder="Tên khách">
   <input type="date" id="ngay">
+
   <input type="text" id="nd" placeholder="Nội dung">
   <input type="number" id="sl" placeholder="Số lượng">
   <input type="number" id="dg" placeholder="Đơn giá">
@@ -22,9 +23,9 @@
     <tbody id="bangTam"></tbody>
   </table>
 
-  <input type="text" id="search" placeholder="Tìm theo tên...">
+  <input type="text" id="search" placeholder="Tìm tên khách...">
   <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
-  <button onclick="xoaDaChon()">❌ Xoá đã chọn</button>
+  <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
 
   <table>
     <thead><tr><th>Chọn</th><th>Tên</th><th>Ngày</th><th>Nội dung</th><th>SL</th><th>ĐG</th><th>TT</th></tr></thead>
