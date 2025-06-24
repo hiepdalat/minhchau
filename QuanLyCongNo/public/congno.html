@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="congno-body">
-  <div style="display:flex; justify-content: space-between; align-items: center;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
     <h2>Quản Lý Công Nợ Cửa Hàng</h2>
     <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
   </div>
@@ -36,7 +36,7 @@
     <tbody id="ds"></tbody>
     <tfoot>
       <tr id="tongCongRow" style="display:none;">
-        <td colspan="6" style="text-align:right; font-weight:bold;">Tổng cộng:</td>
+        <td colspan="6" style="text-align:right;font-weight:bold;">Tổng cộng:</td>
         <td id="tongCongValue"></td>
       </tr>
     </tfoot>
@@ -44,6 +44,7 @@
 
   <input type="text" id="search" placeholder="Tìm theo tên khách hàng...">
   <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm kiếm</button>
+  <button onclick="xoaDaChon()">🗑 Xoá đã chọn</button>
 
   <script src="script.js"></script>
 </body>
