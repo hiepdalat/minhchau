@@ -10,8 +10,8 @@ mongoose.connect('mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimb
   .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
 
 // Middleware
-app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());
 
 // Schema
 const HangHoaSchema = new mongoose.Schema({
@@ -28,7 +28,7 @@ const CongNoSchema = new mongoose.Schema({
 
 const CongNo = mongoose.model('CongNo', CongNoSchema);
 
-// API
+// API thêm mới
 app.post('/them', async (req, res) => {
   const { ten, ngay, hanghoa } = req.body;
   if (!ten || !ngay || !Array.isArray(hanghoa) || hanghoa.length === 0) {
@@ -37,11 +37,12 @@ app.post('/them', async (req, res) => {
   try {
     await new CongNo({ ten, ngay, hanghoa }).save();
     res.json({ success: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ success: false });
   }
 });
 
+// API tìm kiếm
 app.get('/timkiem', async (req, res) => {
   const keyword = req.query.ten || '';
   try {
@@ -54,14 +55,16 @@ app.get('/timkiem', async (req, res) => {
   }
 });
 
-app.delete('/xoa', async (req, res) => {
-  const { ids } = req.body;
+// API xóa
+app.post('/xoa', async (req, res) => {
+  const { ten, ngay } = req.body;
   try {
-    await Promise.all(ids.map(id => CongNo.findByIdAndDelete(id)));
+    await CongNo.deleteMany({ ten, ngay });
     res.json({ success: true });
   } catch {
     res.status(500).json({ success: false });
   }
 });
 
+// Start
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
