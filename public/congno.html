@@ -6,7 +6,10 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body class="congno-body">
-  <h2>Quản Lý Công Nợ <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button></h2>
+ <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2 style="text-align:center; flex:1;">Quản Lý Công Nợ</h2>
+    <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
+  </div>
 
   <input type="text" id="ten" placeholder="Tên khách">
   <input type="date" id="ngay">
@@ -27,7 +30,8 @@
   <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
   <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
 
-  <h3>Dữ liệu đã lưu</h3>
+  <h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
+  
 <div class="box-danhsach">
   <table>
     <thead>
