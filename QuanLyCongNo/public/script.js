@@ -62,18 +62,17 @@ async function loadData(kw = '') {
   const data = await res.json();
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
-  data.forEach((khach, khachIdx) => {
-    khach.hanghoa.forEach((mon, monIdx) => {
-      const tt = mon.soluong * mon.dongia;
+  data.forEach(khach => {
+    khach.hanghoa.forEach(mon => {
       tbody.innerHTML += `
         <tr>
-          <td><input type="checkbox" onchange="tinhTongDaChon()" data-khach="${khachIdx}" data-mon="${monIdx}"></td>
+          <td><input type="checkbox" data-id="${khach._id}" onchange="tinhTongDaChon()"></td>
           <td>${khach.ten}</td>
           <td>${khach.ngay}</td>
           <td>${mon.noidung}</td>
           <td>${mon.soluong}</td>
           <td>${mon.dongia}</td>
-          <td>${tt.toLocaleString()}</td>
+          <td>${(mon.soluong * mon.dongia).toLocaleString()}</td>
         </tr>`;
     });
   });
@@ -94,6 +93,26 @@ function tinhTongDaChon() {
   }
 }
 
+async function xoaDaChon() {
+  const ids = Array.from(document.querySelectorAll('#ds input[type=checkbox]:checked'))
+    .map(chk => chk.getAttribute('data-id'));
+  if (ids.length === 0) {
+    alert('Chọn ít nhất 1 dòng để xoá');
+    return;
+  }
+  const res = await fetch('/xoa', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids })
+  });
+  if (res.ok) {
+    alert('Xoá thành công');
+    loadData();
+  } else {
+    alert('Xoá thất bại');
+  }
+}
+
 function dangXuat() {
   window.location.href = 'index.html';
 }
@@ -102,4 +121,4 @@ document.getElementById('search').addEventListener('keydown', e => {
   if (e.key === 'Enter') loadData(e.target.value.trim());
 });
 
-window.onload = () => loadData();
+window.onload = loadData;
