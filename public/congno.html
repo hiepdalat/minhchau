@@ -3,49 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <title>Quản lý công nợ</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body class="congno-body">
-  <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h2>Quản Lý Công Nợ Cửa Hàng</h2>
-    <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
-  </div>
+  <h2>Quản Lý Công Nợ <button class="btn-logout" onclick="dangXuat()">Đăng xuất</button></h2>
 
   <input type="text" id="ten" placeholder="Tên khách">
   <input type="date" id="ngay">
-
-  <input type="text" id="nd" placeholder="Nội dung món hàng">
-  <input type="number" id="sl" placeholder="Số lượng" min="1">
-  <input type="number" id="dg" placeholder="Đơn giá" min="0">
+  <input type="text" id="nd" placeholder="Nội dung">
+  <input type="number" id="sl" placeholder="Số lượng">
+  <input type="number" id="dg" placeholder="Đơn giá">
   <button onclick="themMon()">➕ Thêm món</button>
   <button onclick="luuTatCa()">💾 Lưu tất cả</button>
 
-  <h3>Danh sách món hàng tạm</h3>
+  <h3>Món tạm</h3>
   <table>
-    <thead>
-      <tr><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th><th>Xoá</th></tr>
-    </thead>
+    <thead><tr><th>Nội dung</th><th>SL</th><th>ĐG</th><th>TT</th><th>Xoá</th></tr></thead>
     <tbody id="bangTam"></tbody>
   </table>
 
-  <h3>Dữ liệu đã lưu</h3>
+  <input type="text" id="search" placeholder="Tìm theo tên...">
+  <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
+  <button onclick="xoaDaChon()">❌ Xoá đã chọn</button>
+
   <table>
-    <thead>
-      <tr><th>Chọn</th><th>Tên khách</th><th>Ngày</th><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
-    </thead>
+    <thead><tr><th>Chọn</th><th>Tên</th><th>Ngày</th><th>Nội dung</th><th>SL</th><th>ĐG</th><th>TT</th></tr></thead>
     <tbody id="ds"></tbody>
     <tfoot>
       <tr id="tongCongRow" style="display:none;">
-        <td colspan="6" style="text-align:right;font-weight:bold;">Tổng cộng:</td>
+        <td colspan="6" style="text-align:right;">Tổng cộng:</td>
         <td id="tongCongValue"></td>
       </tr>
     </tfoot>
   </table>
 
-  <input type="text" id="search" placeholder="Tìm theo tên khách hàng...">
-  <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm kiếm</button>
-  <button onclick="xoaDaChon()">🗑 Xoá đã chọn</button>
-
-  <script src="script.js"></script>
+  <script src="/script.js"></script>
 </body>
 </html>
