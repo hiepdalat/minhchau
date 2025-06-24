@@ -4,16 +4,13 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Kết nối MongoDB
 mongoose.connect('mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority')
   .then(() => console.log('✅ Đã kết nối MongoDB Atlas'))
   .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
 
-// Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// Schema
 const HangHoaSchema = new mongoose.Schema({
   noidung: String,
   soluong: Number,
@@ -22,49 +19,64 @@ const HangHoaSchema = new mongoose.Schema({
 
 const CongNoSchema = new mongoose.Schema({
   ten: String,
+  ten_khongdau: String,
   ngay: String,
   hanghoa: [HangHoaSchema]
 });
-
 const CongNo = mongoose.model('CongNo', CongNoSchema);
 
-// API thêm mới
+function removeDiacritics(str) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 app.post('/them', async (req, res) => {
   const { ten, ngay, hanghoa } = req.body;
   if (!ten || !ngay || !Array.isArray(hanghoa) || hanghoa.length === 0) {
-    return res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ' });
+    return res.status(400).json({ success: false });
   }
   try {
-    await new CongNo({ ten, ngay, hanghoa }).save();
+    await new CongNo({
+      ten,
+      ten_khongdau: removeDiacritics(ten),
+      ngay,
+      hanghoa
+    }).save();
     res.json({ success: true });
   } catch {
     res.status(500).json({ success: false });
   }
 });
 
-// API tìm kiếm
 app.get('/timkiem', async (req, res) => {
-  const keyword = req.query.ten || '';
+  const kw = removeDiacritics(req.query.ten || '');
   try {
     const data = await CongNo.find({
-      ten: { $regex: keyword, $options: 'i' }
+      ten_khongdau: { $regex: kw, $options: 'i' }
     });
     res.json(data);
   } catch {
-    res.status(500).json({ success: false });
+    res.status(500).json([]);
   }
 });
 
-// API xóa
 app.post('/xoa', async (req, res) => {
-  const { ten, ngay } = req.body;
+  const { id, index } = req.body;
+  if (!id || index === undefined) {
+    return res.status(400).json({ success: false });
+  }
   try {
-    await CongNo.deleteMany({ ten, ngay });
+    const congno = await CongNo.findById(id);
+    if (!congno) return res.status(404).json({ success: false });
+    congno.hanghoa.splice(index, 1);
+    if (congno.hanghoa.length === 0) {
+      await CongNo.findByIdAndDelete(id);
+    } else {
+      await congno.save();
+    }
     res.json({ success: true });
   } catch {
     res.status(500).json({ success: false });
   }
 });
 
-// Start
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
