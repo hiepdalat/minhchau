@@ -1,3 +1,4 @@
+
 let danhSachTam = [];
 
 function themMon() {
@@ -66,6 +67,7 @@ async function loadData(kw = '') {
     khach.hanghoa.forEach(mon => {
       tbody.innerHTML += `
         <tr>
+          <td><input type="checkbox" data-id="${khach._id}" onchange="tinhTongDaChon()"></td>
           <td>${khach.ten}</td>
           <td>${khach.ngay}</td>
           <td>${mon.noidung}</td>
@@ -75,12 +77,49 @@ async function loadData(kw = '') {
         </tr>`;
     });
   });
+  document.getElementById('tongCongRow').style.display = 'none';
+}
+
+function tinhTongDaChon() {
+  let tong = 0;
+  document.querySelectorAll('#ds input[type=checkbox]:checked').forEach(chk => {
+    const tt = +chk.closest('tr').querySelector('td:last-child').innerText.replace(/\./g, '');
+    tong += tt;
+  });
+  if (tong > 0) {
+    document.getElementById('tongCongValue').innerText = tong.toLocaleString();
+    document.getElementById('tongCongRow').style.display = '';
+  } else {
+    document.getElementById('tongCongRow').style.display = 'none';
+  }
+}
+
+async function xoaDaChon() {
+  const ids = Array.from(document.querySelectorAll('#ds input[type=checkbox]:checked'))
+    .map(chk => chk.getAttribute('data-id'));
+  if (ids.length === 0) {
+    alert('Chọn ít nhất 1 dòng để xoá');
+    return;
+  }
+  const res = await fetch('/xoa', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids })
+  });
+  if (res.ok) {
+    alert('Xoá thành công');
+    loadData();
+  } else {
+    alert('Xoá thất bại');
+  }
+}
+
+function dangXuat() {
+  window.location.href = 'index.html';
 }
 
 document.getElementById('search').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    loadData(e.target.value.trim());
-  }
+  if (e.key === 'Enter') loadData(e.target.value.trim());
 });
 
 window.onload = loadData;
