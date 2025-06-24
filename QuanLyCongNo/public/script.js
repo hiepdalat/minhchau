@@ -47,18 +47,22 @@ async function luuTatCa() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ten, ngay, hanghoa: danhSachTam })
   });
-  if (res.ok) {
-    alert('Lưu thành công');
+  const data = await res.json();
+  if (res.ok && data.success) {
+    alert(data.message);
     danhSachTam = [];
     capNhatBangTam();
+    document.getElementById('ten').value = '';
+    document.getElementById('ngay').value = '';
     loadData();
   } else {
-    alert('Lưu thất bại');
+    alert(data.message || 'Lưu thất bại');
   }
 }
 
 async function loadData(kw = '') {
-  const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
+  const url = kw ? `/timkiem?ten=${encodeURIComponent(kw)}` : '/danhsach';
+  const res = await fetch(url);
   const data = await res.json();
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
@@ -82,5 +86,3 @@ document.getElementById('search').addEventListener('keydown', e => {
     loadData(e.target.value.trim());
   }
 });
-
-window.onload = loadData;
