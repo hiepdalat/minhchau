@@ -4,7 +4,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Kết nối MongoDB
+// Kết nối MongoDB Atlas
 mongoose.connect('mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority')
   .then(() => console.log('✅ Đã kết nối MongoDB Atlas'))
   .catch(err => console.error('❌ Lỗi kết nối MongoDB:', err));
@@ -36,33 +36,23 @@ app.post('/them', async (req, res) => {
   }
   try {
     await new CongNo({ ten, ngay, hanghoa }).save();
-    res.json({ success: true, message: 'Lưu thành công' });
+    res.json({ success: true });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ success: false, message: 'Lỗi lưu dữ liệu' });
   }
 });
 
-app.get('/danhsach', async (req, res) => {
+app.get('/timkiem', async (req, res) => {
+  const keyword = (req.query.ten || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   try {
     const data = await CongNo.find();
-    res.json(data);
+    const filtered = data.filter(item =>
+      item.ten.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().includes(keyword)
+    );
+    res.json(filtered);
   } catch {
     res.status(500).json({ success: false });
   }
 });
 
-app.get('/timkiem', async (req, res) => {
-  const keyword = req.query.ten || '';
-  try {
-    const data = await CongNo.find({
-      ten: { $regex: keyword, $options: 'i' }
-    });
-    res.json(data);
-  } catch {
-    res.status(500).json({ success: false });
-  }
-});
-
-// Server chạy
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
