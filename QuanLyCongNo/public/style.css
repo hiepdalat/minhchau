@@ -4,7 +4,13 @@
   color: #fff;
   padding: 20px;
 }
-
+.box-danhsach {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
+  background: #fff;
+}
 table {
   background: #fff;
   color: #000;
