@@ -31,9 +31,6 @@ input, button {
 
 button {
   cursor: pointer;
-}
-button {
-  cursor: pointer;
   padding: 5px 10px;
   border: none;
   border-radius: 4px;
