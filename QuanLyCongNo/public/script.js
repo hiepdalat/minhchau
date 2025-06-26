@@ -120,47 +120,6 @@ document.getElementById('search').addEventListener('keydown', e => {
 });
 
 
-
-function initButterfly() {
-  const canvas = document.getElementById("butterflyCanvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resizeCanvas();
-  window.addEventListener("resize", resizeCanvas);
-
-  let butterflies = [];
-  for (let i = 0; i < 10; i++) {
-    butterflies.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      dx: (Math.random() - 0.5) * 2,
-      dy: (Math.random() - 0.5) * 2,
-      size: 20 + Math.random() * 10
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    butterflies.forEach(b => {
-      ctx.fillStyle = "rgba(255, 192, 203, 0.7)";
-      ctx.beginPath();
-      ctx.ellipse(b.x, b.y, b.size / 2, b.size / 4, 0, 0, 2 * Math.PI);
-      ctx.fill();
-      b.x += b.dx;
-      b.y += b.dy;
-      if (b.x < 0 || b.x > canvas.width) b.dx *= -1;
-      if (b.y < 0 || b.y > canvas.height) b.dy *= -1;
-    });
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
-
 window.addEventListener('load', () => {
   loadData();
   initButterfly();
