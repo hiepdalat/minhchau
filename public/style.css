@@ -30,16 +30,25 @@ input, button {
 }
 
 button {
-  cursor: pointer;
-  padding: 5px 10px;
+  background: linear-gradient(135deg, #4CAF50, #388E3C);  /* Xanh lá chuyển sắc */
+  color: #fff;
+  padding: 8px 16px;
   border: none;
-  border-radius: 4px;
-  transition: background 0.3s, color 0.3s;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  font-weight: bold;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 
 button:hover {
-  background: #4CAF50;  /* Xanh lá cây */
-  color: #fff;          /* Chữ trắng */
+  background: linear-gradient(135deg, #45A049, #2E7D32);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .btn-logout:hover {
   background: #f44336; /* Cũng xanh lá */
