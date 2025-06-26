@@ -30,9 +30,6 @@ input, button {
   padding: 5px;
 }
 
-button {
-  cursor: pointer;
-}
 .header-container {
   position: relative;
   text-align: center;
