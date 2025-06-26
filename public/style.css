@@ -42,7 +42,7 @@ button:hover {
   color: #fff;          /* Chữ trắng */
 }
 .btn-logout:hover {
-  background: #4CAF50; /* Cũng xanh lá */
+  background: #f44336; /* Cũng xanh lá */
 }
 .header-container {
   position: relative;
