@@ -122,5 +122,5 @@ document.getElementById('search').addEventListener('keydown', e => {
 
 window.addEventListener('load', () => {
   loadData();
-  /*initButterfly();*/
+ 
 });
