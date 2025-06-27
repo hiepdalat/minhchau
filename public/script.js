@@ -8,7 +8,8 @@ function themMon() {
     alert('Nhập đúng dữ liệu');
     return;
   }
-  danhSachTam.push({ noidung: nd, soluong: sl, dongia: dg });
+  //danhSachTam.push({ noidung: nd, soluong: sl, dongia: dg });
+  danhSachTam.push({ noidung: nd, soluong: sl, dongia: dg, thanhtoan: false });
   capNhatBangTam();
   document.getElementById('nd').value = '';
   document.getElementById('sl').value = '';
