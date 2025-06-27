@@ -203,13 +203,39 @@ function chonTatCa(source) {
   checkboxes.forEach(cb => cb.checked = source.checked);
   tinhTongDaChon();
 }
-function thanhToan() {
+/*function thanhToan() {
+  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  if (checks.length === 0) {
+    alert('Bạn chưa chọn dòng nào để thanh toán!');
+    return;
+  }*/
+async function thanhToan() {
   const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
   if (checks.length === 0) {
     alert('Bạn chưa chọn dòng nào để thanh toán!');
     return;
   }
 
+  for (const chk of checks) {
+    const id = chk.dataset.id;
+    const index = chk.dataset.index;
+
+    // Gửi yêu cầu cập nhật thanhtoan = true lên server
+    const res = await fetch('/thanhtoan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, index })
+    });
+
+    const result = await res.json();
+    if (!result.ok) {
+      alert(`Lỗi khi thanh toán cho khách hàng ID: ${id}`);
+    }
+  }
+
+  alert('Đã thanh toán thành công cho các dòng đã chọn.');
+  loadData(); // Tải lại bảng để cập nhật highlight
+}
   checks.forEach(chk => {
     const tr = chk.closest('tr');
     tr.classList.add('tr-thanh-toan'); // Thêm class CSS để highlight
