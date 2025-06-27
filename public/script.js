@@ -212,6 +212,7 @@ async function thanhToan() {
     return;
   }
 
+  let daThanhToan = [];
   let demThanhToanMoi = 0;
 
   for (const chk of checks) {
@@ -220,13 +221,11 @@ async function thanhToan() {
     const index = chk.dataset.index;
 
     if (tr.classList.contains('tr-thanh-toan')) {
-      // Dòng đã thanh toán → cảnh báo riêng
       const tenKH = tr.children[1].innerText;
-      alert(`Khách hàng "${tenKH}" đã thanh toán trước đó.`);
+      if (!daThanhToan.includes(tenKH)) daThanhToan.push(tenKH);
       continue;
     }
 
-    // Gửi cập nhật thanh toán
     const res = await fetch('/thanhtoan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -242,9 +241,14 @@ async function thanhToan() {
   }
 
   if (demThanhToanMoi > 0) {
-    alert(`Đã thanh toán thành công cho ${demThanhToanMoi} dòng.`);
-    loadData(); // Cập nhật lại bảng
+    alert(`✅ Đã thanh toán thành công cho ${demThanhToanMoi} dòng.`);
   }
+
+  if (daThanhToan.length > 0) {
+    alert(`⚠️ Các khách hàng sau đã thanh toán trước đó:\n- ${daThanhToan.join('\n- ')}`);
+  }
+
+  loadData();
 }
 
 /*function thanhToan() {
