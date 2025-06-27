@@ -69,20 +69,19 @@ async function loadData(kw = '') {
 
       tbody.innerHTML += `
         <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
-          <td>
-            <input type="checkbox"
-                   onchange="tinhTongDaChon()"
-                   data-id="${kh._id}"
-                   data-index="${j}"
-                   ${isThanhToan ? 'disabled' : ''}>
-          </td>
-          <td>${kh.ten}</td>
-          <td>${kh.ngay}</td>
-          <td>${m.noidung}</td>
-          <td>${m.soluong}</td>
-          <td>${m.dongia.toLocaleString()}</td>
-          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
-        </tr>`;
+    <td>
+      <input type="checkbox"
+             onchange="tinhTongDaChon()"
+             data-id="${kh._id}"
+             data-index="${j}">
+    </td>
+    <td>${kh.ten}</td>
+    <td>${kh.ngay}</td>
+    <td>${m.noidung}</td>
+    <td>${m.soluong}</td>
+    <td>${m.dongia.toLocaleString()}</td>
+    <td>${(m.soluong * m.dongia).toLocaleString()}</td>
+  </tr>`;
     });
   });
 
