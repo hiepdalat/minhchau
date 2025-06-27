@@ -78,5 +78,20 @@ app.post('/xoa', async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
+app.post('/thanhtoan', async (req, res) => {
+  const { id, index } = req.body;
+  try {
+    const doc = await CongNo.findById(id);              // Tìm tài liệu theo _id
+    if (!doc || !doc.hanghoa[index]) 
+      return res.status(404).send('Không tìm thấy');     // Không thấy thì báo lỗi
 
+    doc.hanghoa[index].thanhtoan = true;                 // Gán trường "thanhtoan" = true
+    await doc.save();                                    // Lưu lại MongoDB
+
+    res.send({ ok: true });                              // Phản hồi thành công
+  } catch (e) {
+    console.error(e);                                    // Nếu có lỗi thì log ra
+    res.status(500).send('Lỗi server');
+  }
+});
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
