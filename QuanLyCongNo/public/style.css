@@ -59,6 +59,12 @@ button:active {
 .btn-logout:hover {
   background: #f44336; /* Cũng xanh lá */
 }
+
+.tr-thanh-toan {
+  background-color: #ffcccc; /* Màu đỏ nhạt */
+  font-weight: bold;
+}
+
 .header-container h2 {
   margin: 0;
 }
