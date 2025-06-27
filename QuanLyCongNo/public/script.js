@@ -236,7 +236,7 @@ async function thanhToan() {
   alert('Đã thanh toán thành công cho các dòng đã chọn.');
   loadData(); // Tải lại bảng để cập nhật highlight
 }
-  checks.forEach(chk => {
+  /*checks.forEach(chk => {
     const tr = chk.closest('tr');
     tr.classList.add('tr-thanh-toan'); // Thêm class CSS để highlight
     chk.checked = false; // (Tùy chọn) bỏ tick sau khi thanh toán
@@ -244,7 +244,7 @@ async function thanhToan() {
 
   tinhTongDaChon(); // Cập nhật lại tổng sau khi bỏ tick
   alert('Đã đánh dấu thanh toán cho các dòng đã chọn.');
-}
+}*/
 function dangXuat() {
   window.location.href = '/index.html';
 }
