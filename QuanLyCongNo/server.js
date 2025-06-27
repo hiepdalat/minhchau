@@ -14,7 +14,7 @@ app.use(express.json());
 const HangHoaSchema = new mongoose.Schema({
   noidung: String,
   soluong: Number,
-  dongia: Number
+  dongia: Number,
    thanhtoan: { type: Boolean, default: false }
 }, { _id: false });
 
