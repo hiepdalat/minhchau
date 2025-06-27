@@ -79,7 +79,7 @@ async function loadData(kw = '') {
   document.getElementById('tongCongRow').style.display = 'none';
 }
 
-function tinhTongDaChon() {
+/*function tinhTongDaChon() {
   let tong = 0;
   document.querySelectorAll('#ds input[type="checkbox"]:checked').forEach(chk => {
     const tr = chk.closest('tr');
@@ -90,6 +90,30 @@ function tinhTongDaChon() {
     document.getElementById('tongCongRow').style.display = '';
   } else {
     document.getElementById('tongCongRow').style.display = 'none';
+  }
+}*/
+function tinhTongDaChon() {
+  const allCheckboxes = document.querySelectorAll('#ds input[type="checkbox"]');
+  const checked = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+
+  let tong = 0;
+  checked.forEach(chk => {
+    const tr = chk.closest('tr');
+    tong += +(tr.querySelector('td:last-child').innerText.replace(/\./g, ''));
+  });
+
+  // Hiển thị tổng cộng nếu có chọn
+  if (tong > 0) {
+    document.getElementById('tongCongValue').innerText = tong.toLocaleString();
+    document.getElementById('tongCongRow').style.display = '';
+  } else {
+    document.getElementById('tongCongRow').style.display = 'none';
+  }
+
+  // Cập nhật trạng thái "Chọn tất cả"
+  const checkAll = document.getElementById('checkAll');
+  if (checkAll) {
+    checkAll.checked = checked.length === allCheckboxes.length;
   }
 }
 
@@ -142,6 +166,11 @@ async function xoaDaChon() {
     Swal.fire('Đã xoá!', 'Dữ liệu đã được xoá thành công.', 'success');
     loadData();
   }
+}
+function chonTatCa(source) {
+  const checkboxes = document.querySelectorAll('#ds input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = source.checked);
+  tinhTongDaChon();
 }
 
 function dangXuat() {
