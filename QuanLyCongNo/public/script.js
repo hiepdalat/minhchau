@@ -202,13 +202,55 @@ function chonTatCa(source) {
   checkboxes.forEach(cb => cb.checked = source.checked);
   tinhTongDaChon();
 }
+async function thanhToan() {
+  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  if (checks.length === 0) {
+    alert('Bạn chưa chọn dòng nào để thanh toán!');
+    return;
+  }
+
+  let demThanhToanMoi = 0;
+
+  for (const chk of checks) {
+    const tr = chk.closest('tr');
+    const id = chk.dataset.id;
+    const index = chk.dataset.index;
+
+    if (tr.classList.contains('tr-thanh-toan')) {
+      // Dòng đã thanh toán → cảnh báo riêng
+      const tenKH = tr.children[1].innerText;
+      alert(`Khách hàng "${tenKH}" đã thanh toán trước đó.`);
+      continue;
+    }
+
+    // Gửi cập nhật thanh toán
+    const res = await fetch('/thanhtoan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, index })
+    });
+
+    const result = await res.json();
+    if (!result.ok) {
+      alert(`Lỗi khi thanh toán cho khách hàng ID: ${id}`);
+    } else {
+      demThanhToanMoi++;
+    }
+  }
+
+  if (demThanhToanMoi > 0) {
+    alert(`Đã thanh toán thành công cho ${demThanhToanMoi} dòng.`);
+    loadData(); // Cập nhật lại bảng
+  }
+}
+
 /*function thanhToan() {
   const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
   if (checks.length === 0) {
     alert('Bạn chưa chọn dòng nào để thanh toán!');
     return;
   }*/
-async function thanhToan() {
+/*async function thanhToan() {
   const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
   if (checks.length === 0) {
     alert('Bạn chưa chọn dòng nào để thanh toán!');
@@ -234,7 +276,7 @@ async function thanhToan() {
 
   alert('Đã thanh toán thành công cho các dòng đã chọn.');
   loadData(); // Tải lại bảng để cập nhật highlight
-}
+}*/
   /*checks.forEach(chk => {
     const tr = chk.closest('tr');
     tr.classList.add('tr-thanh-toan'); // Thêm class CSS để highlight
