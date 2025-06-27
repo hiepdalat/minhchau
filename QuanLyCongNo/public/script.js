@@ -93,7 +93,7 @@ function tinhTongDaChon() {
   }
 }
 
-async function xoaDaChon() {
+/*async function xoaDaChon() {
   const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
   if (checks.length === 0) {
     alert('Chọn dòng cần xoá!');
@@ -107,6 +107,41 @@ async function xoaDaChon() {
     });
   }
   loadData();
+}*/
+async function xoaDaChon() {
+  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  if (checks.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Chưa chọn dòng nào',
+      text: 'Vui lòng chọn ít nhất một dòng để xoá!',
+    });
+    return;
+  }
+
+  const result = await Swal.fire({
+    title: 'Bạn có chắc chắn?',
+    text: "Bạn muốn xoá nợ cho khách đã chọn?",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Vâng, xoá ngay!',
+    cancelButtonText: 'Không'
+  });
+
+  if (result.isConfirmed) {
+    for (const chk of checks) {
+      await fetch('/xoa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
+      });
+    }
+
+    Swal.fire('Đã xoá!', 'Dữ liệu đã được xoá thành công.', 'success');
+    loadData();
+  }
 }
 
 function dangXuat() {
