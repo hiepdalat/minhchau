@@ -57,8 +57,38 @@ async function luuTatCa() {
     alert('Lưu thất bại');
   }
 }
-
 async function loadData(kw = '') {
+  const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
+  const data = await res.json();
+  const tbody = document.getElementById('ds');
+  tbody.innerHTML = '';
+
+  data.forEach(kh => {
+    kh.hanghoa.forEach((m, j) => {
+      const isThanhToan = m.thanhtoan === true;
+
+      tbody.innerHTML += `
+        <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
+          <td>
+            <input type="checkbox"
+                   onchange="tinhTongDaChon()"
+                   data-id="${kh._id}"
+                   data-index="${j}"
+                   ${isThanhToan ? 'disabled' : ''}>
+          </td>
+          <td>${kh.ten}</td>
+          <td>${kh.ngay}</td>
+          <td>${m.noidung}</td>
+          <td>${m.soluong}</td>
+          <td>${m.dongia.toLocaleString()}</td>
+          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
+        </tr>`;
+    });
+  });
+
+  document.getElementById('tongCongRow').style.display = 'none';
+}
+/*async function loadData(kw = '') {
   const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
   const data = await res.json();
   const tbody = document.getElementById('ds');
@@ -78,7 +108,7 @@ async function loadData(kw = '') {
     });
   });
   document.getElementById('tongCongRow').style.display = 'none';
-}
+}*/
 
 /*function tinhTongDaChon() {
   let tong = 0;
