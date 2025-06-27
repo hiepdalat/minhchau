@@ -15,6 +15,7 @@ const HangHoaSchema = new mongoose.Schema({
   noidung: String,
   soluong: Number,
   dongia: Number
+   thanhtoan: { type: Boolean, default: false }
 }, { _id: false });
 
 const CongNoSchema = new mongoose.Schema({
