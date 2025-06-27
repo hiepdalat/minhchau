@@ -62,6 +62,7 @@ button:active {
 
 .tr-thanh-toan {
   background-color: #fa1e1e;
+  color: #fff !important;
   font-weight: bold;
 }
 
