@@ -144,6 +144,12 @@ async function xoaDaChon() {
   }
 }
 
+function chonTatCa(source) {
+  const checkboxes = document.querySelectorAll('#ds input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = source.checked);
+  tinhTongDaChon();
+}
+
 function dangXuat() {
   window.location.href = '/index.html';
 }
