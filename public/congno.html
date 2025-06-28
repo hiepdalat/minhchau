@@ -20,11 +20,15 @@
   <button onclick="themMon()">➕ Thêm món</button>
   <button onclick="luuTatCa()">💾 Lưu tất cả</button>
 
+  <div id="monTamBox" style="display:none;">
   <h3>Món tạm</h3>
   <table>
-    <thead><tr><th>Nội dung</th><th>Số Lượng</th><th>Đơn Giá</th><th>Thành Tiền</th><th>Xoá</th></tr></thead>
+    <thead>
+      <tr><th>Nội dung</th><th>Số Lượng</th><th>Đơn Giá</th><th>Thành Tiền</th><th>Xoá</th></tr>
+    </thead>
     <tbody id="bangTam"></tbody>
   </table>
+</div>
 
   <input type="text" id="search" placeholder="Tìm tên khách...">
   <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
