@@ -19,6 +19,8 @@ function themMon() {
   document.getElementById('nd').value = '';
   document.getElementById('sl').value = '';
   document.getElementById('dg').value = '';
+// Di chuyển con trỏ về lại ô Nội dung
+  document.getElementById('nd').focus();
 }
 
 function capNhatBangTam() {
