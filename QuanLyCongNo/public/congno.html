@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body class="congno-body">
-<div class="header-container">
+ <div class="card">
   <h2>Quản Lý Công Nợ</h2>
   <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
 </div>
@@ -20,7 +20,7 @@
   <button onclick="themMon()">➕ Thêm món</button>
   <button onclick="luuTatCa()">💾 Lưu tất cả</button>
 
-  <div id="monTamBox" style="display:none;">
+  <div class="card" id="monTamBox" style="display:none;">
   <h3>Món tạm</h3>
   <table>
     <thead>
@@ -35,8 +35,9 @@
   <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
 <button onclick="thanhToan()">💰 Thanh Toán</button>
   
- <h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
-<div class="box-danhsach">
+  <h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
+  
+<div class="card box-danhsach">
   <table>
     <thead>
       <tr>
@@ -58,8 +59,8 @@
     </tfoot>
   </table>
 </div>
-  
+
   <script src="/script.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 </html>
