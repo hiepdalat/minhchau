@@ -4,19 +4,25 @@ function themMon() {
   const nd = document.getElementById('nd').value.trim();
   const sl = +document.getElementById('sl').value;
   const dg = +document.getElementById('dg').value;
+
   if (!nd || sl <= 0 || dg < 0) {
     alert('Nhập đúng dữ liệu');
     return;
   }
-  //danhSachTam.push({ noidung: nd, soluong: sl, dongia: dg });
+
   danhSachTam.push({ noidung: nd, soluong: sl, dongia: dg, thanhtoan: false });
   capNhatBangTam();
+
+  //  Hiện phần Món Tạm khi có dữ liệu
+  document.getElementById('monTamBox').style.display = 'block';
+
   document.getElementById('nd').value = '';
   document.getElementById('sl').value = '';
   document.getElementById('dg').value = '';
 }
 
 function capNhatBangTam() {
+   
   const tbody = document.getElementById('bangTam');
   tbody.innerHTML = '';
   danhSachTam.forEach((item, i) => {
@@ -29,11 +35,12 @@ function capNhatBangTam() {
         <td><button onclick="xoaMon(${i})">❌</button></td>
       </tr>`;
   });
+  document.getElementById('monTamBox').style.display = danhSachTam.length > 0 ? 'block' : 'none';
 }
 
 function xoaMon(i) {
   danhSachTam.splice(i, 1);
-  capNhatBangTam();
+  capNhatBangTam(); //đã tự kiểm tra hiển thị ở đây rồi
 }
 
 async function luuTatCa() {
