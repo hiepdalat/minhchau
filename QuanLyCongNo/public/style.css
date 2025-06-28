@@ -79,4 +79,15 @@ th:nth-child(3), td:nth-child(3) {
   min-width: 120px;
   white-space: nowrap;
 }
+.box-danhsach table {
+  width: 100%;
+  border-collapse: collapse;
+}
 
+.box-danhsach thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  color: #000;
+}
