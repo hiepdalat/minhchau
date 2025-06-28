@@ -4,13 +4,14 @@
   <meta charset="UTF-8">
   <title>Quản Lý Công Nợ</title>
   <link rel="stylesheet" href="/style.css">
+   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body class="congno-body">
- <div class="card">
+ <div class="card header-container">
   <h2>Quản Lý Công Nợ</h2>
   <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
 </div>
-
+ <div class="card">
   <input type="text" id="ten" placeholder="Tên khách">
   <input type="date" id="ngay">
 
@@ -19,7 +20,8 @@
   <input type="number" id="dg" placeholder="Đơn giá">
   <button onclick="themMon()">➕ Thêm món</button>
   <button onclick="luuTatCa()">💾 Lưu tất cả</button>
-
+ </div>
+  
   <div class="card" id="monTamBox" style="display:none;">
   <h3>Món tạm</h3>
   <table>
@@ -29,14 +31,14 @@
     <tbody id="bangTam"></tbody>
   </table>
 </div>
-
+ <div class="card">
   <input type="text" id="search" placeholder="Tìm tên khách...">
   <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
   <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
 <button onclick="thanhToan()">💰 Thanh Toán</button>
+ </div>
   
-  <h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
-  
+<h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
 <div class="card box-danhsach">
   <table>
     <thead>
