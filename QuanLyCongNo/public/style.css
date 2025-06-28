@@ -26,11 +26,14 @@ table {
   max-width: 1000px;
 }
 .card {
-  background: transparent;  /* bỏ nền trắng */
+  background: rgba(20, 40, 60, 0.85); /* xanh đậm nhẹ hơn nền */
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   padding: 20px;
   margin-bottom: 20px;
+  color: #fff; /* đảm bảo chữ trắng rõ ràng */
+  backdrop-filter: blur(4px);
+border: 1px solid rgba(255,255,255,0.1);
 }
 
   th, td {
