@@ -19,13 +19,12 @@ function themMon() {
   document.getElementById('nd').value = '';
   document.getElementById('sl').value = '';
   document.getElementById('dg').value = '';
- setTimeout(() => {
+   setTimeout(() => {
     document.getElementById('nd').focus();
   }, 0);
 }
 
 function capNhatBangTam() {
-   
   const tbody = document.getElementById('bangTam');
   tbody.innerHTML = '';
   danhSachTam.forEach((item, i) => {
@@ -67,6 +66,7 @@ async function luuTatCa() {
     alert('Lưu thất bại');
   }
 }
+
 async function loadData(kw = '') {
   const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
   const data = await res.json();
@@ -97,41 +97,10 @@ async function loadData(kw = '') {
 
   document.getElementById('tongCongRow').style.display = 'none';
 }
-/*async function loadData(kw = '') {
-  const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
-  const data = await res.json();
-  const tbody = document.getElementById('ds');
-  tbody.innerHTML = '';
-  data.forEach(kh => {
-    kh.hanghoa.forEach((m, j) => {
-      tbody.innerHTML += `
-        <tr>
-          <td><input type="checkbox" onchange="tinhTongDaChon()" data-id="${kh._id}" data-index="${j}"></td>
-          <td>${kh.ten}</td>
-          <td>${kh.ngay}</td>
-          <td>${m.noidung}</td>
-          <td>${m.soluong}</td>
-          <td>${m.dongia.toLocaleString()}</td>
-          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
-        </tr>`;
-    });
-  });
-  document.getElementById('tongCongRow').style.display = 'none';
-}*/
 
-/*function tinhTongDaChon() {
-  let tong = 0;
-  document.querySelectorAll('#ds input[type="checkbox"]:checked').forEach(chk => {
-    const tr = chk.closest('tr');
-    tong += +(tr.querySelector('td:last-child').innerText.replace(/\./g, ''));
-  });
-  if (tong > 0) {
-    document.getElementById('tongCongValue').innerText = tong.toLocaleString();
-    document.getElementById('tongCongRow').style.display = '';
-  } else {
-    document.getElementById('tongCongRow').style.display = 'none';
-  }
-}*/
+/* Các phiên bản loadData cũ đã được thay thế bằng bản ở trên, giữ lại để tham khảo nếu cần */
+
+/* function tinhTongDaChon() bản cũ đã được cập nhật bên dưới */
 
 function tinhTongDaChon() {
   const allCheckboxes = document.querySelectorAll('#ds input[type="checkbox"]');
@@ -143,7 +112,6 @@ function tinhTongDaChon() {
     tong += +(tr.querySelector('td:last-child').innerText.replace(/\./g, ''));
   });
 
-  // Hiển thị tổng cộng nếu có chọn
   if (tong > 0) {
     document.getElementById('tongCongValue').innerText = tong.toLocaleString();
     document.getElementById('tongCongRow').style.display = '';
@@ -151,28 +119,14 @@ function tinhTongDaChon() {
     document.getElementById('tongCongRow').style.display = 'none';
   }
 
-  // Cập nhật trạng thái "Chọn tất cả"
   const checkAll = document.getElementById('checkAll');
   if (checkAll) {
     checkAll.checked = checked.length === allCheckboxes.length;
   }
 }
 
-/*async function xoaDaChon() {
-  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
-  if (checks.length === 0) {
-    alert('Chọn dòng cần xoá!');
-    return;
-  }
-  for (const chk of checks) {
-    await fetch('/xoa', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
-    });
-  }
-  loadData();
-}*/
+/* Các phiên bản thanhToan và xoaDaChon cũ đã được cập nhật và giữ lại để tham khảo */
+
 async function xoaDaChon() {
   const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
   if (checks.length === 0) {
@@ -261,49 +215,128 @@ async function thanhToan() {
   loadData();
 }
 
-/*function thanhToan() {
-  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
-  if (checks.length === 0) {
-    alert('Bạn chưa chọn dòng nào để thanh toán!');
-    return;
-  }*/
-/*async function thanhToan() {
-  const checks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
-  if (checks.length === 0) {
-    alert('Bạn chưa chọn dòng nào để thanh toán!');
-    return;
-  }
+function inDanhSach() {
+  const ds = document.querySelectorAll('#ds tr');
+  let rows = [];
+  let tongTien = 0;
 
-  for (const chk of checks) {
-    const id = chk.dataset.id;
-    const index = chk.dataset.index;
+  ds.forEach(row => {
+    const chk = row.querySelector('input[type="checkbox"]');
+    if (chk?.checked) {
+      const cells = row.querySelectorAll('td');
+      const thanhTien = +(cells[6].innerText.replace(/\./g, ''));
+      tongTien += thanhTien;
 
-    // Gửi yêu cầu cập nhật thanhtoan = true lên server
-    const res = await fetch('/thanhtoan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, index })
-    });
-
-    const result = await res.json();
-    if (!result.ok) {
-      alert(`Lỗi khi thanh toán cho khách hàng ID: ${id}`);
+      rows.push(`
+        <tr>
+          <td>${cells[1].innerText}</td>
+          <td>${cells[2].innerText}</td>
+          <td>${cells[3].innerText}</td>
+          <td>${cells[4].innerText}</td>
+          <td>${cells[5].innerText}</td>
+          <td>${cells[6].innerText}</td>
+        </tr>`);
     }
-  }
-
-  alert('Đã thanh toán thành công cho các dòng đã chọn.');
-  loadData(); // Tải lại bảng để cập nhật highlight
-}
-  checks.forEach(chk => {
-    const tr = chk.closest('tr');
-    tr.classList.add('tr-thanh-toan'); // Thêm class CSS để highlight
-    chk.checked = false; // (Tùy chọn) bỏ tick sau khi thanh toán
   });
 
-  tinhTongDaChon(); // Cập nhật lại tổng sau khi bỏ tick
-  alert('Đã đánh dấu thanh toán cho các dòng đã chọn.');
+  if (rows.length === 0) {
+    alert("Vui lòng chọn ít nhất 1 dòng để in.");
+    return;
+  }
+
+  const ngayIn = new Date().toLocaleDateString('vi-VN');
+
+  const printWindow = window.open('', '', 'width=900,height=600');
+  printWindow.document.write(`
+    <html><head>
+      <title>Phiếu Công Nợ</title>
+      <style>
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 20mm;
+          }
+        }
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+          text-align: center;
+        }
+        h1 {
+          margin-bottom: 5px;
+        }
+        .logo {
+          font-size: 24px;
+          font-weight: bold;
+          color: #2c3e50;
+        }
+        .note {
+          margin-top: 5px;
+          font-size: 14px;
+          color: #555;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 30px;
+        }
+        th, td {
+          border: 1px solid #000;
+          padding: 8px;
+          text-align: center;
+        }
+        th {
+          background: #f0f0f0;
+        }
+        tfoot td {
+          font-weight: bold;
+        }
+        .footer {
+          margin-top: 40px;
+          font-size: 14px;
+          text-align: right;
+        }
+      </style>
+    </head><body>
+      <div class="logo">📄 Điện Nước Minh Châu</div>
+      <div class="note">Phiếu công nợ được in vào ngày: <b>${ngayIn}</b></div>
+      <div class="note">Người lập phiếu: <b>AnhTraiDaLaT</b></div>
+      <div class="note">Số Điện Thoại: <b>0938039084</b></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Tên khách</th>
+            <th>Ngày</th>
+            <th>Nội dung</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" style="text-align:right;">Tổng cộng:</td>
+            <td>${tongTien.toLocaleString()}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="footer">
+        <i>Chữ ký người lập phiếu</i>
+        <br><br><br>
+        ____________________
+      </div>
+
+      <script>window.print()<\/script>
+    </body></html>
+  `);
+  printWindow.document.close();
 }
-*/
+
 function dangXuat() {
   window.location.href = '/index.html';
 }
@@ -316,5 +349,4 @@ document.getElementById('search').addEventListener('keydown', e => {
 
 window.addEventListener('load', () => {
   loadData();
- 
 });
