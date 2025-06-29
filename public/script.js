@@ -230,6 +230,7 @@ function inDanhSach() {
   const ds = document.querySelectorAll('#ds tr');
   let rows = [];
   let tongTien = 0;
+  let stt = 1;
 
   ds.forEach(row => {
     const chk = row.querySelector('input[type="checkbox"]');
@@ -240,11 +241,11 @@ function inDanhSach() {
 
       rows.push(`
         <tr>
-          <td>${rows.length + 1}</td>
-          <td>${cells[3].innerText}</td> <!-- Tên hàng -->
-          <td>${cells[4].innerText}</td> <!-- Số lượng -->
-          <td>${cells[5].innerText}</td> <!-- Đơn giá -->
-          <td>${cells[6].innerText}</td> <!-- Thành tiền -->
+          <td>${stt++}</td>
+          <td>${cells[3].innerText}</td>
+          <td>${cells[4].innerText}</td>
+          <td>${cells[5].innerText}</td>
+          <td>${cells[6].innerText}</td>
         </tr>`);
     }
   });
@@ -254,110 +255,79 @@ function inDanhSach() {
     return;
   }
 
-  const today = new Date();
-  const ngay = today.getDate();
-  const thang = today.getMonth() + 1;
-  const nam = today.getFullYear();
+  const rowsPerPage = 25;
+  const totalPages = Math.ceil(rows.length / rowsPerPage);
+  const ngayIn = new Date();
 
   const printWindow = window.open('', '', 'width=900,height=600');
-  printWindow.document.write(`
-    <html><head>
-      <title>Hóa Đơn Bán Hàng</title>
-      <style>
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 20mm;
-          }
-        }
-        body {
-          font-family: Arial, sans-serif;
-          padding: 20px;
-          color: red;
-        }
-        .header {
-          text-align: center;
-          font-weight: bold;
-        }
-        .info {
-          margin-top: 10px;
-          font-size: 14px;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 20px;
-          font-size: 14px;
-        }
-        th, td {
-          border: 1px solid red;
-          padding: 5px;
-          text-align: center;
-        }
-        th {
-          background: #fff;
-        }
-        .total-row td {
-          font-weight: bold;
-        }
-        .footer {
-          margin-top: 40px;
-          font-size: 14px;
-        }
-        .footer td {
-          text-align: center;
-        }
-      </style>
-    </head><body>
-      <div class="header">
-        <div style="font-size: 20px;">Điện Nước <span style="color:red;">MINH CHÂU</span></div>
-        <div>Đc: Chợ Xuân Thọ</div>
-        <div>ĐT: 0973778279 - Zalo: 0938039084</div>
-        <div>✆ DD: 0938039084</div>
-        <div style="margin-top: 10px; font-size:18px;">HÓA ĐƠN BÁN HÀNG</div>
-        <div style="margin-top:5px;">Chuyên: <span id="tuydien">Cung cấp vật tư : Bóng đèn , Dây điện , Ống nước và Hàng gia dụng .v.v.</span></div>
-      </div>
+  printWindow.document.write(`<html><head><title>Hóa Đơn Bán Hàng</title><style>
+    @page { size: A4; margin: 10mm; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; color: red; }
+    .header { text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 5px; }
+    .info, .footer { font-size: 14px; color: red; margin-bottom: 5px; }
+    .table { width: 100%; border-collapse: collapse; margin-top: 10px; color: red; }
+    .table th, .table td { border: 1px solid red; padding: 5px; text-align: center; }
+    .table th { background-color: #fff; }
+    .bold { font-weight: bold; }
+    .total-row td { font-weight: bold; }
+    .note { margin-top: 10px; font-size: 14px; }
+    .sign { margin-top: 30px; display: flex; justify-content: space-between; padding: 0 30px; }
+    .sign div { text-align: center; }
+    .center { text-align: center; }
+    .dotline { border-bottom: 1px dotted red; width: 100%; display: inline-block; height: 12px; }
+  </style></head><body>`);
 
-      <div class="info">
-        Người mua hàng:..................................................................................................................<br>
-        Địa chỉ:.........................................................................................................................................
-      </div>
+  for (let i = 0; i < totalPages; i++) {
+    printWindow.document.write(`
+      <div class="header">Điện Nước<br> MINH CHÂU</div>
+      <div class="center info">Đc: Chợ Xuân Thọ<br>
+        ĐT: 0973778279 - Zalo: 0938039084 - DD: 0938039084</div>
+      <div class="header">HÓA ĐƠN BÁN HÀNG</div>
+      <div class="center info bold">Chuyên:</div>
+      <div class="center info">Cung cấp Dây Điện , Bóng Đèn  <br>
+        - Ống Nước PPC - HDPE <br>
+        - Đồ gia dụng và Dụng cụ nông nghiệp các loại</div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Tên hàng</th>
-            <th>Số lượng</th>
-            <th>Đơn giá</th>
-            <th>Thành tiền</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.join('')}
-        </tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td colspan="4">Tổng cộng hàng</td>
-            <td>${tongTien.toLocaleString()}</td>
-          </tr>
-        </tfoot>
-      </table>
+      <div class="info">Người mua hàng: <span class="dotline"></span></div>
+      <div class="info">Địa chỉ: <span class="dotline"></span></div>
 
-      <div class="info">
-        Bằng chữ: ...................................................................................................................
-      </div>
-
-      <table class="footer" style="width: 100%;">
+      <table class="table">
         <tr>
-          <td><b>NGƯỜI MUA HÀNG</b><br><i>(Ký rõ họ tên)</i></td>
-          <td><b>Ngày ${ngay} tháng ${thang} năm ${nam}</b><br><b>NGƯỜI VIẾT HÓA ĐƠN</b></td>
+          <th>STT</th>
+          <th>Tên hàng</th>
+          <th>Số lượng</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
         </tr>
-      </table>
+    `);
 
-      <script>window.print()<\/script>
-    </body></html>
-  `);
+    const pageRows = rows.slice(i * rowsPerPage, (i + 1) * rowsPerPage);
+    printWindow.document.write(pageRows.join(''));
+
+    if (i === totalPages - 1) {
+      printWindow.document.write(`
+        <tr class="total-row">
+          <td colspan="4">Tổng cộng hàng</td>
+          <td>${tongTien.toLocaleString()}</td>
+        </tr>`);
+    }
+
+    printWindow.document.write(`</table>`);
+
+    if (i === totalPages - 1) {
+      printWindow.document.write(`
+        <div class="info">Bằng chữ: <span class="dotline"></span></div>
+        <div class="sign">
+          <div>NGƯỜI MUA HÀNG<br><i>(Ký rõ họ tên)</i></div>
+          <div>Ngày ${ngayIn.getDate()} Tháng ${ngayIn.getMonth() + 1} Năm ${ngayIn.getFullYear()}<br>
+          NGƯỜI VIẾT HÓA ĐƠN</div>
+        </div>`);
+    }
+
+    if (i < totalPages - 1) printWindow.document.write('<div style="page-break-after: always;"></div>');
+  }
+
+  printWindow.document.write(`</body><script>window.print()<\/script></html>`);
   printWindow.document.close();
 }
 
