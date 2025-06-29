@@ -248,92 +248,95 @@ function inDanhSach() {
 
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`
-    <html><head>
-      <title>Phiếu Công Nợ</title>
-      <style>
-        @media print {
-          @page {
-            size: A4 portrait;
-            margin: 20mm;
-          }
+  <html><head>
+    <title>Phiếu Công Nợ</title>
+    <style>
+      @media print {
+        @page {
+          size: A4 portrait;
+          margin: 20mm;
         }
-        body {
-          font-family: Arial, sans-serif;
-          padding: 20px;
-          text-align: center;
+        .tong-cong {
+          page-break-before: avoid;
+          page-break-after: avoid;
+          break-inside: avoid;
         }
-        h1 {
-          margin-bottom: 5px;
-        }
-        .logo {
-          font-size: 24px;
-          font-weight: bold;
-          color: #2c3e50;
-        }
-        .note {
-          margin-top: 5px;
-          font-size: 14px;
-          color: #555;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 30px;
-        }
-        th, td {
-          border: 1px solid #000;
-          padding: 8px;
-          text-align: center;
-        }
-        th {
-          background: #f0f0f0;
-        }
-        tfoot td {
-          font-weight: bold;
-        }
-        .footer {
-          margin-top: 40px;
-          font-size: 14px;
-          text-align: right;
-        }
-      </style>
-    </head><body>
-      <div class="logo">📄 Điện Nước Minh Châu</div>
-      <div class="note">Phiếu công nợ được in vào ngày: <b>${ngayIn}</b></div>
-      <div class="note">Người lập phiếu: <b>AnhTraiDaLaT</b></div>
-      <div class="note">Số Điện Thoại: <b>0938039084</b></div>
+      }
+      .tong-cong {
+        margin-top: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: right;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        text-align: center;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+      .note {
+        margin-top: 5px;
+        font-size: 14px;
+        color: #555;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+      }
+      th, td {
+        border: 1px solid #000;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background: #f0f0f0;
+      }
+      .footer {
+        margin-top: 40px;
+        font-size: 14px;
+        text-align: right;
+      }
+    </style>
+  </head><body>
+    <div class="logo">📄 Điện Nước Minh Châu</div>
+    <div class="note">Phiếu công nợ được in vào ngày: <b>${ngayIn}</b></div>
+    <div class="note">Người lập phiếu: <b>AnhTraiDaLaT</b></div>
+    <div class="note">Số Điện Thoại: <b>0938039084</b></div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Tên khách</th>
-            <th>Ngày</th>
-            <th>Nội dung</th>
-            <th>Số lượng</th>
-            <th>Đơn giá</th>
-            <th>Thành tiền</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.join('')}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="5" style="text-align:right;">Tổng cộng:</td>
-            <td>${tongTien.toLocaleString()}</td>
-          </tr>
-        </tfoot>
-      </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Tên khách</th>
+          <th>Ngày</th>
+          <th>Nội dung</th>
+          <th>Số lượng</th>
+          <th>Đơn giá</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.join('')}
+      </tbody>
+    </table>
 
-      <div class="footer">
-        <i>Chữ ký người lập phiếu</i>
-        <br><br><br>
-        ____________________
-      </div>
+    <div class="tong-cong">
+      <b>Tổng cộng:</b> ${tongTien.toLocaleString()}
+    </div>
 
-      <script>window.print()<\/script>
-    </body></html>
-  `);
+    <div class="footer">
+      <i>Chữ ký người lập phiếu</i>
+      <br><br><br>
+      ____________________
+    </div>
+
+    <script>window.print()<\/script>
+  </body></html>
+`);
   printWindow.document.close();
 }
 
