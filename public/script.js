@@ -240,12 +240,11 @@ function inDanhSach() {
 
       rows.push(`
         <tr>
-          <td>${cells[1].innerText}</td>
-          <td>${cells[2].innerText}</td>
-          <td>${cells[3].innerText}</td>
-          <td>${cells[4].innerText}</td>
-          <td>${cells[5].innerText}</td>
-          <td>${cells[6].innerText}</td>
+          <td>${rows.length + 1}</td>
+          <td>${cells[3].innerText}</td> <!-- Tên hàng -->
+          <td>${cells[4].innerText}</td> <!-- Số lượng -->
+          <td>${cells[5].innerText}</td> <!-- Đơn giá -->
+          <td>${cells[6].innerText}</td> <!-- Thành tiền -->
         </tr>`);
     }
   });
@@ -255,99 +254,110 @@ function inDanhSach() {
     return;
   }
 
-  const ngayIn = new Date().toLocaleDateString('vi-VN');
+  const today = new Date();
+  const ngay = today.getDate();
+  const thang = today.getMonth() + 1;
+  const nam = today.getFullYear();
 
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`
-  <html><head>
-    <title>Phiếu Công Nợ</title>
-    <style>
-      @media print {
-        @page {
-          size: A4 portrait;
-          margin: 20mm;
+    <html><head>
+      <title>Hóa Đơn Bán Hàng</title>
+      <style>
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 20mm;
+          }
         }
-        .tong-cong {
-          page-break-before: avoid;
-          page-break-after: avoid;
-          break-inside: avoid;
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+          color: red;
         }
-      }
-      .tong-cong {
-        margin-top: 10px;
-        font-size: 16px;
-        font-weight: bold;
-        text-align: right;
-      }
-      body {
-        font-family: Arial, sans-serif;
-        padding: 20px;
-        text-align: center;
-      }
-      .logo {
-        font-size: 24px;
-        font-weight: bold;
-        color: #2c3e50;
-      }
-      .note {
-        margin-top: 5px;
-        font-size: 14px;
-        color: #555;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 30px;
-      }
-      th, td {
-        border: 1px solid #000;
-        padding: 8px;
-        text-align: center;
-      }
-      th {
-        background: #f0f0f0;
-      }
-      .footer {
-        margin-top: 40px;
-        font-size: 14px;
-        text-align: right;
-      }
-    </style>
-  </head><body>
-    <div class="logo">📄 Điện Nước Minh Châu</div>
-    <div class="note">Phiếu công nợ được in vào ngày: <b>${ngayIn}</b></div>
-    <div class="note">Người lập phiếu: <b>AnhTraiDaLaT</b></div>
-    <div class="note">Số Điện Thoại: <b>0938039084</b></div>
+        .header {
+          text-align: center;
+          font-weight: bold;
+        }
+        .info {
+          margin-top: 10px;
+          font-size: 14px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+          font-size: 14px;
+        }
+        th, td {
+          border: 1px solid red;
+          padding: 5px;
+          text-align: center;
+        }
+        th {
+          background: #fff;
+        }
+        .total-row td {
+          font-weight: bold;
+        }
+        .footer {
+          margin-top: 40px;
+          font-size: 14px;
+        }
+        .footer td {
+          text-align: center;
+        }
+      </style>
+    </head><body>
+      <div class="header">
+        <div style="font-size: 20px;">Điện Nước <span style="color:red;">MINH CHÂU</span></div>
+        <div>Đc: Chợ Xuân Thọ</div>
+        <div>ĐT: 0973778279 - Zalo: 0938039084</div>
+        <div>✆ DD: 0938039084</div>
+        <div style="margin-top: 10px; font-size:18px;">HÓA ĐƠN BÁN HÀNG</div>
+        <div style="margin-top:5px;">Chuyên: <span id="tuydien">Cung cấp vật tư : Bóng đèn , Dây điện , Ống nước và Hàng gia dụng .v.v.</span></div>
+      </div>
 
-    <table>
-      <thead>
+      <div class="info">
+        Người mua hàng:..................................................................................................................<br>
+        Địa chỉ:.........................................................................................................................................
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên hàng</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="4">Tổng cộng hàng</td>
+            <td>${tongTien.toLocaleString()}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="info">
+        Bằng chữ: ...................................................................................................................
+      </div>
+
+      <table class="footer" style="width: 100%;">
         <tr>
-          <th>Tên khách</th>
-          <th>Ngày</th>
-          <th>Nội dung</th>
-          <th>Số lượng</th>
-          <th>Đơn giá</th>
-          <th>Thành tiền</th>
+          <td><b>NGƯỜI MUA HÀNG</b><br><i>(Ký rõ họ tên)</i></td>
+          <td><b>Ngày ${ngay} tháng ${thang} năm ${nam}</b><br><b>NGƯỜI VIẾT HÓA ĐƠN</b></td>
         </tr>
-      </thead>
-      <tbody>
-        ${rows.join('')}
-      </tbody>
-    </table>
+      </table>
 
-    <div class="tong-cong">
-      <b>Tổng cộng:</b> ${tongTien.toLocaleString()}
-    </div>
-
-    <div class="footer">
-      <i>Chữ ký người lập phiếu</i>
-      <br><br><br>
-      ____________________
-    </div>
-
-    <script>window.print()<\/script>
-  </body></html>
-`);
+      <script>window.print()<\/script>
+    </body></html>
+  `);
   printWindow.document.close();
 }
 
