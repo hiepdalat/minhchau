@@ -176,6 +176,17 @@ async function thanhToan() {
     return;
   }
 
+  const result = await Swal.fire({
+    title: 'Xác nhận thanh toán?',
+    text: 'Bạn có chắc muốn đánh dấu thanh toán cho các dòng đã chọn?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Có, thanh toán!',
+    cancelButtonText: 'Huỷ bỏ'
+  });
+
+  if (!result.isConfirmed) return;
+
   let daThanhToan = [];
   let demThanhToanMoi = 0;
 
@@ -205,11 +216,11 @@ async function thanhToan() {
   }
 
   if (demThanhToanMoi > 0) {
-    alert(`✅ Đã thanh toán thành công cho ${demThanhToanMoi} dòng.`);
+    Swal.fire('✅ Thành công', `Đã thanh toán ${demThanhToanMoi} dòng.`, 'success');
   }
 
   if (daThanhToan.length > 0) {
-    alert(`⚠️ Các khách hàng sau đã thanh toán trước đó:\n- ${daThanhToan.join('\n- ')}`);
+    Swal.fire('⚠️ Đã thanh toán trước đó', `Các khách hàng sau đã thanh toán:\n- ${daThanhToan.join('\n- ')}`);
   }
 
   loadData();
