@@ -304,6 +304,60 @@ async function thanhToan() {
   alert('Đã đánh dấu thanh toán cho các dòng đã chọn.');
 }
 */
+function inDanhSach() {
+  const ds = document.querySelectorAll('#ds tr');
+  let rows = [];
+  ds.forEach(row => {
+    if (row.querySelector('input[type="checkbox"]')?.checked) {
+      const cells = row.querySelectorAll('td');
+      rows.push(`
+        <tr>
+          <td>${cells[1].innerText}</td>
+          <td>${cells[2].innerText}</td>
+          <td>${cells[3].innerText}</td>
+          <td>${cells[4].innerText}</td>
+          <td>${cells[5].innerText}</td>
+          <td>${cells[6].innerText}</td>
+        </tr>`);
+    }
+  });
+
+  if (rows.length === 0) {
+    alert("Vui lòng chọn ít nhất 1 dòng để in.");
+    return;
+  }
+
+  const printWindow = window.open('', '', 'width=900,height=600');
+  printWindow.document.write(`
+    <html><head>
+      <title>Danh Sách In</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+        th { background: #f0f0f0; }
+      </style>
+    </head><body>
+      <h2>Danh Sách Công Nợ</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tên khách</th>
+            <th>Ngày</th>
+            <th>Nội dung</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>${rows.join('')}</tbody>
+      </table>
+      <script>window.print()<\/script>
+    </body></html>
+  `);
+  printWindow.document.close();
+}
 function dangXuat() {
   window.location.href = '/index.html';
 }
