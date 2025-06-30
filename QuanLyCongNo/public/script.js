@@ -294,7 +294,7 @@ function inDanhSach() {
       </div>
       <div class="center">
       <h2><b>HÓA ĐƠN BÁN HÀNG</b></h2>
-      </div?
+      </div>
 
       <div class="info">Người mua hàng: <span class="dotline"></span></div>
       <div class="info">Địa chỉ: <span class="dotline"></span></div>
