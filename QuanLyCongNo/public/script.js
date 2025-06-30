@@ -281,7 +281,7 @@ function inDanhSach() {
     printWindow.document.write(`
       <div class="header-section">
         <div class="left-info">
-          <b>IN<br>MINH CHÂU</b><br>
+          <b>Điện Nước MINH CHÂU</b><br>
           Đc: Chợ Xuân Thọ<br>
           ĐT: 0973778279 - Zalo: 0938039084<br>
           DD: 0938039084
@@ -289,7 +289,7 @@ function inDanhSach() {
         <div class="right-info">
           <b>HÓA ĐƠN BÁN HÀNG</b><br>
           <div class="bold">Chuyên:</div>
-          <div><i>Bạn tự điền nội dung này trong script.</i></div>
+          <div><i>Cung cấp Đây Điện , Bóng đèn .<br> Ống nước PVC, HDPE .<br> Đồ gia dụng và dụng cụ nông nghiệp các loại</i></div>
         </div>
       </div>
 
