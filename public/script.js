@@ -287,12 +287,15 @@ function inDanhSach() {
           DD: 0938039084
         </div>
         <div class="right-info">
-          <b>HÓA ĐƠN BÁN HÀNG</b><br>
+          
+          
           <div class="bold">Chuyên:</div>
           <div><i>Cung cấp Đây Điện , Bóng đèn .<br> Ống nước PVC, HDPE .<br> Đồ gia dụng và dụng cụ nông nghiệp các loại</i></div>
         </div>
       </div>
-
+       <div class="center">
+      <h2><b>HÓA ĐƠN BÁN HÀNG</b></h2>
+      </div>
       <div class="info">Người mua hàng: <span class="dotline"></span></div>
       <div class="info">Địa chỉ: <span class="dotline"></span></div>
 
