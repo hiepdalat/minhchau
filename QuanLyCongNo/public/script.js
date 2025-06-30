@@ -292,7 +292,7 @@ function inDanhSach() {
           <div><i>Cung cấp Đây Điện , Bóng đèn .<br> Ống nước PVC, HDPE .<br> Đồ gia dụng và dụng cụ nông nghiệp các loại</i></div>
         </div>
       </div>
-      <div class="center">
+      <div class="center-title">
       <h2><b>HÓA ĐƠN BÁN HÀNG</b></h2>
       </div>
 
