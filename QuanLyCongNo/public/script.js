@@ -263,30 +263,35 @@ function inDanhSach() {
   printWindow.document.write(`<html><head><title>Hóa Đơn Bán Hàng</title><style>
     @page { size: A4; margin: 10mm; }
     body { font-family: Arial, sans-serif; margin: 0; padding: 10px; color: red; }
-    .header { text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 5px; }
-    .info, .footer { font-size: 14px; color: red; margin-bottom: 5px; }
+    .header-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .left-info, .right-info { width: 45%; font-size: 14px; color: red; }
+    .center-title { text-align: center; font-size: 20px; font-weight: bold; margin: 10px 0; color: red; }
     .table { width: 100%; border-collapse: collapse; margin-top: 10px; color: red; }
     .table th, .table td { border: 1px solid red; padding: 5px; text-align: center; }
     .table th { background-color: #fff; }
     .bold { font-weight: bold; }
     .total-row td { font-weight: bold; }
     .note { margin-top: 10px; font-size: 14px; }
-    .sign { margin-top: 30px; display: flex; justify-content: space-between; padding: 0 30px; }
+    .sign { margin-top: 30px; display: flex; justify-content: space-between; padding: 0 30px; color: red; }
     .sign div { text-align: center; }
-    .center { text-align: center; }
     .dotline { border-bottom: 1px dotted red; width: 100%; display: inline-block; height: 12px; }
   </style></head><body>`);
 
   for (let i = 0; i < totalPages; i++) {
     printWindow.document.write(`
-      <div class="header">Điện Nước<br> MINH CHÂU</div>
-      <div class="center info">Đc: Chợ Xuân Thọ<br>
-        ĐT: 0973778279 - Zalo: 0938039084 - DD: 0938039084</div>
-      <div class="header">HÓA ĐƠN BÁN HÀNG</div>
-      <div class="center info bold">Chuyên:</div>
-      <div class="center info">Cung cấp Dây Điện , Bóng Đèn  <br>
-        - Ống Nước PPC - HDPE <br>
-        - Đồ gia dụng và Dụng cụ nông nghiệp các loại</div>
+      <div class="header-section">
+        <div class="left-info">
+          <b>IN<br>MINH CHÂU</b><br>
+          Đc: Chợ Xuân Thọ<br>
+          ĐT: 0973778279 - Zalo: 0938039084<br>
+          DD: 0938039084
+        </div>
+        <div class="right-info">
+          <b>HÓA ĐƠN BÁN HÀNG</b><br>
+          <div class="bold">Chuyên:</div>
+          <div><i>Bạn tự điền nội dung này trong script.</i></div>
+        </div>
+      </div>
 
       <div class="info">Người mua hàng: <span class="dotline"></span></div>
       <div class="info">Địa chỉ: <span class="dotline"></span></div>
@@ -318,9 +323,9 @@ function inDanhSach() {
       printWindow.document.write(`
         <div class="info">Bằng chữ: <span class="dotline"></span></div>
         <div class="sign">
-          <div>NGƯỜI MUA HÀNG<br><i>(Ký rõ họ tên)</i></div>
+          <div>NGƯỚI MUA HÀNG<br><i>(Ký rõ họ tên)</i></div>
           <div>Ngày ${ngayIn.getDate()} Tháng ${ngayIn.getMonth() + 1} Năm ${ngayIn.getFullYear()}<br>
-          NGƯỜI VIẾT HÓA ĐƠN</div>
+          NGƯỚI VIẾT HÓA ĐƠN</div>
         </div>`);
     }
 
