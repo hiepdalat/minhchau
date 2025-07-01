@@ -67,13 +67,66 @@ async function luuTatCa() {
   }
 }
 
-function shuffleArray(array) {
-  const arr = [...array]; // sao chép để không ảnh hưởng gốc
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+async function loadData(kw = '') {
+  try {
+    const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
+    if (!res.ok) throw new Error('Lỗi kết nối server');
+    const data = await res.json();
+
+    const tbody = document.getElementById('ds');
+    tbody.innerHTML = '';
+
+    let danhSachMon = [];
+
+    data.forEach(kh => {
+      if (!kh.hanghoa || !Array.isArray(kh.hanghoa)) return; // bỏ qua nếu không có dữ liệu hàng hóa
+
+      kh.hanghoa.forEach((m, j) => {
+        danhSachMon.push({
+          ten: kh.ten,
+          ngay: kh.ngay,
+          _id: kh._id,
+          index: j,
+          noidung: m.noidung,
+          soluong: m.soluong,
+          dongia: m.dongia,
+          thanhtoan: m.thanhtoan
+        });
+      });
+    });
+
+    // Lọc hiển thị
+    const hienThiMon = kw ? danhSachMon : shuffleArray(danhSachMon).slice(0, 10);
+
+    if (hienThiMon.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:gray">Không có dữ liệu</td></tr>';
+    }
+
+    hienThiMon.forEach(m => {
+      const isThanhToan = m.thanhtoan === true;
+      tbody.innerHTML += `
+        <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
+          <td>
+            <input type="checkbox"
+                   onchange="tinhTongDaChon()"
+                   data-id="${m._id}"
+                   data-index="${m.index}">
+          </td>
+          <td>${m.ten}</td>
+          <td>${m.ngay}</td>
+          <td>${m.noidung}</td>
+          <td>${m.soluong}</td>
+          <td>${m.dongia.toLocaleString()}</td>
+          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
+        </tr>`;
+    });
+
+    document.getElementById('tongCongRow').style.display = 'none';
+
+  } catch (err) {
+    console.error('Lỗi khi load data:', err);
+    alert('Không thể tải dữ liệu. Vui lòng kiểm tra kết nối hoặc máy chủ.');
   }
-  return arr;
 }
 
 // Hàm xáo trộn mảng (Fisher-Yates shuffle)
