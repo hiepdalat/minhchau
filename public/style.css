@@ -106,3 +106,46 @@ th:nth-child(3), td:nth-child(3) {
   z-index: 2;
   color: #000;
 }
+.glow-box {
+  position: relative;
+  padding: 20px;
+  background: #111;
+  color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* Tạo viền chạy */
+.glow-box::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #00ff00, #00ccff, #00ff00);
+  background-size: 400% 400%;
+  animation: borderGlow 6s linear infinite;
+  z-index: -1;
+  border-radius: 12px;
+}
+
+/* Tạo nền đè phía trong để không sáng toàn bộ */
+.glow-box::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  background: #111;
+  border-radius: 8px;
+  z-index: -1;
+}
+
+@keyframes borderGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
