@@ -124,9 +124,9 @@ th:nth-child(3), td:nth-child(3) {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #00ff00, #00ccff, #00ff00);
+  background: linear-gradient(45deg, #00ff00, #00ffff, #ff00ff, #ff0000, #00ff00);
   background-size: 400% 400%;
-  animation: borderGlow 6s linear infinite;
+  animation: borderGlow 4s linear infinite;
   z-index: -1;
   border-radius: 12px;
 }
