@@ -48,26 +48,28 @@
 <body>
   <div class="login-container">
     <h2>Đăng nhập hệ thống</h2>
-    <input type="text" id="username" placeholder="Tên đăng nhập" onkeydown="checkEnter(event)">
-    <input type="password" id="password" placeholder="Mật khẩu" onkeydown="checkEnter(event)">
-    <button onclick="dangNhap()">Đăng nhập</button>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Tên đăng nhập" required>
+      <input type="password" id="password" placeholder="Mật khẩu" required>
+      <button type="submit">Đăng nhập</button>
+    </form>
   </div>
 
   <script>
+    // Gán sự kiện submit cho form
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault(); // Ngăn gửi form mặc định
+      dangNhap();         // Gọi hàm xử lý
+    });
+
     function dangNhap() {
       const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value.trim();
-      
+
       if (user === 'minhchau' && pass === '0938039084') {
         window.location.href = 'congno.html';
       } else {
         alert('Tên đăng nhập hoặc mật khẩu không đúng!');
-      }
-    }
-
-    function checkEnter(event) {
-      if (event.key === 'Enter') {
-        dangNhap();
       }
     }
   </script>
