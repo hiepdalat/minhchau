@@ -73,7 +73,10 @@ async function loadData(kw = '') {
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
 
-  data.forEach(kh => {
+  // Chỉ hiển thị ngẫu nhiên 10 khách hàng
+  const randomKhach = data.sort(() => 0.5 - Math.random()).slice(0, 10);
+
+  randomKhach.forEach(kh => {
     kh.hanghoa.forEach((m, j) => {
       const isThanhToan = m.thanhtoan === true;
 
