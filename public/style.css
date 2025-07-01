@@ -106,32 +106,4 @@ th:nth-child(3), td:nth-child(3) {
   z-index: 2;
   color: #000;
 }
-.khung-chay-vien {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  z-index: 0;
-}
 
-.khung-chay-vien::before,
-.khung-chay-vien::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(90deg, #00ffcc, #ff00cc, #00ffcc);
-  background-size: 300% 300%;
-  animation: chay-vien 4s linear infinite;
-  border-radius: 10px;
-}
-
-.khung-chay-vien::after {
-  filter: brightness(1.3);
-  opacity: 0.5;
-  animation-delay: 2s; /* tạo hiệu ứng chạy song song nhưng lệch nhịp */
-}
-
-@keyframes chay-vien {
-  0%   { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
-}
