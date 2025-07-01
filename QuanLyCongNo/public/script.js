@@ -67,40 +67,13 @@ async function luuTatCa() {
   }
 }
 
-async function loadData(kw = '') {
-  const res = await fetch('/timkiem?ten=' + encodeURIComponent(kw));
-  const data = await res.json();
-  const tbody = document.getElementById('ds');
-  tbody.innerHTML = '';
-
-  // Lọc ra đúng 10 khách hàng ngẫu nhiên
-  let danhSachKhach = data;
-  if (!kw) {
-    danhSachKhach = shuffleArray(data).slice(0, 10);
+function shuffleArray(array) {
+  const arr = [...array]; // sao chép để không ảnh hưởng gốc
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
   }
-
-  danhSachKhach.forEach(kh => {
-    kh.hanghoa.forEach((m, j) => {
-      const isThanhToan = m.thanhtoan === true;
-      tbody.innerHTML += `
-        <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
-          <td>
-            <input type="checkbox"
-                   onchange="tinhTongDaChon()"
-                   data-id="${kh._id}"
-                   data-index="${j}">
-          </td>
-          <td>${kh.ten}</td>
-          <td>${kh.ngay}</td>
-          <td>${m.noidung}</td>
-          <td>${m.soluong}</td>
-          <td>${m.dongia.toLocaleString()}</td>
-          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
-        </tr>`;
-    });
-  });
-
-  document.getElementById('tongCongRow').style.display = 'none';
+  return arr;
 }
 
 // Hàm xáo trộn mảng (Fisher-Yates shuffle)
