@@ -73,31 +73,44 @@ async function loadData(kw = '') {
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
 
-  // Lọc ra đúng 10 khách hàng ngẫu nhiên
-  let danhSachKhach = data;
-  if (!kw) {
-    danhSachKhach = shuffleArray(data).slice(0, 10);
-  }
+  let danhSachMon = [];
 
-  danhSachKhach.forEach(kh => {
+  data.forEach(kh => {
     kh.hanghoa.forEach((m, j) => {
-      const isThanhToan = m.thanhtoan === true;
-      tbody.innerHTML += `
-        <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
-          <td>
-            <input type="checkbox"
-                   onchange="tinhTongDaChon()"
-                   data-id="${kh._id}"
-                   data-index="${j}">
-          </td>
-          <td>${kh.ten}</td>
-          <td>${kh.ngay}</td>
-          <td>${m.noidung}</td>
-          <td>${m.soluong}</td>
-          <td>${m.dongia.toLocaleString()}</td>
-          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
-        </tr>`;
+      danhSachMon.push({
+        ten: kh.ten,
+        ngay: kh.ngay,
+        _id: kh._id,
+        index: j,
+        noidung: m.noidung,
+        soluong: m.soluong,
+        dongia: m.dongia,
+        thanhtoan: m.thanhtoan
+      });
     });
+  });
+
+  // Nếu có từ khóa tìm kiếm thì giữ nguyên toàn bộ kết quả tìm được
+  // Nếu không có từ khóa thì chỉ lấy 10 món ngẫu nhiên
+  const hienThiMon = kw ? danhSachMon : shuffleArray(danhSachMon).slice(0, 10);
+
+  hienThiMon.forEach(m => {
+    const isThanhToan = m.thanhtoan === true;
+    tbody.innerHTML += `
+      <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
+        <td>
+          <input type="checkbox"
+                 onchange="tinhTongDaChon()"
+                 data-id="${m._id}"
+                 data-index="${m.index}">
+        </td>
+        <td>${m.ten}</td>
+        <td>${m.ngay}</td>
+        <td>${m.noidung}</td>
+        <td>${m.soluong}</td>
+        <td>${m.dongia.toLocaleString()}</td>
+        <td>${(m.soluong * m.dongia).toLocaleString()}</td>
+      </tr>`;
   });
 
   document.getElementById('tongCongRow').style.display = 'none';
