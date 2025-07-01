@@ -73,34 +73,45 @@ async function loadData(kw = '') {
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
 
-  // Chỉ hiển thị ngẫu nhiên 10 khách hàng
-  const randomKhach = data.sort(() => 0.5 - Math.random()).slice(0, 10);
+  // Lọc ra đúng 10 khách hàng ngẫu nhiên
+  let danhSachKhach = data;
+  if (!kw) {
+    danhSachKhach = shuffleArray(data).slice(0, 10);
+  }
 
-  randomKhach.forEach(kh => {
+  danhSachKhach.forEach(kh => {
     kh.hanghoa.forEach((m, j) => {
       const isThanhToan = m.thanhtoan === true;
-
       tbody.innerHTML += `
         <tr class="${isThanhToan ? 'tr-thanh-toan' : ''}">
-    <td>
-      <input type="checkbox"
-             onchange="tinhTongDaChon()"
-             data-id="${kh._id}"
-             data-index="${j}">
-    </td>
-    <td>${kh.ten}</td>
-    <td>${kh.ngay}</td>
-    <td>${m.noidung}</td>
-    <td>${m.soluong}</td>
-    <td>${m.dongia.toLocaleString()}</td>
-    <td>${(m.soluong * m.dongia).toLocaleString()}</td>
-  </tr>`;
+          <td>
+            <input type="checkbox"
+                   onchange="tinhTongDaChon()"
+                   data-id="${kh._id}"
+                   data-index="${j}">
+          </td>
+          <td>${kh.ten}</td>
+          <td>${kh.ngay}</td>
+          <td>${m.noidung}</td>
+          <td>${m.soluong}</td>
+          <td>${m.dongia.toLocaleString()}</td>
+          <td>${(m.soluong * m.dongia).toLocaleString()}</td>
+        </tr>`;
     });
   });
 
   document.getElementById('tongCongRow').style.display = 'none';
 }
 
+// Hàm xáo trộn mảng (Fisher-Yates shuffle)
+function shuffleArray(array) {
+  const arr = [...array]; // tránh thay đổi mảng gốc
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 /* Các phiên bản loadData cũ đã được thay thế bằng bản ở trên, giữ lại để tham khảo nếu cần */
 
 /* function tinhTongDaChon() bản cũ đã được cập nhật bên dưới */
