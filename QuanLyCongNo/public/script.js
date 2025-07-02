@@ -398,10 +398,8 @@ function inDanhSach() {
         Số tài khoản: 9973778279 – Ngân hàng Vietcombank - Chủ TK : Dương Xuân Hiệp
       </div>
      
-        <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
-        
-    
     </div>
+    <div class="center-title">HÓA ĐƠN BÁN HÀNG</div>
   `);
 
   // PHẦN GIỮA
