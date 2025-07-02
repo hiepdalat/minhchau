@@ -387,7 +387,7 @@ function inDanhSach() {
   printWindow.document.write(`
     <div class="header-top">
       <div class="logo">
-        <img src="https://i.imgur.com/vUJzh8j.png">
+        <img src="https://www.design.com/maker/social/m0jyf8v8gg">
       </div>
       <div class="company-info">
         <b>Điện Nước Minh Châu</b><br>
