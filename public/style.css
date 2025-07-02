@@ -108,40 +108,36 @@ th:nth-child(3), td:nth-child(3) {
 }
 /* --- Hiệu ứng viền sáng chạy quanh .box-danhsach --- */
 .box-danhsach {
-  position: relative; /* thêm để dùng ::before/::after */
-  z-index: 0;          /* cho viền nằm dưới nội dung */
-  overflow: visible;   /* để không bị cắt viền sáng bên ngoài */
+  position: relative;
+  z-index: 0;
+  overflow: visible;
 }
 
-/* Viền sáng động 1 */
+/* Tạo viền chạy như khung sáng sát viền */
 .box-danhsach::before,
 .box-danhsach::after {
-  content: '';
+  content: "";
   position: absolute;
-  top: -2px;
-  left: -2px;
-  width: calc(100% + 4px);
-  height: calc(100% + 4px);
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
   border-radius: 12px;
-  background: linear-gradient(0deg, transparent, #00ffe0, transparent);
+  background: conic-gradient(from 0deg, transparent 0%, #00ffe0 10%, transparent 20%);
   z-index: -1;
-  animation: vienChay 3s linear infinite;
-  opacity: 0.8;
+  animation: spinBorder 3s linear infinite;
   pointer-events: none;
+  mask-image: linear-gradient(#fff 0 0); /* chống hiển thị sai */
 }
 
-/* Viền sáng động 2 - lệch pha */
+/* Viền thứ 2 - lệch nửa chu kỳ */
 .box-danhsach::after {
   animation-delay: 1.5s;
-  background: linear-gradient(0deg, transparent, #ff00ff, transparent);
+  background: conic-gradient(from 0deg, transparent 0%, #ff00ff 10%, transparent 20%);
   opacity: 0.6;
 }
 
-@keyframes vienChay {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+@keyframes spinBorder {
+  to {
     transform: rotate(360deg);
   }
 }
