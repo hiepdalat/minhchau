@@ -346,145 +346,93 @@ function inDanhSach() {
     return;
   }
 
-  const rowsPerPage = 25;
-  const totalPages = Math.ceil(rows.length / rowsPerPage);
-  const ngayIn = new Date();
   const tienChu = convertNumberToWords(tongTien);
+  const ngayIn = new Date(2025, 6, 2); // Ngày 2 tháng 7 năm 2025
 
   const printWindow = window.open('', '', 'width=900,height=600');
-  printWindow.document.write(`<html><head><title>HÓA ĐƠN BÁN HÀNG</title><style>
-    @page { size: A4; margin: 15mm; }
-    body { font-family: Arial, sans-serif; margin: 0; padding: 15px; font-size: 14px; }
+  printWindow.document.write(`<html><head><title>HÓA ĐƠN</title><style>
+    body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .logo { width: 15%; }
+    .logo img { height: 60px; }
+    .company-info { width: 55%; text-align: left; font-size: 13px; line-height: 1.5; }
+    .company-info b { color: red; font-size: 16px; }
+    .invoice-info { width: 28%; text-align: center; }
+    .invoice-title { font-size: 18px; color: red; font-weight: bold; margin-bottom: 5px; }
 
-    .header-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-    }
-    .left-info {
-      width: 50%;
-      font-size: 14px;
-    }
-    .left-info b {
-      font-size: 20px;
-      color: red;
-    }
-    .logo {
-      font-size: 32px;
-      font-weight: bold;
-      color: red;
-    }
-    .right-info {
-      width: 45%;
-      font-size: 13px;
-      text-align: right;
-    }
-    .center-title {
-      text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      margin: 20px 0 5px;
-      color: red;
-    }
+    .center-title { text-align: center; font-size: 20px; color: red; font-weight: bold; margin: 20px 0 10px; }
 
-    .info { margin-bottom: 6px; }
+    .info { margin-bottom: 5px; }
+    .dotline { border-bottom: 1px dotted #000; width: 100%; display: inline-block; height: 12px; }
 
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    .table th, .table td {
-      border: 1px solid black;
-      padding: 5px;
-      text-align: center;
-    }
-    .table th {
-      background-color: #f0f0f0;
-      font-weight: bold;
-    }
-    .total-row td {
-      font-weight: bold;
-      text-align: right;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid black; padding: 5px; text-align: center; }
+    th { background-color: #f0f0f0; }
 
-    .bold { font-weight: bold; }
+    .total-row td { font-weight: bold; text-align: right; }
 
     .sign {
       margin-top: 40px;
       display: flex;
       justify-content: space-between;
       padding: 0 40px;
+      font-size: 14px;
     }
-    .sign div {
-      text-align: center;
-      width: 45%;
-    }
-    .dotline {
-      border-bottom: 1px dotted #000;
-      width: 100%;
-      display: inline-block;
-      height: 12px;
-    }
+    .sign div { text-align: center; width: 45%; }
   </style></head><body>`);
 
-  for (let i = 0; i < totalPages; i++) {
-    printWindow.document.write(`
-      <div class="header-section">
-        <div class="left-info">
-          <div class="logo">MC</div>
-          <b>Điện Nước MINH CHÂU</b><br>
-          Đc: Chợ Xuân Thọ - Đà Lạt<br>
-          ĐT: 0973778279 - Zalo: 0938039084<br>
-          DD: 0938039084
-        </div>
-        <div class="right-info">
-          <div><b>HÓA ĐƠN BÁN HÀNG</b></div>
-          <div>Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}</div>
-        </div>
+  // PHẦN ĐẦU HÓA ĐƠN
+  printWindow.document.write(`
+    <div class="header-top">
+      <div class="logo">
+        <img src="https://i.imgur.com/vUJzh8j.png">
       </div>
+      <div class="company-info">
+        <b>Điện Nước Minh Châu</b><br>
+        Mã số thuế: 8056681027-001<br>
+        Địa chỉ: Chợ Xuân Thọ - Phường Xuân Trường - TP Đà Lạt<br>
+        Điện thoại: 0973778279<br>
+        Zalo : 0938039084<br>
+        Số tài khoản: 9973778279 – Ngân hàng Vietcombank - Chủ TK : Dương Xuân Hiệp
+      </div>
+      <div class="invoice-info">
+        <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
+        <div><i>Ngày 2 tháng 7 năm 2025</i></div>
+        <div><b>Mã CQT:</b></div>
+        <div><b>Số: <i>&lt;Chưa cấp số&gt;</i></b></div>
+      </div>
+    </div>
+  `);
 
-      <div class="info">Người mua hàng: <span class="dotline"></span></div>
-      <div class="info">Địa chỉ: <span class="dotline"></span></div>
+  // PHẦN GIỮA
+  printWindow.document.write(`
+    <div class="info">Người mua hàng: <span class="dotline"></span></div>
+    <div class="info">Địa chỉ: <span class="dotline"></span></div>
 
-      <table class="table">
-        <tr>
-          <th>STT</th>
-          <th>Tên hàng hóa, dịch vụ</th>
-          <th>Số lượng</th>
-          <th>Đơn giá</th>
-          <th>Thành tiền</th>
-        </tr>
-    `);
+    <table>
+      <tr>
+        <th>STT</th>
+        <th>Tên hàng hóa, dịch vụ</th>
+        <th>Số lượng</th>
+        <th>Đơn giá</th>
+        <th>Thành tiền</th>
+      </tr>
+  `);
 
-    const pageRows = rows.slice(i * rowsPerPage, (i + 1) * rowsPerPage);
-    printWindow.document.write(pageRows.join(''));
+  printWindow.document.write(rows.join(''));
+  printWindow.document.write(`
+    <tr class="total-row">
+      <td colspan="4">Tổng cộng hàng</td>
+      <td>${tongTien.toLocaleString()}</td>
+    </tr>
+    </table>
+    <div class="info">Số tiền viết bằng chữ: <b>${tienChu}</b></div>
 
-    if (i === totalPages - 1) {
-      printWindow.document.write(`
-        <tr class="total-row">
-          <td colspan="4">Tổng cộng hàng</td>
-          <td>${tongTien.toLocaleString()}</td>
-        </tr>`);
-    }
-
-    printWindow.document.write(`</table>`);
-
-    if (i === totalPages - 1) {
-      printWindow.document.write(`
-        <div class="info">Số tiền viết bằng chữ: <b>${tienChu}</b></div>
-
-        <div class="sign">
-          <div>NGƯỜI MUA HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
-          <div>NGƯỜI BÁN HÀNG<br>Ngày ${ngayIn.getDate()} Tháng ${ngayIn.getMonth() + 1} Năm ${ngayIn.getFullYear()}<br><i>(Ký, ghi rõ họ tên)</i></div>
-        </div>`);
-    }
-
-    if (i < totalPages - 1) {
-      printWindow.document.write('<div style="page-break-after: always;"></div>');
-    }
-  }
+    <div class="sign">
+      <div>NGƯỜI MUA HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
+      <div>NGƯỜI BÁN HÀNG<br>Ngày 2 Tháng 7 Năm 2025<br><i>(Ký, ghi rõ họ tên)</i></div>
+    </div>
+  `);
 
   printWindow.document.write(`</body><script>window.print()<\/script></html>`);
   printWindow.document.close();
