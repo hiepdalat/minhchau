@@ -316,9 +316,7 @@ function convertNumberToWords(number) {
 
   return str.trim().replace(/\s+/g, ' ') + ' đồng chẵn';
 }
-javascript
-Sao chép
-Chỉnh sửa
+
 function inDanhSach() {
   const ds = document.querySelectorAll('#ds tr');
   let rows = [];
