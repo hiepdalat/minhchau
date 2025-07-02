@@ -106,38 +106,4 @@ th:nth-child(3), td:nth-child(3) {
   z-index: 2;
   color: #000;
 }
-/* --- Hiệu ứng viền sáng chạy quanh .box-danhsach --- */
-.box-danhsach {
-  position: relative;
-  z-index: 0;
-  overflow: visible;
-}
 
-/* Tạo viền chạy như khung sáng sát viền */
-.box-danhsach::before,
-.box-danhsach::after {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  background: conic-gradient(from 0deg, transparent 0%, #00ffe0 10%, transparent 20%);
-  z-index: -1;
-  animation: spinBorder 3s linear infinite;
-  pointer-events: none;
-  mask-image: linear-gradient(#fff 0 0); /* chống hiển thị sai */
-}
-
-/* Viền thứ 2 - lệch nửa chu kỳ */
-.box-danhsach::after {
-  animation-delay: 1.5s;
-  background: conic-gradient(from 0deg, transparent 0%, #ff00ff 10%, transparent 20%);
-  opacity: 0.6;
-}
-
-@keyframes spinBorder {
-  to {
-    transform: rotate(360deg);
-  }
-}
