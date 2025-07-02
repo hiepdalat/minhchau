@@ -346,9 +346,6 @@ function inDanhSach() {
     return;
   }
 
-  const tenKhach = prompt("Nhập tên khách hàng:");
-  if (!tenKhach) return;
-
   const rowsPerPage = 25;
   const totalPages = Math.ceil(rows.length / rowsPerPage);
   const ngayIn = new Date();
@@ -448,7 +445,7 @@ function inDanhSach() {
         </div>
       </div>
 
-      <div class="info">Người mua hàng: <b>${tenKhach}</b></div>
+      <div class="info">Người mua hàng: <span class="dotline"></span></div>
       <div class="info">Địa chỉ: <span class="dotline"></span></div>
 
       <table class="table">
