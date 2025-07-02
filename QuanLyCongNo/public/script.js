@@ -393,9 +393,8 @@ function inDanhSach() {
         <b>Điện Nước Minh Châu</b><br>
         Mã số thuế: 8056681027-001<br>
         Địa chỉ: Chợ Xuân Thọ - Phường Xuân Trường - TP Đà Lạt<br>
-        Điện thoại: 0973778279<br>
-        Zalo : 0938039084<br>
-        Số tài khoản: 9973778279 – Ngân hàng Vietcombank - Chủ TK : Dương Xuân Hiệp
+        Điện thoại: 0973778279 - Zalo : 0938039084<br>
+        Số tài khoản: 9973778279 – Ngân hàng Vietcombank - Dương Xuân Hiệp
       </div>
      
     </div>
