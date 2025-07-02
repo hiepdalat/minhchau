@@ -397,12 +397,10 @@ function inDanhSach() {
         Zalo : 0938039084<br>
         Số tài khoản: 9973778279 – Ngân hàng Vietcombank - Chủ TK : Dương Xuân Hiệp
       </div>
-      <div class="invoice-info">
+     
         <div class="invoice-title">HÓA ĐƠN BÁN HÀNG</div>
-        <div><i>Ngày 2 tháng 7 năm 2025</i></div>
-        <div><b>Mã CQT:</b></div>
-        <div><b>Số: <i>&lt;Chưa cấp số&gt;</i></b></div>
-      </div>
+        
+    
     </div>
   `);
 
