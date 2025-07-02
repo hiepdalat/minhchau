@@ -267,6 +267,59 @@ async function thanhToan() {
   loadData();
 }
 
+function convertNumberToWords(number) {
+  const chuSo = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+  const hangDonVi = ['', 'nghìn', 'triệu', 'tỷ'];
+
+  function docBaSo(num) {
+    let [tram, chuc, donVi] = [
+      Math.floor(num / 100),
+      Math.floor((num % 100) / 10),
+      num % 10
+    ];
+    let result = '';
+
+    if (tram > 0) {
+      result += chuSo[tram] + ' trăm';
+      if (chuc === 0 && donVi !== 0) result += ' linh';
+    }
+
+    if (chuc > 1) {
+      result += ' ' + chuSo[chuc] + ' mươi';
+      if (donVi === 1) result += ' mốt';
+      else if (donVi === 5) result += ' lăm';
+      else if (donVi !== 0) result += ' ' + chuSo[donVi];
+    } else if (chuc === 1) {
+      result += ' mười';
+      if (donVi === 5) result += ' lăm';
+      else if (donVi !== 0) result += ' ' + chuSo[donVi];
+    } else if (donVi !== 0 && chuc === 0) {
+      result += ' ' + chuSo[donVi];
+    }
+
+    return result.trim();
+  }
+
+  if (number === 0) return 'Không đồng';
+
+  let str = '';
+  let i = 0;
+
+  while (number > 0) {
+    const num = number % 1000;
+    if (num !== 0) {
+      const temp = docBaSo(num);
+      str = temp + ' ' + hangDonVi[i] + ' ' + str;
+    }
+    number = Math.floor(number / 1000);
+    i++;
+  }
+
+  return str.trim().replace(/\s+/g, ' ') + ' đồng chẵn';
+}
+javascript
+Sao chép
+Chỉnh sửa
 function inDanhSach() {
   const ds = document.querySelectorAll('#ds tr');
   let rows = [];
@@ -296,54 +349,115 @@ function inDanhSach() {
     return;
   }
 
+  const tenKhach = prompt("Nhập tên khách hàng:");
+  if (!tenKhach) return;
+
   const rowsPerPage = 25;
   const totalPages = Math.ceil(rows.length / rowsPerPage);
   const ngayIn = new Date();
+  const tienChu = convertNumberToWords(tongTien);
 
   const printWindow = window.open('', '', 'width=900,height=600');
-  printWindow.document.write(`<html><head><title>Hóa Đơn Bán Hàng</title><style>
-    @page { size: A4; margin: 10mm; }
-    body { font-family: Arial, sans-serif; margin: 0; padding: 10px; color: red; }
-    .header-section { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .left-info, .right-info { width: 45%; font-size: 14px; color: red; }
-    .center-title { text-align: center; font-size: 20px; font-weight: bold; margin: 10px 0; color: red; }
-    .table { width: 100%; border-collapse: collapse; margin-top: 10px; color: red; }
-    .table th, .table td { border: 1px solid red; padding: 5px; text-align: center; }
-    .table th { background-color: #fff; }
+  printWindow.document.write(`<html><head><title>HÓA ĐƠN BÁN HÀNG</title><style>
+    @page { size: A4; margin: 15mm; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 15px; font-size: 14px; }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .left-info {
+      width: 50%;
+      font-size: 14px;
+    }
+    .left-info b {
+      font-size: 20px;
+      color: red;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      color: red;
+    }
+    .right-info {
+      width: 45%;
+      font-size: 13px;
+      text-align: right;
+    }
+    .center-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin: 20px 0 5px;
+      color: red;
+    }
+
+    .info { margin-bottom: 6px; }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .table th, .table td {
+      border: 1px solid black;
+      padding: 5px;
+      text-align: center;
+    }
+    .table th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+    .total-row td {
+      font-weight: bold;
+      text-align: right;
+    }
+
     .bold { font-weight: bold; }
-    .total-row td { font-weight: bold; }
-    .note { margin-top: 10px; font-size: 14px; }
-    .sign { margin-top: 30px; display: flex; justify-content: space-between; padding: 0 30px; color: red; }
-    .sign div { text-align: center; }
-    .dotline { border-bottom: 1px dotted red; width: 100%; display: inline-block; height: 12px; }
+
+    .sign {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 40px;
+    }
+    .sign div {
+      text-align: center;
+      width: 45%;
+    }
+    .dotline {
+      border-bottom: 1px dotted #000;
+      width: 100%;
+      display: inline-block;
+      height: 12px;
+    }
   </style></head><body>`);
 
   for (let i = 0; i < totalPages; i++) {
     printWindow.document.write(`
       <div class="header-section">
         <div class="left-info">
+          <div class="logo">MC</div>
           <b>Điện Nước MINH CHÂU</b><br>
-          Đc: Chợ Xuân Thọ<br>
+          Đc: Chợ Xuân Thọ - Đà Lạt<br>
           ĐT: 0973778279 - Zalo: 0938039084<br>
           DD: 0938039084
         </div>
         <div class="right-info">
-          
-          <div class="bold">Chuyên:</div>
-          <div><i>Cung cấp Đây Điện , Bóng đèn .<br> Ống nước PVC, HDPE .<br> Đồ gia dụng và dụng cụ nông nghiệp các loại</i></div>
+          <div><b>HÓA ĐƠN BÁN HÀNG</b></div>
+          <div>Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}</div>
         </div>
       </div>
-      <div class="center-title">
-      <h2><b>HÓA ĐƠN BÁN HÀNG</b></h2>
-      </div>
 
-      <div class="info">Người mua hàng: <span class="dotline"></span></div>
+      <div class="info">Người mua hàng: <b>${tenKhach}</b></div>
       <div class="info">Địa chỉ: <span class="dotline"></span></div>
 
       <table class="table">
         <tr>
           <th>STT</th>
-          <th>Tên hàng</th>
+          <th>Tên hàng hóa, dịch vụ</th>
           <th>Số lượng</th>
           <th>Đơn giá</th>
           <th>Thành tiền</th>
@@ -365,15 +479,17 @@ function inDanhSach() {
 
     if (i === totalPages - 1) {
       printWindow.document.write(`
-        <div class="info">Bằng chữ: <span class="dotline"></span></div>
+        <div class="info">Số tiền viết bằng chữ: <b>${tienChu}</b></div>
+
         <div class="sign">
-          <div>NGƯỚI MUA HÀNG<br><i>(Ký rõ họ tên)</i></div>
-          <div>Ngày ${ngayIn.getDate()} Tháng ${ngayIn.getMonth() + 1} Năm ${ngayIn.getFullYear()}<br>
-          NGƯỚI VIẾT HÓA ĐƠN</div>
+          <div>NGƯỜI MUA HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
+          <div>NGƯỜI BÁN HÀNG<br>Ngày ${ngayIn.getDate()} Tháng ${ngayIn.getMonth() + 1} Năm ${ngayIn.getFullYear()}<br><i>(Ký, ghi rõ họ tên)</i></div>
         </div>`);
     }
 
-    if (i < totalPages - 1) printWindow.document.write('<div style="page-break-after: always;"></div>');
+    if (i < totalPages - 1) {
+      printWindow.document.write('<div style="page-break-after: always;"></div>');
+    }
   }
 
   printWindow.document.write(`</body><script>window.print()<\/script></html>`);
