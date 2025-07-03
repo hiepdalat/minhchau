@@ -353,7 +353,7 @@ function inDanhSach() {
 
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`<html><head><title>HÓA ĐƠN</title><style>
-    body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; position:relative;}
+    body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
     .header-top{
                 display:flex;          /* đặt logo + thông tin cùng hàng */
                 align-items:center;    /* canh giữa theo chiều cao */
@@ -397,18 +397,26 @@ function inDanhSach() {
       font-size: 14px;
     }
     .sign div { text-align: center; width: 45%; }
-    body::before{
+    
+    .items-table{
+  position:relative;                 /* làm gốc tọa độ cho ::before */
+}
+
+.items-table::before{
   content:'';
-  position:fixed;                   /* dính theo khung giấy */
+  position:absolute;
   top:50%; left:50%;
-  width:400px; height:400px;         /* lớn hơn để rõ */
   transform:translate(-50%,-50%) rotate(-30deg);
+  width:350px; height:350px;         /* chỉnh lớn / nhỏ tùy ý */
   background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
             center/contain no-repeat;
-  opacity:0.12;                      /* tăng độ đậm */
+  opacity:0.05;                      /* độ mờ – tăng / giảm tùy in thử */
   pointer-events:none;
-  z-index:5;                         /* nổi lên trên nội dung */
+  z-index:0;                         /* nằm dưới nội dung bảng */
 }
+
+/* bảo đảm chữ bảng nằm trên watermark */
+.items-table table{ position:relative; z-index:1; }
   </style></head><body>`);
 
   // PHẦN ĐẦU HÓA ĐƠN
@@ -436,7 +444,7 @@ function inDanhSach() {
   printWindow.document.write(`
     <div class="info">Người mua hàng: <span class="dotline"></span></div>
     <div class="info">Địa chỉ: <span class="dotline"></span></div>
-
+<div class="items-table">
     <table>
       <tr>
         <th>STT</th>
@@ -454,6 +462,7 @@ function inDanhSach() {
       <td>${tongTien.toLocaleString()}</td>
     </tr>
     </table>
+    </div>
     <div class="info">Số tiền viết bằng chữ: <b>${tienChu}</b></div>
 
     <div class="sign">
