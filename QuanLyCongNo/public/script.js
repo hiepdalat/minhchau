@@ -361,11 +361,11 @@ function inDanhSach() {
                 margin-bottom:10px;
                 }
      .logo{
-          flex:0 0 140px;        /* khung logo cố định rộng 140px */
+          flex:0 0 180px;        /* khung logo cố định rộng 140px */
           text-align:center;
           }
       .logo img{
-                height:100px;          /* logo cao ~100px (vừa khung đỏ) */
+                height:140px;          /* logo cao ~100px (vừa khung đỏ) */
                 width:auto;            /* tự co theo tỉ lệ, không méo hình */
                 display:block;
                 }
@@ -397,6 +397,11 @@ function inDanhSach() {
       font-size: 14px;
     }
     .sign div { text-align: center; width: 45%; }
+    body::before{ 
+    content:""; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) 
+    rotate(-30deg); width:350px; height:350px;
+    background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
+    center/contain no-repeat; opacity:0.05; pointer-events:none; }
   </style></head><body>`);
 
   // PHẦN ĐẦU HÓA ĐƠN
