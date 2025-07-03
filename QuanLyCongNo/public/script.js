@@ -353,7 +353,7 @@ function inDanhSach() {
 
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`<html><head><title>HÓA ĐƠN</title><style>
-    body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
+    body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; position:relative;}
     .header-top{
                 display:flex;          /* đặt logo + thông tin cùng hàng */
                 align-items:center;    /* canh giữa theo chiều cao */
@@ -378,7 +378,7 @@ function inDanhSach() {
     .invoice-info { width: 28%; text-align: center; }
     .invoice-title { font-size: 18px; color: red; font-weight: bold; margin-bottom: 5px; }
 
-    .center-title { text-align: center; font-size: 20px; color: red; font-weight: bold; margin: 20px 0 10px; }
+    .center-title { text-align: center; font-size: 20px; color: red; font-weight: bold; margin: 20px 0 0; }
 
     .info { margin-bottom: 5px; }
     .dotline { border-bottom: 1px dotted #000; width: 100%; display: inline-block; height: 12px; }
@@ -397,11 +397,18 @@ function inDanhSach() {
       font-size: 14px;
     }
     .sign div { text-align: center; width: 45%; }
-    body::before{ 
-    content:""; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) 
-    rotate(-30deg); width:350px; height:350px;
-    background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
-    center/contain no-repeat; opacity:0.05; pointer-events:none; }
+    body::before{
+  content:'';
+  position:fixed;                   /* dính theo khung giấy */
+  top:50%; left:50%;
+  width:400px; height:400px;         /* lớn hơn để rõ */
+  transform:translate(-50%,-50%) rotate(-30deg);
+  background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
+            center/contain no-repeat;
+  opacity:0.12;                      /* tăng độ đậm */
+  pointer-events:none;
+  z-index:5;                         /* nổi lên trên nội dung */
+}
   </style></head><body>`);
 
   // PHẦN ĐẦU HÓA ĐƠN
