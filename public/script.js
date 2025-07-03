@@ -409,7 +409,7 @@ function inDanhSach() {
   width:450px; height:450px;               /* to hơn chút */
   background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
             center/contain no-repeat;
-  opacity:0.15;                            /* đậm hơn để dễ thấy */
+  opacity:0.18;                            /* đậm hơn để dễ thấy */
   pointer-events:none;
   z-index:2;                               /* nằm trên nền ô bảng */
 }
