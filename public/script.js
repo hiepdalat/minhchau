@@ -419,7 +419,7 @@ function inDanhSach() {
      
     </div>
     <div class="center-title">HÓA ĐƠN BÁN HÀNG</div><br>
-     <div style="font-style: italic; text-align:center; margin-top:-10px; margin-bottom:10px;">
+     <div style="font-style: italic; text-align:center; margin-top:-15px; margin-bottom:10px;">
           Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}
     </div>
   `);
