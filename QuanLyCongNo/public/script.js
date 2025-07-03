@@ -399,7 +399,7 @@ function inDanhSach() {
     .sign div { text-align: center; width: 45%; }
     
     .items-table{
-  position:relative;                 /* làm gốc tọa độ cho ::before */
+  position:relative;
 }
 
 .items-table::before{
@@ -407,16 +407,26 @@ function inDanhSach() {
   position:absolute;
   top:50%; left:50%;
   transform:translate(-50%,-50%) rotate(-30deg);
-  width:350px; height:350px;         /* chỉnh lớn / nhỏ tùy ý */
+  width:380px; height:380px;               /* to hơn chút */
   background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
             center/contain no-repeat;
-  opacity:0.05;                      /* độ mờ – tăng / giảm tùy in thử */
+  opacity:0.10;                            /* đậm hơn để dễ thấy */
   pointer-events:none;
-  z-index:0;                         /* nằm dưới nội dung bảng */
+  z-index:2;                               /* nằm trên nền ô bảng */
 }
 
-/* bảo đảm chữ bảng nằm trên watermark */
-.items-table table{ position:relative; z-index:1; }
+/* Đảm bảo chữ nằm TRÊN watermark */
+.items-table table{
+  position:relative;
+  z-index:3;
+  background:transparent;                  /* bỏ màu nền trắng của bảng */
+}
+@media print{
+  *{
+    -webkit-print-color-adjust:exact;
+            print-color-adjust:exact;
+  }
+}
   </style></head><body>`);
 
   // PHẦN ĐẦU HÓA ĐƠN
