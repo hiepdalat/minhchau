@@ -356,7 +356,9 @@ function inDanhSach() {
     body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
     .logo { width: 15%; }
-    .logo img { height: 60px; }
+    .logo img { height: 60px;
+                max-width: 100%; 
+                display: block; }
     .company-info { width: 55%; text-align: left; font-size: 13px; line-height: 1.5; }
     .company-info b { color: red; font-size: 16px; }
     .invoice-info { width: 28%; text-align: center; }
@@ -387,7 +389,7 @@ function inDanhSach() {
   printWindow.document.write(`
     <div class="header-top">
       <div class="logo">
-        <img src="https://www.design.com/maker/social/m0jyf8v8gg">
+        <img src="https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png">
       </div>
       <div class="company-info">
         <b>Điện Nước Minh Châu</b><br>
@@ -398,7 +400,8 @@ function inDanhSach() {
       </div>
      
     </div>
-    <div class="center-title">HÓA ĐƠN BÁN HÀNG</div>
+    <div class="center-title">HÓA ĐƠN BÁN HÀNG</div><br>
+     <div style="font-style: italic;">Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}</div>
   `);
 
   // PHẦN GIỮA
