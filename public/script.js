@@ -352,12 +352,26 @@ function inDanhSach() {
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`<html><head><title>HÓA ĐƠN</title><style>
     body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
-    .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .logo { width: 15%; }
-    .logo img { height: 60px;
-                max-width: 100%; 
-                display: block; }
-    .company-info { width: 55%; text-align: left; font-size: 13px; line-height: 1.5; }
+    .header-top{
+                display:flex;          /* đặt logo + thông tin cùng hàng */
+                align-items:center;    /* canh giữa theo chiều cao */
+                gap:15px;              /* khoảng cách rất ngắn giữa logo và chữ */
+                margin-bottom:10px;
+                }
+     .logo{
+          flex:0 0 140px;        /* khung logo cố định rộng 140px */
+          text-align:center;
+          }
+      .logo img{
+                height:100px;          /* logo cao ~100px (vừa khung đỏ) */
+                width:auto;            /* tự co theo tỉ lệ, không méo hình */
+                display:block;
+                }
+    .company-info{
+                flex:1;                /* chiếm hết phần còn lại */
+                font-size:13px;
+                line-height:1.5;
+                }
     .company-info b { color: red; font-size: 16px; }
     .invoice-info { width: 28%; text-align: center; }
     .invoice-title { font-size: 18px; color: red; font-weight: bold; margin-bottom: 5px; }
@@ -400,7 +414,9 @@ function inDanhSach() {
      
     </div>
     <div class="center-title">HÓA ĐƠN BÁN HÀNG</div><br>
-     <div style="font-style: italic;">Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}</div>
+     <div style="font-style: italic; text-align:center; margin-top:-10px; margin-bottom:10px;">
+          Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}
+    </div>
   `);
 
   // PHẦN GIỮA
