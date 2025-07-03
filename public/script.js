@@ -406,10 +406,10 @@ function inDanhSach() {
   position:absolute;
   top:50%; left:50%;
   transform:translate(-50%,-50%) rotate(-30deg);
-  width:380px; height:380px;               /* to hơn chút */
+  width:450px; height:450px;               /* to hơn chút */
   background:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png')
             center/contain no-repeat;
-  opacity:0.10;                            /* đậm hơn để dễ thấy */
+  opacity:0.15;                            /* đậm hơn để dễ thấy */
   pointer-events:none;
   z-index:2;                               /* nằm trên nền ô bảng */
 }
