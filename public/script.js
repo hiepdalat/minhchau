@@ -385,7 +385,7 @@ function inDanhSach() {
   printWindow.document.write(`
     <div class="header-top">
       <div class="logo">
-        <img src="https://www.design.com/maker/social/m0jyf8v8gg">
+        <img src="https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png">
       </div>
       <div class="company-info">
         <b>Điện Nước Minh Châu</b><br>
@@ -397,7 +397,8 @@ function inDanhSach() {
       </div>
      
     </div>
-    <div class="center-title">HÓA ĐƠN BÁN HÀNG</div>
+    <div class="center-title">HÓA ĐƠN BÁN HÀNG</div><br>
+     <div style="font-style: italic;">Ngày ${ngayIn.getDate()} tháng ${ngayIn.getMonth() + 1} năm ${ngayIn.getFullYear()}</div>
   `);
 
   // PHẦN GIỮA
@@ -426,7 +427,7 @@ function inDanhSach() {
 
     <div class="sign">
       <div>NGƯỜI MUA HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
-      <div>NGƯỜI BÁN HÀNG<br>Ngày 2 Tháng 7 Năm 2025<br><i>(Ký, ghi rõ họ tên)</i></div>
+      
     </div>
   `);
 
