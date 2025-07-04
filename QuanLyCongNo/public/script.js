@@ -5,10 +5,12 @@ let danhSachTam = [];
   /* Tạo chuỗi ngày tiếng Việt */
   function buildText(){
     const d = new Date();
-    return `Hôm nay thứ ${thuVN[d.getDay()]} ` +
-           `ngày ${d.getDate().toString().padStart(2,'0')} ` +
-           `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} ` +
-           `năm ${d.getFullYear()}`;
+    const ngay = `Hôm nay thứ ${thuVN[d.getDay()]} ` +
+               `ngày ${d.getDate().toString().padStart(2,'0')} ` +
+               `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} ` +
+               `năm ${d.getFullYear()}`;
+  const extra = ' – Chúc bạn một ngày làm việc thật hiệu quả!';
+  return ngay + extra; 
   }
 
   /* Căn khung ticker sát nút Đăng xuất */
