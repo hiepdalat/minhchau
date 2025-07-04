@@ -2,29 +2,30 @@ let danhSachTam = [];
 (function(){
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
 
-  function buildTicker(){
+  // Tạo chuỗi ngày
+  function buildText(){
     const d  = new Date();
-    const str = `Hôm nay thứ ${thuVN[d.getDay()]} `
-              + `ngày ${d.getDate().toString().padStart(2,'0')} `
-              + `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} `
-              + `năm ${d.getFullYear()}`;
-    document.getElementById('tickerText').textContent = str;
+    return  `Hôm nay thứ ${thuVN[d.getDay()]} `
+          + `ngày ${d.getDate().toString().padStart(2,'0')} `
+          + `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} `
+          + `năm ${d.getFullYear()}`;
   }
 
-  function setTickerPosition(){
+  /* Căn lề trái ticker ngay sát nút Đăng xuất ---------------------- */
+  function setTickerPos(){
     const logout = document.querySelector('.btn-logout');
     const ticker = document.getElementById('dateTicker');
-
-    /* khoảng cách từ mép phải cửa sổ đến mép trái nút logout */
     const gap = window.innerWidth - logout.getBoundingClientRect().left;
-    ticker.style.right = gap + 'px';     // ticker bắt đầu ngay trước nút
+    ticker.style.right = gap + 'px';
   }
 
   document.addEventListener('DOMContentLoaded', ()=>{
-    buildTicker();
-    setTickerPosition();
+    const text = buildText();
+    /* Nhân đôi nội dung + vài khoảng trắng để cuộn mượt */
+    document.getElementById('tickerWrap').innerHTML = `${text}&nbsp;&nbsp;&nbsp;${text}`;
+    setTickerPos();
   });
-  window.addEventListener('resize', setTickerPosition); // vẫn đúng khi thu phóng
+  window.addEventListener('resize', setTickerPos);
 })();
 
 function themMon() {
