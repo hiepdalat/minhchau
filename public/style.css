@@ -8,6 +8,29 @@
   font-family: 'Roboto', sans-serif;
   transition: background 0.6s ease-in-out;
 }
+/* ░── Ticker ngày tháng ──░ */
+#dateTicker{
+  position:absolute;          /* phủ lên dưới tiêu đề */
+  top: 58px;                  /* canh đúng dưới "Quản Lý Công Nợ" – chỉnh nếu cần */
+  left: 20px;
+  right: 140px;               /* để chừa chỗ nút Đăng xuất bên phải */
+  height: 24px;
+  overflow:hidden;
+  pointer-events:none;        /* không cản click nút bên dưới */
+}
+
+#dateTicker span{
+  display:inline-block;
+  white-space:nowrap;
+  font-weight:600;
+  color:#fff;                 /* chữ trắng nổi trên thanh xanh đậm */
+  animation:tickerMove 18s linear infinite;
+}
+
+@keyframes tickerMove{
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
 .box-danhsach table tbody tr:hover {
   background-color: #f0f8ff;
   transition: background-color 0.2s;
