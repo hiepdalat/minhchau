@@ -4,16 +4,27 @@ let danhSachTam = [];
 
   function buildTicker(){
     const d  = new Date();
-    const th = thuVN[d.getDay()];
-    const dd = d.getDate().toString().padStart(2,'0');
-    const mm = (d.getMonth()+1).toString().padStart(2,'0');
-    const yy = d.getFullYear();
-
-    const text = `Hôm nay thứ ${th} ngày ${dd} tháng ${mm} năm ${yy}`;
-    document.getElementById('tickerText').textContent = text;
+    const str = `Hôm nay thứ ${thuVN[d.getDay()]} `
+              + `ngày ${d.getDate().toString().padStart(2,'0')} `
+              + `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} `
+              + `năm ${d.getFullYear()}`;
+    document.getElementById('tickerText').textContent = str;
   }
 
-  document.addEventListener('DOMContentLoaded', buildTicker);
+  function setTickerPosition(){
+    const logout = document.getElementById('logoutBtn');
+    const ticker = document.getElementById('dateTicker');
+
+    /* khoảng cách từ mép phải cửa sổ đến mép trái nút logout */
+    const gap = window.innerWidth - logout.getBoundingClientRect().left;
+    ticker.style.right = gap + 'px';     // ticker bắt đầu ngay trước nút
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    buildTicker();
+    setTickerPosition();
+  });
+  window.addEventListener('resize', setTickerPosition); // vẫn đúng khi thu phóng
 })();
 
 function themMon() {
