@@ -11,25 +11,25 @@
 /* ░── Ticker ngày tháng ──░ */
 #dateTicker{
   position:absolute;
-  top: 58px;          /* nằm ngay dưới dòng “Quản Lý Công Nợ” – chỉnh nếu cần */
-  left: 0;            /* tràn hết về bên trái */
-  height: 24px;
+  top:58px;           /* dưới dòng “Quản Lý Công Nợ” – chỉnh nếu cần   */
+  left:0;
+  height:24px;
   overflow:hidden;
   pointer-events:none;
 }
 
-#dateTicker span{
+.ticker__wrap{
   display:inline-block;
   white-space:nowrap;
   font-weight:600;
-  color:#fff;         /* hoặc #000 tuỳ nền */
-  animation:tickerMove 18s linear infinite;
+  color:#fff;         /* đổi màu nếu nền sáng                           */
+  /* Dịch 0 → -50% vì đã nhân đôi nội dung → cuộn liền mạch            */
+  animation:tickerRun 15s linear infinite;
 }
 
-/* bắt đầu tại mép phải khung – chạy sang trái */
-@keyframes tickerMove{
-  0%   { transform: translateX(0);      }
-  100% { transform: translateX(-100%); }
+@keyframes tickerRun{
+  0%   { transform: translateX(0);    }
+  100% { transform: translateX(-50%); }
 }
 .box-danhsach table tbody tr:hover {
   background-color: #f0f8ff;
