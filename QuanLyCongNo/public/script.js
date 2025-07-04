@@ -30,14 +30,15 @@ let danhSachTam = [];
 
     let last = performance.now();
     function loop(now){
-      const dt = (now - last)/1000;   // giây
-      last = now;
-      pos -= speed * dt;
-      // Khi toàn bộ chữ ra khỏi khung (bên trái) -> nhảy về mép phải
-      if(pos < -textW){ pos += (textW + boxW); }
-      wrap.style.transform = `translateX(${pos}px)`;
-      requestAnimationFrame(loop);
-    }
+    const dt = (now - last) / 1000;   // giây
+    last = now;
+
+    const cycle = textW + boxW;       // quãng đường = chiều dài text + khung
+    pos = ((pos - speed * dt) % cycle + cycle) % cycle - textW;
+
+    wrap.style.transform = `translateX(${pos}px)`;
+    requestAnimationFrame(loop);
+  }
     requestAnimationFrame(loop);
 
     /* nếu resize cửa sổ – cập nhật lại kích thước */
