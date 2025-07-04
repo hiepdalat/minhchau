@@ -267,54 +267,63 @@ async function thanhToan() {
 }
 
 function convertNumberToWords(number) {
+  if (number === 0) return 'Không đồng';
+
   const chuSo = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
   const hangDonVi = ['', 'nghìn', 'triệu', 'tỷ'];
 
-  function docBaSo(num) {
-    let [tram, chuc, donVi] = [
-      Math.floor(num / 100),
-      Math.floor((num % 100) / 10),
-      num % 10
-    ];
-    let result = '';
+  // Đọc 1 nhóm 3 chữ số – isHigher=true khi phía trước còn nhóm lớn hơn
+  function docBaSo(num, isHigher) {
+    const tram = Math.floor(num / 100);
+    const chuc = Math.floor((num % 100) / 10);
+    const donVi = num % 10;
+    let str = '';
 
+    // ─── hàng trăm ─────────────────────────────────────────────────────
     if (tram > 0) {
-      result += chuSo[tram] + ' trăm';
-      if (chuc === 0 && donVi !== 0) result += ' linh';
+      str += chuSo[tram] + ' trăm';
+    } else if (isHigher && (chuc > 0 || donVi > 0)) {
+      // nhóm giữa, thiếu hàng trăm nhưng không phải nhóm cao nhất ➜ “không trăm”
+      str += 'không trăm';
     }
 
+    // ─── hàng chục ────────────────────────────────────────────────────
     if (chuc > 1) {
-      result += ' ' + chuSo[chuc] + ' mươi';
-      if (donVi === 1) result += ' mốt';
-      else if (donVi === 5) result += ' lăm';
-      else if (donVi !== 0) result += ' ' + chuSo[donVi];
+      str += ' ' + chuSo[chuc] + ' mươi';
+      if (donVi === 1) str += ' mốt';
+      else if (donVi === 5) str += ' lăm';
+      else if (donVi !== 0) str += ' ' + chuSo[donVi];
     } else if (chuc === 1) {
-      result += ' mười';
-      if (donVi === 5) result += ' lăm';
-      else if (donVi !== 0) result += ' ' + chuSo[donVi];
-    } else if (donVi !== 0 && chuc === 0) {
-      result += ' ' + chuSo[donVi];
+      str += ' mười';
+      if (donVi === 5) str += ' lăm';
+      else if (donVi !== 0) str += ' ' + chuSo[donVi];
+    } else if (chuc === 0) {
+      // không có hàng chục
+      if (donVi !== 0) {
+        if (tram !== 0 || isHigher) str += ' linh';
+        // quy tắc 5 cuối (05 → năm, 15/25… → lăm đã xử lý ở trên)
+        if (donVi === 5) str += ' năm';
+        else str += ' ' + chuSo[donVi];
+      }
     }
 
-    return result.trim();
+    return str.trim();
   }
 
-  if (number === 0) return 'Không đồng';
-
-  let str = '';
-  let i = 0;
-
+  // ─── tách số thành từng nhóm 3 chữ số và đọc ─────────────────────────
+  let i = 0, words = '';
   while (number > 0) {
-    const num = number % 1000;
-    if (num !== 0) {
-      const temp = docBaSo(num);
-      str = temp + ' ' + hangDonVi[i] + ' ' + str;
+    const group = number % 1000;
+    if (group !== 0) {
+      const isHigher = number > 999; // còn nhóm cao hơn phía trước
+      const groupWords = docBaSo(group, isHigher);
+      words = groupWords + (groupWords ? ' ' : '') + hangDonVi[i] + (words ? ' ' : '') + words;
     }
     number = Math.floor(number / 1000);
     i++;
   }
 
-  return str.trim().replace(/\s+/g, ' ') + ' đồng chẵn';
+  return words.trim().replace(/\s+/g, ' ') + ' đồng chẵn';
 }
 
 function inDanhSach() {
