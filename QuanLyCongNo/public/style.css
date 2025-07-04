@@ -84,11 +84,9 @@ input, button {
   z-index: 99;
   padding-left: 12px;
 }
-
-.ticker__wrap {
-  display: inline-block;
-  white-space: nowrap;
-  animation: tickerRun 15s linear infinite;
+#tickerWrap{
+  white-space:nowrap;
+  will-change:transform;
 }
 @keyframes tickerRun {
   0%   { transform: translateX(100%); }
