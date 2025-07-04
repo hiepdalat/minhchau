@@ -89,10 +89,7 @@ input, button {
   white-space:nowrap;
   will-change:transform;
 }
-@keyframes tickerRun {
-  0%   { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
+
 button {
   background: linear-gradient(135deg, #4CAF50, #388E3C);  /* Xanh lá chuyển sắc */
   color: #fff;
