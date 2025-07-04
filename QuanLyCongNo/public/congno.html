@@ -7,13 +7,18 @@
    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 <body class="congno-body">
- <div class="header-container">
-  <h2 style="text-align:center; color:white;">Quản Lý Công Nợ</h2>
-  <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
-   <div id="dateTicker">
- <div class="ticker__wrap" id="tickerWrap"></div>
-</div>
-</div>
+ <header class="header-container">
+  <!-- Hàng 1: tiêu đề + nút -->
+  <div class="header-top">
+      <h2>Quản Lý Công Nợ</h2>
+      <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
+  </div>
+
+  <!-- Hàng 2: ticker chạy ngày -->
+  <div id="dateTicker">
+      <div class="ticker__wrap" id="tickerWrap"></div>
+  </div>
+</header>
   
  <div class="card">
   <input type="text" id="ten" placeholder="Tên khách">
