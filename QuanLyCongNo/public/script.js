@@ -12,7 +12,7 @@ let danhSachTam = [];
   }
 
   function setTickerPosition(){
-    const logout = document.getElementById('logoutBtn');
+    const logout = document.querySelector('.btn-logout');
     const ticker = document.getElementById('dateTicker');
 
     /* khoảng cách từ mép phải cửa sổ đến mép trái nút logout */
