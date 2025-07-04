@@ -2,7 +2,7 @@ let danhSachTam = [];
 (() => {
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
 
-  /* tạo chuỗi ngày tiếng Việt */
+  /* Tạo chuỗi ngày tiếng Việt */
   function buildText(){
     const d = new Date();
     return `Hôm nay thứ ${thuVN[d.getDay()]} ` +
@@ -11,45 +11,47 @@ let danhSachTam = [];
            `năm ${d.getFullYear()}`;
   }
 
-  /* căn khung ticker bắt đầu sát nút Đăng xuất */
+  /* Căn khung ticker sát nút Đăng xuất */
   function alignTickerBox(){
-    const logout  = document.querySelector('.btn-logout');
-    const tickerB = document.getElementById('dateTicker');
-    const gap     = window.innerWidth - logout.getBoundingClientRect().left;
-    tickerB.style.right = gap + 'px';
+    const logout = document.querySelector('.btn-logout');
+    const box    = document.getElementById('dateTicker');
+    const gap    = window.innerWidth - logout.getBoundingClientRect().left;
+    box.style.right = gap + 'px';
   }
 
-  /* hàm cuộn liên tục, reset khi hết chữ */
+  /* Hàm cuộn liên tục */
   function startTicker(){
-    const wrap   = document.getElementById('tickerWrap');
-    const box    = document.getElementById('dateTicker');
-    let   boxW   = box.clientWidth;
-    let   textW  = wrap.clientWidth;
-    let   pos    = boxW;              // bắt đầu vừa khuất bên phải
-    const speed  = 60;                // px / giây  (đổi tốc độ tại đây)
+    const wrap = document.getElementById('tickerWrap');
+    const box  = document.getElementById('dateTicker');
+
+    let boxW  = box.clientWidth;   // chiều rộng khung nhìn
+    let textW = wrap.clientWidth;  // chiều rộng dòng chữ
+    let pos   = boxW;              // bắt đầu ngay ngoài bên phải
+    const speed = 60;              // px/giây (đổi tốc độ tại đây)
 
     let last = performance.now();
+
     function loop(now){
-    const dt = (now - last) / 1000;   // giây
-    last = now;
+      const dt = (now - last) / 1000;   // giây
+      last = now;
 
-    const cycle = textW + boxW;       // quãng đường = chiều dài text + khung
-    pos = ((pos - speed * dt) % cycle + cycle) % cycle - textW;
+      pos -= speed * dt;               // dịch sang trái
+      /* Nếu toàn bộ chữ đi hết bên trái → nhảy về mép phải */
+      while (pos <= -textW) pos += (textW + boxW);
 
-    wrap.style.transform = `translateX(${pos}px)`;
+      wrap.style.transform = `translateX(${pos}px)`;
+      requestAnimationFrame(loop);
+    }
     requestAnimationFrame(loop);
-  }
-    requestAnimationFrame(loop);
 
-    /* nếu resize cửa sổ – cập nhật lại kích thước */
+    /* Cập nhật lại khi đổi cỡ cửa sổ */
     window.addEventListener('resize', ()=>{
       boxW  = box.clientWidth;
       textW = wrap.clientWidth;
-      if(pos < -textW) pos = boxW;    // tránh mất chữ khi thu phóng
+      if(pos <= -textW) pos = boxW;    // bảo đảm không “mất tăm”
     });
   }
 
-  /* Khởi động sau khi DOM sẵn sàng */
   document.addEventListener('DOMContentLoaded', ()=>{
     document.getElementById('tickerWrap').textContent = buildText();
     alignTickerBox();
