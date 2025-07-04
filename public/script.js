@@ -1,4 +1,20 @@
 let danhSachTam = [];
+(function(){
+  const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
+
+  function buildTicker(){
+    const d  = new Date();
+    const th = thuVN[d.getDay()];
+    const dd = d.getDate().toString().padStart(2,'0');
+    const mm = (d.getMonth()+1).toString().padStart(2,'0');
+    const yy = d.getFullYear();
+
+    const text = `Hôm nay thứ ${th} ngày ${dd} tháng ${mm} năm ${yy}`;
+    document.getElementById('tickerText').textContent = text;
+  }
+
+  document.addEventListener('DOMContentLoaded', buildTicker);
+})();
 
 function themMon() {
   const nd = document.getElementById('nd').value.trim();
