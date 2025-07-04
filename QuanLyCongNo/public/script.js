@@ -349,7 +349,7 @@ function inDanhSach() {
   }
 
   const tienChu = convertNumberToWords(tongTien);
-  const ngayIn = new Date(2025, 6, 2); // Ngày 2 tháng 7 năm 2025
+  const ngayIn = new Date(); // Ngày 2 tháng 7 năm 2025
 
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`<html><head><title>HÓA ĐƠN</title><style>
@@ -477,7 +477,7 @@ function inDanhSach() {
 
     <div class="sign">
       <div>NGƯỜI MUA HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
-      <div>NGƯỜI BÁN HÀNG<br>Ngày 2 Tháng 7 Năm 2025<br><i>(Ký, ghi rõ họ tên)</i></div>
+      <div>NGƯỜI BÁN HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
     </div>
   `);
 
