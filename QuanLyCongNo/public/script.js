@@ -1,31 +1,60 @@
 let danhSachTam = [];
-(function(){
+(() => {
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
 
-  // Tạo chuỗi ngày
+  /* tạo chuỗi ngày tiếng Việt */
   function buildText(){
-    const d  = new Date();
-    return  `Hôm nay thứ ${thuVN[d.getDay()]} `
-          + `ngày ${d.getDate().toString().padStart(2,'0')} `
-          + `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} `
-          + `năm ${d.getFullYear()}`;
+    const d = new Date();
+    return `Hôm nay thứ ${thuVN[d.getDay()]} ` +
+           `ngày ${d.getDate().toString().padStart(2,'0')} ` +
+           `tháng ${(d.getMonth()+1).toString().padStart(2,'0')} ` +
+           `năm ${d.getFullYear()}`;
   }
 
-  /* Căn lề trái ticker ngay sát nút Đăng xuất ---------------------- */
-  function setTickerPos(){
-    const logout = document.querySelector('.btn-logout');
-    const ticker = document.getElementById('dateTicker');
-    const gap = window.innerWidth - logout.getBoundingClientRect().left;
-    ticker.style.right = gap + 'px';
+  /* căn khung ticker bắt đầu sát nút Đăng xuất */
+  function alignTickerBox(){
+    const logout  = document.querySelector('.btn-logout');
+    const tickerB = document.getElementById('dateTicker');
+    const gap     = window.innerWidth - logout.getBoundingClientRect().left;
+    tickerB.style.right = gap + 'px';
   }
 
+  /* hàm cuộn liên tục, reset khi hết chữ */
+  function startTicker(){
+    const wrap   = document.getElementById('tickerWrap');
+    const box    = document.getElementById('dateTicker');
+    let   boxW   = box.clientWidth;
+    let   textW  = wrap.clientWidth;
+    let   pos    = boxW;              // bắt đầu vừa khuất bên phải
+    const speed  = 60;                // px / giây  (đổi tốc độ tại đây)
+
+    let last = performance.now();
+    function loop(now){
+      const dt = (now - last)/1000;   // giây
+      last = now;
+      pos -= speed * dt;
+      // Khi toàn bộ chữ ra khỏi khung (bên trái) -> nhảy về mép phải
+      if(pos < -textW){ pos += (textW + boxW); }
+      wrap.style.transform = `translateX(${pos}px)`;
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    /* nếu resize cửa sổ – cập nhật lại kích thước */
+    window.addEventListener('resize', ()=>{
+      boxW  = box.clientWidth;
+      textW = wrap.clientWidth;
+      if(pos < -textW) pos = boxW;    // tránh mất chữ khi thu phóng
+    });
+  }
+
+  /* Khởi động sau khi DOM sẵn sàng */
   document.addEventListener('DOMContentLoaded', ()=>{
-    const text = buildText();
-    /* Nhân đôi nội dung + vài khoảng trắng để cuộn mượt */
-    document.getElementById('tickerWrap').innerHTML = `${text}&nbsp;&nbsp;&nbsp;${text}`;
-    setTickerPos();
+    document.getElementById('tickerWrap').textContent = buildText();
+    alignTickerBox();
+    startTicker();
   });
-  window.addEventListener('resize', setTickerPos);
+  window.addEventListener('resize', alignTickerBox);
 })();
 
 function themMon() {
