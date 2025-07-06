@@ -161,6 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   logoutBtn.addEventListener('click', () => {
-    fetch('/logout', { method:'POST' }).finally(()=>window.location.href='/login.html');
+    fetch('/logout', { method:'POST' }).finally(()=>window.location.href='/index.html');
   });
 });
