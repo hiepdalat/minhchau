@@ -114,4 +114,8 @@
     }
     window.open('/chi-tiet-phieu-nhap?ngay=' + date, '_blank');
   });
+   document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  fetch('/logout', { method: 'POST' })
+    .finally(() => window.location.href = '/index.html');
+});
 });
