@@ -1,3 +1,21 @@
+app.use(session({
+  secret: 'mat_khau_bi_mat',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 5 * 60 * 1000 }   // 5 phút
+}));
+function requireLogin(req, res, next) {
+  if (!req.session.user) return res.redirect('/login');
+  res.set('Cache-Control', 'no-store');   // chống cache
+  next();
+}
+
+app.get('/congno', requireLogin, (req, res) =>
+  res.sendFile(__dirname + '/congno.html')
+);
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => res.redirect('/login'));
+});
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
