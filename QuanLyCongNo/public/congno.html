@@ -117,6 +117,12 @@
   document.addEventListener("DOMContentLoaded", () => {
     document.body.style.background = random;
   });
+
+    // Nếu không có session, thì redirect về login.html
+  fetch('/session-check')
+    .then(res => {
+      if (!res.ok) location.href = '/index.html';
+    });
 </script>
 </body>
 </html>
