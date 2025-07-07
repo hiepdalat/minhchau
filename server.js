@@ -42,7 +42,10 @@ app.use(session({
   store: MongoStore.create({ mongoUrl: MONGO_URI }),
   cookie: { maxAge: 5 * 60 * 1000 }   // 5 phút (đổi tại đây nếu muốn)
 }));
-
+app.get('/session-check', (req, res) => {
+  if (req.session.user) res.sendStatus(200);
+  else res.sendStatus(401);
+});
 // -----------------------------------------------------------------------------
 // 4. DEFINITIONS MONGOOSE
 // -----------------------------------------------------------------------------
