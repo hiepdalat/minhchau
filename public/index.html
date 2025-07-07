@@ -1,147 +1,111 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Đăng nhập hệ thống</title>
+  <meta charset="UTF-8">
+  <title>Trang chính</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #00aaff, #00ffaa);
+      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
+      background: linear-gradient(135deg, #00aaff, #00ffaa);
+      font-family: Arial, sans-serif;
     }
-
-    .container {
-      background-color: white;
-      padding: 40px 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-      max-width: 400px;
-      width: 100%;
-    }
-
-    h2 {
+    .box {
+      background: #fff;
+      padding: 32px 28px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, .25);
+      width: 320px;
       text-align: center;
+    }
+    h2 {
       color: #0077cc;
+      margin-top: 0;
     }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 15px;
-      color: #333;
-    }
-
     input {
       width: 100%;
       padding: 10px;
+      margin: 8px 0;
       border-radius: 6px;
       border: 1px solid #ccc;
-      margin-top: 5px;
     }
-
-    .buttons {
-      margin-top: 25px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    button {
-      padding: 12px;
+    .btn {
+      width: 100%;
+      padding: 11px;
+      margin-top: 10px;
       border: none;
       border-radius: 8px;
+      color: #fff;
       font-size: 16px;
-      color: white;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: opacity .2s;
     }
-
-    .btn-congno {
-      background-color: #0077cc;
-    }
-
-    .btn-kho {
-      background-color: #28a745;
-    }
-
-    .btn-banhang {
-      background-color: #ff6600;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
+    .btn-congno { background: #0077cc; }
+    .btn-kho    { background: #28a745; }
+    .btn-bh     { background: #ff6600; }
+    .btn:hover  { opacity: .9; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="box">
     <h2>Đăng nhập hệ thống</h2>
-    <form id="loginForm">
-      <label for="username">Tên đăng nhập:</label>
-      <input type="text" id="username" required />
+    <input id="username" placeholder="Tài khoản">
+    <input id="password" type="password" placeholder="Mật khẩu">
 
-      <label for="password">Mật khẩu:</label>
-      <input type="password" id="password" required />
-    </form>
+    <hr style="margin: 24px 0 16px">
 
-    <div class="buttons">
-      <button class="btn-congno" onclick="checkAndRedirect('/congno.html')">Quản Lý Công Nợ</button>
-      <button class="btn-kho" onclick="checkAndRedirect('/khohang.html')">Quản Lý Kho</button>
-      <button class="btn-banhang" onclick="checkAndRedirect('/banhang.html')">Quản Lý Bán Hàng</button>
-    </div>
+    <button class="btn btn-congno" onclick="chucNang('/congno.html')">Quản Lý Công Nợ</button>
+    <button class="btn btn-kho"     onclick="chucNang('/khohang.html')">Quản Lý Kho</button>
+    <button class="btn btn-bh"      onclick="chucNang('/banhang.html')">Quản Lý Bán Hàng</button>
   </div>
 
   <script>
-    // Ngăn submit bằng Enter
-    document.getElementById('loginForm').addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        dangNhap();
-      }
-    });
+    let isLoggedIn = false;
 
-    function dangNhap() {
+    async function loginIfNeeded() {
+      if (isLoggedIn) return true;
+
       const username = document.getElementById('username').value.trim();
       const password = document.getElementById('password').value.trim();
-
       if (!username || !password) {
-        Swal.fire('Thông báo', 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!', 'warning');
-        return;
+        Swal.fire('Thiếu thông tin', 'Vui lòng nhập tài khoản và mật khẩu trước!', 'warning');
+        return false;
       }
 
-      fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-        .then(async res => {
-          if (res.ok) {
-            Swal.fire('Thành công', 'Đăng nhập thành công!', 'success');
-          } else {
-            const text = await res.text();
-            Swal.fire('Lỗi', text || 'Sai tên đăng nhập hoặc mật khẩu!', 'error');
-          }
-        })
-        .catch(() => Swal.fire('Lỗi', 'Không kết nối được server.', 'error'));
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (res.ok) {
+          isLoggedIn = true;
+          return true;
+        } else {
+          const text = await res.text();
+          Swal.fire('Lỗi đăng nhập', text || 'Sai tài khoản hoặc mật khẩu!', 'error');
+          return false;
+        }
+      } catch {
+        Swal.fire('Lỗi', 'Không kết nối được server.', 'error');
+        return false;
+      }
     }
 
-    function checkAndRedirect(path) {
-      fetch('/session-check')
-        .then(res => {
-          if (res.ok) {
-            window.location.href = path;
-          } else {
-            Swal.fire('Cảnh báo', 'Vui lòng đăng nhập trước khi truy cập!', 'warning');
-          }
-        })
-        .catch(() => Swal.fire('Lỗi', 'Không kiểm tra được phiên đăng nhập.', 'error'));
+    async function chucNang(path) {
+      const ok = await loginIfNeeded();
+      if (ok) window.location.href = path;
     }
+
+    // Gõ Enter trong ô mật khẩu sẽ tự động login và chuyển nếu đã có nút bấm trước
+    document.getElementById('password').addEventListener('keydown', e => {
+      if (e.key === 'Enter') chucNang('/congno.html');
+    });
   </script>
 </body>
 </html>
