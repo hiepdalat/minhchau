@@ -592,7 +592,7 @@ function inDanhSach() {
 
 /* --- ĐỔI HÀM ĐĂNG XUẤT để thực sự hủy session ------------ */
 function dangXuat() {
-  window.location.href = '/logout';   // không trỏ về /index.html nữa
+  window.location.href = '/logout';   // không trỏ về /index.html
 }
 
 document.getElementById('search').addEventListener('keydown', e => {
