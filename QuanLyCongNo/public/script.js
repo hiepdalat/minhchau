@@ -1,4 +1,38 @@
+/* ======================= CẤU HÌNH ======================= */
+const SESSION_IDLE_LIMIT = 5 * 60 * 1000;   // 5 phút không hoạt động
+/* ======================================================= */
+
 let danhSachTam = [];
+let idleTimer;                // ⏱️  hẹn giờ hết phiên
+
+/* --- HÀM KHỞI TẠO ĐẾM THỜI GIAN NHÀN RỖI ---------------- */
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    Swal.fire({
+      icon: 'info',
+      title: 'Phiên làm việc đã hết',
+      text: 'Bạn đã không hoạt động quá 5 phút – vui lòng đăng nhập lại.',
+    }).then(() => window.location.href = '/logout');
+  }, SESSION_IDLE_LIMIT);
+}
+
+/* Bất kỳ thao tác nào cũng reset bộ đếm */
+['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
+  document.addEventListener(evt, resetIdleTimer)
+);
+resetIdleTimer();   // kích hoạt ngay khi trang vừa tải
+
+/* -------------------------------------------------------- */
+/* TOÀN BỘ CODE SẴN CÓ CỦA BẠN GIỮ NGUYÊN – chỉ chèn thêm
+   phần idleTimer ở trên & đổi hàm dangXuat() ở dưới.        */
+/* -------------------------------------------------------- */
+
+/* ... (phần code của bạn giữ nguyên) ... */
+
+
+
+
 (() => {
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
 
@@ -556,8 +590,9 @@ function inDanhSach() {
   printWindow.document.close();
 }
 
+/* --- ĐỔI HÀM ĐĂNG XUẤT để thực sự hủy session ------------ */
 function dangXuat() {
-  window.location.href = '/index.html';
+  window.location.href = '/logout';   // không trỏ về /index.html nữa
 }
 
 document.getElementById('search').addEventListener('keydown', e => {
