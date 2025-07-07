@@ -30,9 +30,15 @@ const app  = express();
 const PORT = process.env.PORT || 10000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));   // public chứa html/css/js
-
-// -----------------------------------------------------------------------------
+app.use(express.static(path.join(__dirname, 'public'), {
+  etag: false,            // tắt ETag
+  maxAge: 0,              // không lưu cache
+  setHeaders: res => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Pragma',        'no-cache');
+    res.setHeader('Expires',       '0');
+  }
+}));
 // 3. CẤU HÌNH SESSION (5 phút hết hạn) – LƯU VÀO MONGODB
 // -----------------------------------------------------------------------------
 app.use(session({
@@ -112,10 +118,13 @@ app.get('/logout', (req, res) => {
 // 8. ROUTE TRANG CHÍNH
 // -----------------------------------------------------------------------------
 app.get('/congno', requireLogin, (req, res) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
   res.sendFile(path.join(__dirname, 'public', 'congno.html'));
 });
-
-// -----------------------------------------------------------------------------
 // 9. API DỮ LIỆU – TẤT CẢ CẦN ĐĂNG NHẬP
 // -----------------------------------------------------------------------------
 app.post('/them', requireLogin, async (req, res) => {
