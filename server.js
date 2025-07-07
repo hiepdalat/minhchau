@@ -176,8 +176,8 @@ app.post('/thanhtoan', requireLogin, async (req, res) => {
 // -----------------------------------------------------------------------------
 // 10. KHỞI CHẠY SERVER
 // -----------------------------------------------------------------------------
-console.log('✅ Các route đã đăng ký:');
-app._router.stack
-  .filter(r => r.route && r.route.path)
-  .forEach(r => console.log(' ▶', r.route.path));
+//console.log('✅ Các route đã đăng ký:');
+//app._router.stack
+ // .filter(r => r.route && r.route.path)
+  //.forEach(r => console.log(' ▶', r.route.path));
 app.listen(PORT, () => console.log(`🚀 Server chạy trên port ${PORT}`));
