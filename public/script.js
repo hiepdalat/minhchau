@@ -1,4 +1,38 @@
+/* ======================= CẤU HÌNH ======================= */
+const SESSION_IDLE_LIMIT = 5 * 60 * 1000;   // 5 phút không hoạt động
+/* ======================================================= */
+
 let danhSachTam = [];
+let idleTimer;                // ⏱️  hẹn giờ hết phiên
+
+/* --- HÀM KHỞI TẠO ĐẾM THỜI GIAN NHÀN RỖI ---------------- */
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    Swal.fire({
+      icon: 'info',
+      title: 'Phiên làm việc đã hết',
+      text: 'Bạn đã không hoạt động quá 5 phút – vui lòng đăng nhập lại.',
+    }).then(() => window.location.href = '/logout');
+  }, SESSION_IDLE_LIMIT);
+}
+
+/* Bất kỳ thao tác nào cũng reset bộ đếm */
+['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
+  document.addEventListener(evt, resetIdleTimer)
+);
+resetIdleTimer();   // kích hoạt ngay khi trang vừa tải
+
+/* -------------------------------------------------------- */
+/* TOÀN BỘ CODE SẴN CÓ CỦA BẠN GIỮ NGUYÊN – chỉ chèn thêm
+   phần idleTimer ở trên & đổi hàm dangXuat() ở dưới.        */
+/* -------------------------------------------------------- */
+
+/* ... (phần code của bạn giữ nguyên) ... */
+
+
+
+
 (() => {
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
 
@@ -11,7 +45,6 @@ let danhSachTam = [];
                `năm ${d.getFullYear()}`;
   const extra = ' – Chúc bạn một ngày làm việc thật hiệu quả!';
   return ngay + extra; 
-    
   }
 
   /* Căn khung ticker sát nút Đăng xuất */
@@ -201,6 +234,7 @@ function shuffleArray(array) {
   }
   return arr;
 }
+
 /* Các phiên bản loadData cũ đã được thay thế bằng bản ở trên, giữ lại để tham khảo nếu cần */
 
 /* function tinhTongDaChon() bản cũ đã được cập nhật bên dưới */
@@ -389,6 +423,7 @@ function convertNumberToWords(number) {
   return words.trim().replace(/\s+/g, ' ') + ' đồng chẵn';
 }
 
+
 function inDanhSach() {
   const ds = document.querySelectorAll('#ds tr');
   let rows = [];
@@ -423,8 +458,7 @@ function inDanhSach() {
 
   const printWindow = window.open('', '', 'width=900,height=600');
   printWindow.document.write(`<html><head><title>HÓA ĐƠN</title><style>
-   
-    body{ font-family:Arial, sans-serif; margin:20px; font-size:13px; }
+    body { font-family: Arial, sans-serif; margin: 20px; font-size: 13px; }
     .header-top{
                 display:flex;          /* đặt logo + thông tin cùng hàng */
                 align-items:center;    /* canh giữa theo chiều cao */
@@ -449,7 +483,7 @@ function inDanhSach() {
     .invoice-info { width: 28%; text-align: center; }
     .invoice-title { font-size: 18px; color: red; font-weight: bold; margin-bottom: 5px; }
 
-    .center-title { text-align: center; font-size: 20px; color: red; font-weight: bold; margin: 10px 0 0; }
+    .center-title { text-align: center; font-size: 20px; color: red; font-weight: bold; margin: 20px 0 0; }
 
     .info { margin-bottom: 5px; }
     .dotline { border-bottom: 1px dotted #000; width: 100%; display: inline-block; height: 12px; }
@@ -469,7 +503,7 @@ function inDanhSach() {
     }
     .sign div { text-align: center; width: 45%; }
     
-  .items-table{
+    .items-table{
   position:relative;
 }
 
@@ -512,7 +546,6 @@ function inDanhSach() {
         Địa chỉ: Chợ Xuân Thọ - Phường Xuân Trường - TP Đà Lạt<br>
         Điện thoại: 0973778279 - Zalo : 0938039084<br>
         Số tài khoản: 9973778279 – Ngân hàng Vietcombank - Dương Xuân Hiệp
-         
       </div>
      
     </div>
@@ -549,7 +582,7 @@ function inDanhSach() {
 
     <div class="sign">
       <div>NGƯỜI MUA HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
-      
+      <div>NGƯỜI BÁN HÀNG<br><i>(Ký, ghi rõ họ tên)</i></div>
     </div>
   `);
 
@@ -557,8 +590,9 @@ function inDanhSach() {
   printWindow.document.close();
 }
 
+/* --- ĐỔI HÀM ĐĂNG XUẤT để thực sự hủy session ------------ */
 function dangXuat() {
-  window.location.href = '/index.html';
+  window.location.href = '/logout';   // không trỏ về /index.html nữa
 }
 
 document.getElementById('search').addEventListener('keydown', e => {
