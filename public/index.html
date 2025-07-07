@@ -1,70 +1,146 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <title>Trang chính</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập hệ thống</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
-      background: linear-gradient(135deg, #fceabb, #f8b500);
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #00aaff, #00ffaa);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
     }
+
     .container {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      text-align: center;
+      background-color: white;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
+      width: 100%;
     }
+
     h2 {
-      margin-bottom: 20px;
+      text-align: center;
+      color: #0077cc;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
       color: #333;
     }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+    }
+
+    .buttons {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     button {
-      display: block;
-      width: 250px;
       padding: 12px;
-      margin: 10px auto;
-      font-size: 16px;
       border: none;
       border-radius: 8px;
-      background-color: #f8b500;
+      font-size: 16px;
       color: white;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.3s ease;
     }
+
+    .btn-congno {
+      background-color: #0077cc;
+    }
+
+    .btn-kho {
+      background-color: #28a745;
+    }
+
+    .btn-banhang {
+      background-color: #ff6600;
+    }
+
     button:hover {
-      background-color: #e6a400;
+      opacity: 0.9;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Chọn chức năng</h2>
-    <button onclick="kiemTraDangNhap('/congno.html')">Quản Lý Công Nợ</button>
-    <button onclick="kiemTraDangNhap('/khohang.html')">Quản Lý Kho</button>
-    <button onclick="kiemTraDangNhap('/banhang.html')">Quản Lý Bán Hàng</button>
+    <h2>Đăng nhập hệ thống</h2>
+    <form id="loginForm">
+      <label for="username">Tên đăng nhập:</label>
+      <input type="text" id="username" required />
+
+      <label for="password">Mật khẩu:</label>
+      <input type="password" id="password" required />
+    </form>
+
+    <div class="buttons">
+      <button class="btn-congno" onclick="checkAndRedirect('/congno.html')">Quản Lý Công Nợ</button>
+      <button class="btn-kho" onclick="checkAndRedirect('/khohang.html')">Quản Lý Kho</button>
+      <button class="btn-banhang" onclick="checkAndRedirect('/banhang.html')">Quản Lý Bán Hàng</button>
+    </div>
   </div>
 
   <script>
-    function kiemTraDangNhap(url) {
+    // Ngăn submit bằng Enter
+    document.getElementById('loginForm').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        dangNhap();
+      }
+    });
+
+    function dangNhap() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !password) {
+        Swal.fire('Thông báo', 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!', 'warning');
+        return;
+      }
+
+      fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+        .then(async res => {
+          if (res.ok) {
+            Swal.fire('Thành công', 'Đăng nhập thành công!', 'success');
+          } else {
+            const text = await res.text();
+            Swal.fire('Lỗi', text || 'Sai tên đăng nhập hoặc mật khẩu!', 'error');
+          }
+        })
+        .catch(() => Swal.fire('Lỗi', 'Không kết nối được server.', 'error'));
+    }
+
+    function checkAndRedirect(path) {
       fetch('/session-check')
         .then(res => {
           if (res.ok) {
-            window.location.href = url;
+            window.location.href = path;
           } else {
-            Swal.fire('Cảnh báo', 'Bạn chưa đăng nhập! Vui lòng truy cập lại qua trang đăng nhập.', 'warning');
+            Swal.fire('Cảnh báo', 'Vui lòng đăng nhập trước khi truy cập!', 'warning');
           }
         })
-        .catch(() => {
-          Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ. Thử lại sau!', 'error');
-        });
+        .catch(() => Swal.fire('Lỗi', 'Không kiểm tra được phiên đăng nhập.', 'error'));
     }
   </script>
 </body>
