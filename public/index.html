@@ -1,107 +1,69 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Đăng nhập hệ thống</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Trang chính</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       background: linear-gradient(135deg, #fceabb, #f8b500);
       font-family: 'Segoe UI', sans-serif;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       height: 100vh;
       margin: 0;
     }
-    .login-box {
+    .container {
       background: white;
       padding: 30px;
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(0,0,0,0.2);
       text-align: center;
-      width: 300px;
     }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
     }
     button {
-      padding: 10px 20px;
+      display: block;
+      width: 250px;
+      padding: 12px;
+      margin: 10px auto;
       font-size: 16px;
-      margin: 10px 5px 0 5px;
       border: none;
       border-radius: 8px;
       background-color: #f8b500;
       color: white;
       cursor: pointer;
+      transition: background 0.2s;
     }
     button:hover {
       background-color: #e6a400;
     }
-    .btn-group {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 10px;
-    }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Đăng nhập hệ thống</h2>
-    <form id="loginForm" onsubmit="event.preventDefault(); dangNhap();">
-      <input id="username" placeholder="Tài khoản" required />
-      <input type="password" id="password" placeholder="Mật khẩu" required />
-      <button type="submit">Đăng nhập</button>
-    </form>
-
-    <div class="btn-group">
-      <button onclick="location.href='congno.html'">Quản Lý Công Nợ</button>
-      <button onclick="location.href='khohang.html'">Quản Lý Kho</button>
-      <button onclick="location.href='banhang.html'">Quản Lý Bán Hàng</button>
-    </div>
+  <div class="container">
+    <h2>Chọn chức năng</h2>
+    <button onclick="kiemTraDangNhap('/congno.html')">Quản Lý Công Nợ</button>
+    <button onclick="kiemTraDangNhap('/khohang.html')">Quản Lý Kho</button>
+    <button onclick="kiemTraDangNhap('/banhang.html')">Quản Lý Bán Hàng</button>
   </div>
 
   <script>
-    // Ngăn Enter gây reload nếu chưa nhập đủ
-    document.getElementById('loginForm').addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        dangNhap();
-      }
-    });
-
-    function dangNhap() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (!username || !password) {
-        Swal.fire('Thông báo', 'Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu!', 'warning');
-        return;
-      }
-
-      fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-        .then(async res => {
+    function kiemTraDangNhap(url) {
+      fetch('/session-check')
+        .then(res => {
           if (res.ok) {
-            window.location.href = '/congno';
+            window.location.href = url;
           } else {
-            const text = await res.text();
-            Swal.fire('Lỗi', text || 'Sai tài khoản hoặc mật khẩu!', 'error');
+            Swal.fire('Cảnh báo', 'Bạn chưa đăng nhập! Vui lòng truy cập lại qua trang đăng nhập.', 'warning');
           }
         })
         .catch(() => {
-          Swal.fire('Lỗi', 'Không kết nối được server. Vui lòng thử lại sau!', 'error');
+          Swal.fire('Lỗi', 'Không thể kết nối tới máy chủ. Thử lại sau!', 'error');
         });
     }
   </script>
