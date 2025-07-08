@@ -3,6 +3,10 @@ const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 
+app.post('/api/stock/receive', async (req, res) => {
+  try {
+    console.log('📥 Nhận từ client:', req.body);  // Dòng này rất quan trọng để kiểm tra dữ liệu
+    
 // ===== MongoDB Connection =====
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority&appName=QuanLyCongNo';
 mongoose
