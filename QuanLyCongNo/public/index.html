@@ -11,7 +11,7 @@
   <!-- SweetAlert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-  <!-- YouTube Iframe API – cho phép điều chỉnh volume -->
+  <!-- YouTube Iframe API (đặt TRƯỚC script tự viết) -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <style>
@@ -97,11 +97,40 @@
       background:#4a90e2;
       border:none;
     }
+
+    /* ======= NÚT ĐIỀU KHIỂN ======= */
+    .controls{
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+      gap:14px;
+    }
+    .controls button{
+      background:#4a90e2;
+      color:#fff;
+      border:none;
+      width:38px;height:38px;
+      border-radius:50%;
+      font-size:18px;
+      cursor:pointer;
+      transition:transform .25s, opacity .25s;
+    }
+    .controls button:hover{opacity:.87;transform:scale(1.1);}
+    #shuffleBtn.active{background:#FF8C42;}
+
+    /* ======= TÊN BÀI ĐANG PHÁT ======= */
+    #nowPlaying{
+      margin-top:10px;
+      font-size:14px;
+      color:#4a90e2;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
   </style>
 </head>
 
 <body>
-  <!-- ==== HỘP ĐĂNG NHẬP ==== -->
   <div class="box">
     <h2>🌼 Đăng nhập hệ thống</h2>
     <input id="username" placeholder="👤 Tài khoản">
@@ -113,16 +142,29 @@
     <button class="btn btn-kho"     onclick="chucNang('/khohang.html')">📦 Quản Lý Kho</button>
     <button class="btn btn-bh"      onclick="chucNang('/banhang.html')">🛒 Quản Lý Bán Hàng</button>
 
-    <!-- ==== TRÌNH PHÁT NHẠC ==== -->
+    <!-- ======= TRÌNH PHÁT NHẠC ======= -->
     <div class="music-box">
-      <!-- Player ẩn (0×0) để chỉ lấy âm thanh -->
+      <!-- Player ẩn (0×0) để lấy âm thanh -->
       <div id="ytPlayer"></div>
+
+      <!-- Slider volume -->
       <input type="range" id="volumeControl" min="0" max="100" value="70">
+
+      <!-- Nút điều khiển -->
+      <div class="controls">
+        <button id="prevBtn"   title="Bài trước">⏮</button>
+        <button id="nextBtn"   title="Bài kế">⏭</button>
+        <button id="shuffleBtn" title="Shuffle">🔀</button>
+      </div>
+
+      <!-- Tên bài đang phát -->
+      <div id="nowPlaying">…</div>
     </div>
   </div>
 
+  <!-- ====================== SCRIPT ====================== -->
   <script>
-    /* ====================== LOGIN ====================== */
+    /* ---------- LOGIN ---------- */
     let isLoggedIn = false;
     async function loginIfNeeded(){
       if(isLoggedIn) return true;
@@ -156,36 +198,74 @@
     document.getElementById('password')
       .addEventListener('keydown',e=>{if(e.key==='Enter') chucNang('/congno.html');});
 
-    /* ====================== YOUTUBE AUDIO ====================== */
-    let player; // đối tượng YT.Player
+    /* ---------- YOUTUBE AUDIO ---------- */
+    const playlists = [
+      'PLv1quoEqqgjAihdJtJZVKWtZWo_vD2y6U', // Lo‑fi chill
+      'PLb6SKl2NeUNmVWEYVtFR7PZ6Cvj1QKkuC', // Guitar acoustic
+      'PLUybubhBTyxw3kZ9zolmZ_6BrQ2leETko', // Piano thư giãn
+      'PLYkB2GLfxxJfKld8qa_raVXHWFB8OL2tK'  // Ambient chill
+    ];
+    let listIdx = 0;      // playlist hiện tại
+    let player;           // đối tượng YT.Player
+    let shuffle = false;  // trạng thái shuffle
 
-    // Hàm được gọi khi API YouTube sẵn sàng
+    /* YouTube Iframe API callback */
     function onYouTubeIframeAPIReady(){
-      player=new YT.Player('ytPlayer',{
-        height:'0',
-        width:'0',
+      player = new YT.Player('ytPlayer',{
+        height:'0', width:'0',
         playerVars:{
           listType:'playlist',
-          list:'PLB1F2BC6D6A2A2204', // playlist nhạc bất hủ không lời
+          list:playlists[listIdx],
           autoplay:1,
-          loop:1,
-          mute:0
+          loop:1     // lặp trong playlist
         },
-        events:{onReady:onPlayerReady}
+        events:{
+          onReady:onPlayerReady,
+          onStateChange:onPlayerStateChange
+        }
       });
     }
 
     function onPlayerReady(){
-      player.setVolume(70);            // Volume mặc định 70%
+      player.setVolume(70);
       player.playVideo();
+      updateNowPlaying();
+      if(shuffle) player.setShuffle(true);
     }
 
-    // Điều chỉnh âm lượng qua slider
+    function onPlayerStateChange(e){
+      // Khi hết bài cuối → chuyển playlist kế tiếp
+      if(e.data === YT.PlayerState.ENDED &&
+         player.getPlaylistIndex() === player.getPlaylist().length - 1){
+        listIdx = (listIdx + 1) % playlists.length;
+        player.loadPlaylist({listType:'playlist', list:playlists[listIdx], index:0});
+        if(shuffle) player.setShuffle(true);
+      }
+      // Cập nhật tên bài khi phát
+      if(e.data === YT.PlayerState.PLAYING) updateNowPlaying();
+    }
+
+    /* Hiển thị tên bài */
+    function updateNowPlaying(){
+      const title = player?.getVideoData()?.title || '';
+      document.getElementById('nowPlaying').textContent = title;
+    }
+
+    /* Volume */
     document.getElementById('volumeControl')
       .addEventListener('input', e=>{
-        const vol = parseInt(e.target.value,10);
-        if(player && player.setVolume) player.setVolume(vol);
+        player?.setVolume(+e.target.value);
       });
+
+    /* Nút Prev / Next / Shuffle */
+    document.getElementById('prevBtn').onclick   = ()=> player?.previousVideo();
+    document.getElementById('nextBtn').onclick   = ()=> player?.nextVideo();
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    shuffleBtn.onclick = ()=>{
+      shuffle = !shuffle;
+      player?.setShuffle(shuffle);
+      shuffleBtn.classList.toggle('active', shuffle);
+    };
   </script>
 </body>
 </html>
