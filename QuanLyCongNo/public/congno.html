@@ -3,56 +3,92 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Cache-Control" content="no-store" />
-<meta http-equiv="Pragma"        content="no-cache" />
-<meta http-equiv="Expires"       content="0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quản Lý Công Nợ</title>
   <link rel="stylesheet" href="/style.css">
-   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    /* Responsive: cuộn bảng ngang khi màn hình hẹp */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      body { font-size: 14px; }
+
+      input, button {
+        font-size: 14px;
+        padding: 6px 8px;
+      }
+
+      .card input {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      .card button {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+    }
+  </style>
 </head>
 <body class="congno-body">
- <header class="header-container">
-  <!-- Hàng 1: tiêu đề + nút -->
+<header class="header-container">
   <div class="header-top">
-      <h2>Quản Lý Công Nợ</h2>
-      <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
+    <h2>Quản Lý Công Nợ</h2>
+    <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
   </div>
-
-  <!-- Hàng 2: ticker chạy ngày -->
   <div id="dateTicker">
-      <div class="ticker__wrap" id="tickerWrap"></div>
+    <div class="ticker__wrap" id="tickerWrap"></div>
   </div>
 </header>
-  
- <div class="card">
+
+<div class="card">
   <input type="text" id="ten" placeholder="Tên khách">
   <input type="date" id="ngay">
-
   <input type="text" id="nd" placeholder="Nội dung">
   <input type="number" id="sl" placeholder="Số lượng">
   <input type="number" id="dg" placeholder="Đơn giá">
   <button onclick="themMon()">➕ Thêm món</button>
   <button onclick="luuTatCa()">💾 Lưu tất cả</button>
- </div>
-  
-  <div class="card" id="monTamBox" style="display:none;">
-  <h3>Món tạm</h3>
-  <table>
-    <thead>
-      <tr><th>Nội dung</th><th>Số Lượng</th><th>Đơn Giá</th><th>Thành Tiền</th><th>Xoá</th></tr>
-    </thead>
-    <tbody id="bangTam"></tbody>
-  </table>
 </div>
- <div class="card">
+
+<div class="card" id="monTamBox" style="display:none;">
+  <h3>Món tạm</h3>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr><th>Nội dung</th><th>Số Lượng</th><th>Đơn Giá</th><th>Thành Tiền</th><th>Xoá</th></tr>
+      </thead>
+      <tbody id="bangTam"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
   <input type="text" id="search" placeholder="Tìm tên khách...">
   <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
   <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
-<button onclick="thanhToan()">💰 Thanh Toán</button>
-   <button onclick="inDanhSach()">📩 In Danh Sách</button> <!-- in ra danh sach da chon -->
- </div>
+  <button onclick="thanhToan()">💰 Thanh Toán</button>
+  <button onclick="inDanhSach()">📩 In Danh Sách</button>
+</div>
 
 <h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
-<div class="card box-danhsach">
+<div class="card box-danhsach table-wrapper">
   <table>
     <thead>
       <tr>
@@ -75,41 +111,31 @@
   </table>
 </div>
 
-  <script src="/script.js"></script>
-   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <script>
+<script src="/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
   const gradients = [
-    // 🌸 Tím, hồng nhẹ
-    "linear-gradient(135deg, #e0c3fc, #8ec5fc)",   // Tím pastel → xanh baby
-    "linear-gradient(135deg, #d9a7c7, #fffcdc)",   // Tím hồng → vàng kem
-    "linear-gradient(135deg, #fbc2eb, #a6c1ee)",   // Hồng tím → xanh nhạt
-    "linear-gradient(135deg, #f3e7e9, #e3eeff)",   // Hồng kem → trắng xanh
-
-    // 🌿 Xanh đọt chuối, bơ, bạc hà
-    "linear-gradient(135deg, #d4fc79, #96e6a1)",   // Xanh mạ non → xanh bạc hà
-    "linear-gradient(135deg, #a8e063, #56ab2f)",   // Xanh đọt chuối → xanh đậm
-    "linear-gradient(135deg, #c1dfc4, #deecdd)",   // Xanh bạc hà nhạt → xanh lục nhạt
-    "linear-gradient(135deg, #e0f7da, #c8e6c9)",   // Xanh bơ sữa → xanh lá pastel
-
-    // 🍊 Cam nhẹ, hồng cam
-    "linear-gradient(135deg, #fbc2eb, #fcd6a4)",   // Hồng pastel → cam kem
-    "linear-gradient(135deg, #f6d365, #fda085)",   // Vàng nhạt → cam đào
-    "linear-gradient(135deg, #ffecd2, #fcb69f)",   // Kem nhạt → hồng cam
-    "linear-gradient(135deg, #f9d29d, #ffd8cb)",   // Cam sữa → hồng đào
-
-    // 🌌 Xanh đậm - than - biển
-    "linear-gradient(135deg, #1e3c72, #2a5298)",   // Xanh đậm → xanh biển
-    "linear-gradient(135deg, #0f2027, #4b6cb7)",   // Xanh đêm → xanh lam
-    "linear-gradient(135deg, #2c3e50, #3498db)",   // Xám xanh → xanh da trời
-    "linear-gradient(135deg, #373B44, #4286f4)",   // Than khói → xanh nhạt
-    "linear-gradient(135deg, #232526, #414345)",   // Đen xám → xám bạc
-
-    // 🌈 Mới thêm - tươi sáng & pastel
-    "linear-gradient(135deg, #89f7fe, #66a6ff)",   // Xanh baby → xanh biển
-    "linear-gradient(135deg, #fddb92, #d1fdff)",   // Vàng nhạt → xanh nhạt
-    "linear-gradient(135deg, #ff9a9e, #fad0c4)",   // Hồng đào → kem
-    "linear-gradient(135deg, #b8cbb8, #e2c58b)"    // Xám ngọc trai → vàng cát
+    "linear-gradient(135deg, #e0c3fc, #8ec5fc)",
+    "linear-gradient(135deg, #d9a7c7, #fffcdc)",
+    "linear-gradient(135deg, #fbc2eb, #a6c1ee)",
+    "linear-gradient(135deg, #f3e7e9, #e3eeff)",
+    "linear-gradient(135deg, #d4fc79, #96e6a1)",
+    "linear-gradient(135deg, #a8e063, #56ab2f)",
+    "linear-gradient(135deg, #c1dfc4, #deecdd)",
+    "linear-gradient(135deg, #e0f7da, #c8e6c9)",
+    "linear-gradient(135deg, #fbc2eb, #fcd6a4)",
+    "linear-gradient(135deg, #f6d365, #fda085)",
+    "linear-gradient(135deg, #ffecd2, #fcb69f)",
+    "linear-gradient(135deg, #f9d29d, #ffd8cb)",
+    "linear-gradient(135deg, #1e3c72, #2a5298)",
+    "linear-gradient(135deg, #0f2027, #4b6cb7)",
+    "linear-gradient(135deg, #2c3e50, #3498db)",
+    "linear-gradient(135deg, #373B44, #4286f4)",
+    "linear-gradient(135deg, #232526, #414345)",
+    "linear-gradient(135deg, #89f7fe, #66a6ff)",
+    "linear-gradient(135deg, #fddb92, #d1fdff)",
+    "linear-gradient(135deg, #ff9a9e, #fad0c4)",
+    "linear-gradient(135deg, #b8cbb8, #e2c58b)"
   ];
 
   const random = gradients[Math.floor(Math.random() * gradients.length)];
@@ -118,7 +144,6 @@
     document.body.style.background = random;
   });
 
-    // Nếu không có session, thì redirect về login.html
   fetch('/session-check')
     .then(res => {
       if (!res.ok) location.href = '/index.html';
