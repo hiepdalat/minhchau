@@ -4,132 +4,122 @@
   <meta charset="UTF-8">
   <title>Trang chính</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- Font mềm mại -->
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
-
-  <!-- SweetAlert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- YouTube Iframe API (đặt TRƯỚC script tự viết) -->
   <script src="https://www.youtube.com/iframe_api"></script>
 
   <style>
-    /* ======= NỀN & BỐ CỤC ======= */
-    body{
-      margin:0;
-      font-family:'Quicksand',sans-serif;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      background-image:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/hinhnen.jpg');
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      background-attachment:fixed;
+    body {
+      margin: 0;
+      font-family: 'Quicksand', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-image: url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/hinhnen.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
     }
+    .box {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(6px);
+      padding: 36px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      width: 320px;
+      text-align: center;
+    }
+    h2 {
+      color: #4a90e2;
+      margin: 0 0 20px;
+      font-size: 24px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      background: #f9f9f9;
+      box-shadow: inset 0 0 4px rgba(0,0,0,.1);
+      font-size: 15px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: all .3s;
+    }
+    .btn-congno { background: #6C63FF; }
+    .btn-kho    { background: #57C478; }
+    .btn-bh     { background: #FF8C42; }
+    .btn:hover  { opacity: .92; transform: scale(1.03); }
+    hr { margin: 24px 0; border: 0; border-top: 1px solid #ddd; }
 
-    /* ======= HỘP ĐĂNG NHẬP ======= */
-    .box{
-      background:rgba(255,255,255,.85);
-      backdrop-filter:blur(6px);
-      padding:36px 30px;
-      border-radius:20px;
-      box-shadow:0 8px 24px rgba(0,0,0,.2);
-      width:320px;
-      text-align:center;
+    .music-box {
+      margin-top: 24px;
+      text-align: center;
     }
-    h2{
-      color:#4a90e2;
-      margin:0 0 20px;
-      font-size:24px;
+    #volumeControl {
+      width: 160px;
+      margin-top: 10px;
+      appearance: none;
+      height: 6px;
+      border-radius: 4px;
+      background: #ccc;
+      outline: none;
+      cursor: pointer;
     }
-    input{
-      width:100%;
-      padding:12px;
-      margin:10px 0;
-      border:none;
-      border-radius:10px;
-      background:#f9f9f9;
-      box-shadow:inset 0 0 4px rgba(0,0,0,.1);
-      font-size:15px;
+    #volumeControl::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4a90e2;
+      border: none;
     }
-
-    /* ======= NÚT CHỨC NĂNG ======= */
-    .btn{
-      width:100%;
-      padding:12px;
-      margin-top:12px;
-      border:none;
-      border-radius:12px;
-      font-size:16px;
-      font-weight:bold;
-      color:#fff;
-      cursor:pointer;
-      transition:all .3s;
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      justify-content: center;
+      gap: 14px;
     }
-    .btn-congno{background:#6C63FF;}
-    .btn-kho   {background:#57C478;}
-    .btn-bh    {background:#FF8C42;}
-    .btn:hover{opacity:.92;transform:scale(1.03);}
-    hr{margin:24px 0;border:0;border-top:1px solid #ddd;}
-
-    /* ======= TRÌNH PHÁT NHẠC ======= */
-    .music-box{
-      margin-top:24px;
-      text-align:center;
+    .controls button {
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform .25s, opacity .25s;
     }
-    #volumeControl{
-      width:160px;
-      margin-top:10px;
-      appearance:none;
-      height:6px;
-      border-radius:4px;
-      background:#ccc;
-      outline:none;
-      cursor:pointer;
+    .controls button:hover {
+      opacity: .87;
+      transform: scale(1.1);
     }
-    #volumeControl::-webkit-slider-thumb{
-      appearance:none;
-      width:14px;height:14px;
-      border-radius:50%;
-      background:#4a90e2;
-      border:none;
+    #shuffleBtn.active {
+      background: #FF8C42;
     }
-
-    /* ======= NÚT ĐIỀU KHIỂN ======= */
-    .controls{
-      margin-top:12px;
-      display:flex;
-      justify-content:center;
-      gap:14px;
-    }
-    .controls button{
-      background:#4a90e2;
-      color:#fff;
-      border:none;
-      width:38px;height:38px;
-      border-radius:50%;
-      font-size:18px;
-      cursor:pointer;
-      transition:transform .25s, opacity .25s;
-    }
-    .controls button:hover{opacity:.87;transform:scale(1.1);}
-    #shuffleBtn.active{background:#FF8C42;}
-
-    /* ======= TÊN BÀI ĐANG PHÁT ======= */
-    #nowPlaying{
-      margin-top:10px;
-      font-size:14px;
-      color:#4a90e2;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+    #nowPlaying {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #4a90e2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   </style>
 </head>
-
 <body>
   <div class="box">
     <h2>🌼 Đăng nhập hệ thống</h2>
@@ -137,134 +127,123 @@
     <input id="password" type="password" placeholder="🔒 Mật khẩu">
 
     <hr>
-
     <button class="btn btn-congno" onclick="chucNang('/congno.html')">📒 Quản Lý Công Nợ</button>
     <button class="btn btn-kho"     onclick="chucNang('/khohang.html')">📦 Quản Lý Kho</button>
     <button class="btn btn-bh"      onclick="chucNang('/banhang.html')">🛒 Quản Lý Bán Hàng</button>
 
-    <!-- ======= TRÌNH PHÁT NHẠC ======= -->
+    <!-- ==== NHẠC ==== -->
     <div class="music-box">
-      <!-- Player ẩn (0×0) để lấy âm thanh -->
       <div id="ytPlayer"></div>
-
-      <!-- Slider volume -->
       <input type="range" id="volumeControl" min="0" max="100" value="70">
 
-      <!-- Nút điều khiển -->
       <div class="controls">
-        <button id="prevBtn"   title="Bài trước">⏮</button>
-        <button id="nextBtn"   title="Bài kế">⏭</button>
+        <button id="prevBtn" title="Bài trước">⏮</button>
+        <button id="playPause" title="Phát / Dừng">⏯</button>
+        <button id="nextBtn" title="Bài kế">⏭</button>
         <button id="shuffleBtn" title="Shuffle">🔀</button>
       </div>
-
-      <!-- Tên bài đang phát -->
       <div id="nowPlaying">…</div>
     </div>
   </div>
 
-  <!-- ====================== SCRIPT ====================== -->
   <script>
-    /* ---------- LOGIN ---------- */
     let isLoggedIn = false;
     async function loginIfNeeded(){
-      if(isLoggedIn) return true;
-      const username=document.getElementById('username').value.trim();
-      const password=document.getElementById('password').value.trim();
-      if(!username||!password){
-        Swal.fire('Thiếu thông tin','Vui lòng nhập tài khoản và mật khẩu!','warning');
+      if (isLoggedIn) return true;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      if (!username || !password) {
+        Swal.fire('Thiếu thông tin', 'Vui lòng nhập tài khoản và mật khẩu!', 'warning');
         return false;
       }
-      try{
-        const res=await fetch('/login',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({username,password})
+      try {
+        const res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
         });
-        if(res.ok){isLoggedIn=true;return true;}
-        else{
-          const text=await res.text();
-          Swal.fire('Lỗi đăng nhập',text||'Sai tài khoản hoặc mật khẩu!','error');
+        if (res.ok) {
+          isLoggedIn = true;
+          return true;
+        } else {
+          const text = await res.text();
+          Swal.fire('Lỗi đăng nhập', text || 'Sai tài khoản hoặc mật khẩu!', 'error');
           return false;
         }
-      }catch{
-        Swal.fire('Lỗi','Không kết nối được server.','error');
+      } catch {
+        Swal.fire('Lỗi', 'Không kết nối được server.', 'error');
         return false;
       }
     }
     async function chucNang(path){
-      const ok=await loginIfNeeded();
-      if(ok) window.location.href=path;
+      const ok = await loginIfNeeded();
+      if (ok) window.location.href = path;
     }
     document.getElementById('password')
-      .addEventListener('keydown',e=>{if(e.key==='Enter') chucNang('/congno.html');});
+      .addEventListener('keydown', e => {
+        if (e.key === 'Enter') chucNang('/congno.html');
+      });
 
-    /* ---------- YOUTUBE AUDIO ---------- */
-    const playlists = [
-      'PLv1quoEqqgjAihdJtJZVKWtZWo_vD2y6U', // Lo‑fi chill
-      'PLb6SKl2NeUNmVWEYVtFR7PZ6Cvj1QKkuC', // Guitar acoustic
-      'PLUybubhBTyxw3kZ9zolmZ_6BrQ2leETko', // Piano thư giãn
-      'PLYkB2GLfxxJfKld8qa_raVXHWFB8OL2tK'  // Ambient chill
-    ];
-    let listIdx = 0;      // playlist hiện tại
-    let player;           // đối tượng YT.Player
-    let shuffle = false;  // trạng thái shuffle
+    // ========== YOUTUBE PLAYER ==========
+    const videoList = ['zaY0FEVhfAw', 'fuXfT4Rv_WM'];
+    let player;
+    let shuffle = false;
+    let isPlaying = true;
 
-    /* YouTube Iframe API callback */
     function onYouTubeIframeAPIReady(){
-      player = new YT.Player('ytPlayer',{
-        height:'0', width:'0',
-        playerVars:{
-          listType:'playlist',
-          list:playlists[listIdx],
-          autoplay:1,
-          loop:1     // lặp trong playlist
-        },
-        events:{
-          onReady:onPlayerReady,
-          onStateChange:onPlayerStateChange
+      player = new YT.Player('ytPlayer', {
+        height: '0',
+        width: '0',
+        playerVars: { autoplay: 1, loop: 1 },
+        events: {
+          onReady: () => {
+            player.loadPlaylist({ playlist: videoList, index: 0 });
+            player.setVolume(70);
+            player.setLoop(true);
+            if (shuffle) player.setShuffle(true);
+            updateNowPlaying();
+          },
+          onStateChange: e => {
+            if (e.data === YT.PlayerState.PLAYING){
+              isPlaying = true;
+              updateNowPlaying();
+              updatePlayButton();
+            }
+            if (e.data === YT.PlayerState.PAUSED){
+              isPlaying = false;
+              updatePlayButton();
+            }
+          }
         }
       });
     }
 
-    function onPlayerReady(){
-      player.setVolume(70);
-      player.playVideo();
-      updateNowPlaying();
-      if(shuffle) player.setShuffle(true);
-    }
-
-    function onPlayerStateChange(e){
-      // Khi hết bài cuối → chuyển playlist kế tiếp
-      if(e.data === YT.PlayerState.ENDED &&
-         player.getPlaylistIndex() === player.getPlaylist().length - 1){
-        listIdx = (listIdx + 1) % playlists.length;
-        player.loadPlaylist({listType:'playlist', list:playlists[listIdx], index:0});
-        if(shuffle) player.setShuffle(true);
-      }
-      // Cập nhật tên bài khi phát
-      if(e.data === YT.PlayerState.PLAYING) updateNowPlaying();
-    }
-
-    /* Hiển thị tên bài */
     function updateNowPlaying(){
       const title = player?.getVideoData()?.title || '';
       document.getElementById('nowPlaying').textContent = title;
     }
 
-    /* Volume */
+    function updatePlayButton(){
+      document.getElementById('playPause').textContent = isPlaying ? '⏸' : '▶️';
+    }
+
     document.getElementById('volumeControl')
-      .addEventListener('input', e=>{
+      .addEventListener('input', e => {
         player?.setVolume(+e.target.value);
       });
 
-    /* Nút Prev / Next / Shuffle */
-    document.getElementById('prevBtn').onclick   = ()=> player?.previousVideo();
-    document.getElementById('nextBtn').onclick   = ()=> player?.nextVideo();
-    const shuffleBtn = document.getElementById('shuffleBtn');
-    shuffleBtn.onclick = ()=>{
+    document.getElementById('prevBtn').onclick   = () => player?.previousVideo();
+    document.getElementById('nextBtn').onclick   = () => player?.nextVideo();
+
+    document.getElementById('shuffleBtn').onclick = () => {
       shuffle = !shuffle;
       player?.setShuffle(shuffle);
-      shuffleBtn.classList.toggle('active', shuffle);
+      document.getElementById('shuffleBtn').classList.toggle('active', shuffle);
+    };
+
+    document.getElementById('playPause').onclick = () => {
+      if (!player) return;
+      isPlaying ? player.pauseVideo() : player.playVideo();
     };
   </script>
 </body>
