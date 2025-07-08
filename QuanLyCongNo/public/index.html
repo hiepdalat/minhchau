@@ -4,108 +4,188 @@
   <meta charset="UTF-8">
   <title>Trang chính</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Font mềm mại -->
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+
+  <!-- SweetAlert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- YouTube Iframe API – cho phép điều chỉnh volume -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
   <style>
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #00aaff, #00ffaa);
-      font-family: Arial, sans-serif;
+    /* ======= NỀN & BỐ CỤC ======= */
+    body{
+      margin:0;
+      font-family:'Quicksand',sans-serif;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      background-image:url('https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/hinhnen.jpg');
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      background-attachment:fixed;
     }
-    .box {
-      background: #fff;
-      padding: 32px 28px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, .25);
-      width: 320px;
-      text-align: center;
+
+    /* ======= HỘP ĐĂNG NHẬP ======= */
+    .box{
+      background:rgba(255,255,255,.85);
+      backdrop-filter:blur(6px);
+      padding:36px 30px;
+      border-radius:20px;
+      box-shadow:0 8px 24px rgba(0,0,0,.2);
+      width:320px;
+      text-align:center;
     }
-    h2 {
-      color: #0077cc;
-      margin-top: 0;
+    h2{
+      color:#4a90e2;
+      margin:0 0 20px;
+      font-size:24px;
     }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+    input{
+      width:100%;
+      padding:12px;
+      margin:10px 0;
+      border:none;
+      border-radius:10px;
+      background:#f9f9f9;
+      box-shadow:inset 0 0 4px rgba(0,0,0,.1);
+      font-size:15px;
     }
-    .btn {
-      width: 100%;
-      padding: 11px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-      transition: opacity .2s;
+
+    /* ======= NÚT CHỨC NĂNG ======= */
+    .btn{
+      width:100%;
+      padding:12px;
+      margin-top:12px;
+      border:none;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:bold;
+      color:#fff;
+      cursor:pointer;
+      transition:all .3s;
     }
-    .btn-congno { background: #0077cc; }
-    .btn-kho    { background: #28a745; }
-    .btn-bh     { background: #ff6600; }
-    .btn:hover  { opacity: .9; }
+    .btn-congno{background:#6C63FF;}
+    .btn-kho   {background:#57C478;}
+    .btn-bh    {background:#FF8C42;}
+    .btn:hover{opacity:.92;transform:scale(1.03);}
+    hr{margin:24px 0;border:0;border-top:1px solid #ddd;}
+
+    /* ======= TRÌNH PHÁT NHẠC ======= */
+    .music-box{
+      margin-top:24px;
+      text-align:center;
+    }
+    #volumeControl{
+      width:160px;
+      margin-top:10px;
+      appearance:none;
+      height:6px;
+      border-radius:4px;
+      background:#ccc;
+      outline:none;
+      cursor:pointer;
+    }
+    #volumeControl::-webkit-slider-thumb{
+      appearance:none;
+      width:14px;height:14px;
+      border-radius:50%;
+      background:#4a90e2;
+      border:none;
+    }
   </style>
 </head>
+
 <body>
+  <!-- ==== HỘP ĐĂNG NHẬP ==== -->
   <div class="box">
-    <h2>Đăng nhập hệ thống</h2>
-    <input id="username" placeholder="Tài khoản">
-    <input id="password" type="password" placeholder="Mật khẩu">
+    <h2>🌼 Đăng nhập hệ thống</h2>
+    <input id="username" placeholder="👤 Tài khoản">
+    <input id="password" type="password" placeholder="🔒 Mật khẩu">
 
-    <hr style="margin: 24px 0 16px">
+    <hr>
 
-    <button class="btn btn-congno" onclick="chucNang('/congno.html')">Quản Lý Công Nợ</button>
-    <button class="btn btn-kho"     onclick="chucNang('/khohang.html')">Quản Lý Kho</button>
-    <button class="btn btn-bh"      onclick="chucNang('/banhang.html')">Quản Lý Bán Hàng</button>
+    <button class="btn btn-congno" onclick="chucNang('/congno.html')">📒 Quản Lý Công Nợ</button>
+    <button class="btn btn-kho"     onclick="chucNang('/khohang.html')">📦 Quản Lý Kho</button>
+    <button class="btn btn-bh"      onclick="chucNang('/banhang.html')">🛒 Quản Lý Bán Hàng</button>
+
+    <!-- ==== TRÌNH PHÁT NHẠC ==== -->
+    <div class="music-box">
+      <!-- Player ẩn (0×0) để chỉ lấy âm thanh -->
+      <div id="ytPlayer"></div>
+      <input type="range" id="volumeControl" min="0" max="100" value="70">
+    </div>
   </div>
 
   <script>
+    /* ====================== LOGIN ====================== */
     let isLoggedIn = false;
-
-    async function loginIfNeeded() {
-      if (isLoggedIn) return true;
-
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      if (!username || !password) {
-        Swal.fire('Thiếu thông tin', 'Vui lòng nhập tài khoản và mật khẩu trước!', 'warning');
+    async function loginIfNeeded(){
+      if(isLoggedIn) return true;
+      const username=document.getElementById('username').value.trim();
+      const password=document.getElementById('password').value.trim();
+      if(!username||!password){
+        Swal.fire('Thiếu thông tin','Vui lòng nhập tài khoản và mật khẩu!','warning');
         return false;
       }
-
-      try {
-        const res = await fetch('/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+      try{
+        const res=await fetch('/login',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({username,password})
         });
-        if (res.ok) {
-          isLoggedIn = true;
-          return true;
-        } else {
-          const text = await res.text();
-          Swal.fire('Lỗi đăng nhập', text || 'Sai tài khoản hoặc mật khẩu!', 'error');
+        if(res.ok){isLoggedIn=true;return true;}
+        else{
+          const text=await res.text();
+          Swal.fire('Lỗi đăng nhập',text||'Sai tài khoản hoặc mật khẩu!','error');
           return false;
         }
-      } catch {
-        Swal.fire('Lỗi', 'Không kết nối được server.', 'error');
+      }catch{
+        Swal.fire('Lỗi','Không kết nối được server.','error');
         return false;
       }
     }
+    async function chucNang(path){
+      const ok=await loginIfNeeded();
+      if(ok) window.location.href=path;
+    }
+    document.getElementById('password')
+      .addEventListener('keydown',e=>{if(e.key==='Enter') chucNang('/congno.html');});
 
-    async function chucNang(path) {
-      const ok = await loginIfNeeded();
-      if (ok) window.location.href = path;
+    /* ====================== YOUTUBE AUDIO ====================== */
+    let player; // đối tượng YT.Player
+
+    // Hàm được gọi khi API YouTube sẵn sàng
+    function onYouTubeIframeAPIReady(){
+      player=new YT.Player('ytPlayer',{
+        height:'0',
+        width:'0',
+        playerVars:{
+          listType:'playlist',
+          list:'PLB1F2BC6D6A2A2204', // playlist nhạc bất hủ không lời
+          autoplay:1,
+          loop:1,
+          mute:0
+        },
+        events:{onReady:onPlayerReady}
+      });
     }
 
-    // Gõ Enter trong ô mật khẩu sẽ tự động login và chuyển nếu đã có nút bấm trước
-    document.getElementById('password').addEventListener('keydown', e => {
-      if (e.key === 'Enter') chucNang('/congno.html');
-    });
+    function onPlayerReady(){
+      player.setVolume(70);            // Volume mặc định 70%
+      player.playVideo();
+    }
+
+    // Điều chỉnh âm lượng qua slider
+    document.getElementById('volumeControl')
+      .addEventListener('input', e=>{
+        const vol = parseInt(e.target.value,10);
+        if(player && player.setVolume) player.setVolume(vol);
+      });
   </script>
 </body>
 </html>
