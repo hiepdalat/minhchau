@@ -1,7 +1,8 @@
-// 📦 GỘP CẢ 3 MODULE: Đăng nhập + Công nợ + Nhập hàng + Mới: Tìm kiếm đại lý, xem đơn hàng theo ngày
+// script.js – Hoàn chỉnh chức năng tìm đại lý + xem chi tiết đơn hàng theo ngày
 
 const SESSION_IDLE_LIMIT = 5 * 60 * 1000;
 let idleTimer;
+
 function resetIdleTimer() {
   clearTimeout(idleTimer);
   idleTimer = setTimeout(() => {
@@ -16,7 +17,7 @@ function resetIdleTimer() {
   document.addEventListener(evt, resetIdleTimer));
 resetIdleTimer();
 
-// ========== HIỂN THỊ NGÀY TỰ ĐỘNG =============
+// Ticker ngày
 (() => {
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
   function buildText(){
@@ -29,18 +30,17 @@ resetIdleTimer();
   });
 })();
 
-// ========== ĐĂNG XUẤT =============
+// Xử lý đăng xuất
 function dangXuat() {
   fetch('/logout', { method: 'POST' }).finally(() => window.location.href = '/index.html');
 }
 
-// ========== PHÂN TRANG =============
-document.addEventListener('DOMContentLoaded', () => {
+// Phân trang xử lý
+window.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'nhaphang') initNhapHang();
 });
 
-// ========== MODULE NHẬP HÀNG =============
 function initNhapHang() {
   const supplierInput = document.getElementById('supplier');
   const dateInput = document.getElementById('date');
@@ -55,8 +55,8 @@ function initNhapHang() {
   const saveBtn = document.getElementById('saveBtn');
   const detailBtn = document.getElementById('detailBtn');
   const searchInput = document.getElementById('searchSupplier');
+  const btnSearch = document.getElementById('btnSearchSupplier');
   const suggestions = document.getElementById('suggestions');
-  const loadOrdersBtn = document.getElementById('loadOrdersBtn');
 
   dateInput.valueAsDate = new Date();
   let items = [];
@@ -132,48 +132,25 @@ function initNhapHang() {
     window.open('/chi-tiet-phieu-nhap?ngay=' + dateInput.value, '_blank');
   });
 
-  // ======= Tìm kiếm đại lý =======
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value.trim();
-    if (!q) return suggestions.innerHTML = '';
-    fetch('/api/search-supplier?kw=' + encodeURIComponent(q))
-      .then(r => r.json())
-      .then(data => {
-        suggestions.innerHTML = data.map(name => `<div class="suggestion-item">${name}</div>`).join('');
-      });
-  });
+  // Tìm kiếm đại lý
+  btnSearch.addEventListener('click', async () => {
+    const name = searchInput.value.trim();
+    if (!name) return alert('Nhập tên cần tìm');
+    const res = await fetch('/api/search-supplier?kw=' + encodeURIComponent(name));
+    const data = await res.json();
+    if (!data.length) return alert('Không tìm thấy kết quả phù hợp');
 
-  suggestions.addEventListener('click', (e) => {
-    const name = e.target.textContent;
-    if (name) {
-      searchInput.value = name;
-      suggestions.innerHTML = '';
-    }
-  });
-
-  // ======= Xem đơn hàng theo ngày =======
-  loadOrdersBtn.addEventListener('click', () => {
-    const ten = searchInput.value.trim();
-    if (!ten) return alert('Vui lòng nhập tên đại lý');
-    fetch('/api/supplier-orders?ten=' + encodeURIComponent(ten))
-      .then(r => r.json())
-      .then(data => {
-        if (!data.length) return alert('Không có đơn hàng');
-        const html = data.map(ngay => `<label><input type="radio" name="ngayNhap" value="${ngay}"> ${ngay}</label>`).join('<br/>');
-        Swal.fire({
-          title: 'Chọn ngày để xem',
-          html,
-          showCancelButton: true,
-          confirmButtonText: 'Xem chi tiết',
-          preConfirm: () => {
-            const val = document.querySelector('input[name="ngayNhap"]:checked')?.value;
-            if (!val) return Swal.showValidationMessage('Chọn 1 ngày');
-            return val;
-          }
-        }).then(r => {
-          if (r.isConfirmed && r.value)
-            window.open('/chi-tiet-phieu-nhap?ngay=' + r.value, '_blank');
-        });
+    suggestions.innerHTML = '';
+    data.forEach(d => {
+      const div = document.createElement('div');
+      div.textContent = `${d.daily} (${d.ngay.slice(0,10)})`;
+      div.className = 'suggest-item';
+      div.addEventListener('click', () => {
+        supplierInput.value = d.daily;
+        dateInput.value = d.ngay.slice(0, 10);
+        suggestions.innerHTML = '';
       });
+      suggestions.appendChild(div);
+    });
   });
 }
