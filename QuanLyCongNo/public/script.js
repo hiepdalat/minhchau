@@ -124,17 +124,17 @@ function initCongNo() {
       tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
     });
 
-  btnTim.onclick = () => {
-    const keyword = inputTim.value.trim().toLowerCase();
-    if (!keyword) {
-      renderTable(getRandomRows(allData, 10));
-    } else {
-      const matched = allData.filter(row =>
-        row.tenkhach.toLowerCase().includes(keyword)
-      );
-      renderTable(matched);
-    }
-  };
+ btnTim.onclick = () => {
+  const keyword = inputTim.value.trim().toLowerCase();
+  if (!keyword) {
+    renderTable(getRandomRows(allData, 10));
+  } else {
+    const matched = allData.filter(row =>
+      (row.ten || '').toLowerCase().includes(keyword)
+    );
+    renderTable(matched);
+  }
+};
 
   document.getElementById('checkAll')?.addEventListener('change', function() {
     chonTatCa(this);
