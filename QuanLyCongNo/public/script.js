@@ -362,7 +362,7 @@ function inDanhSach() {
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
         .header { display: flex; align-items: center; }
-        .header img { height: 160px; margin-right: 16px; }
+        .header img { height: 240px; margin-right: 16px; }
         .company-info h1 { margin: 0; color: #d00; font-size: 22px; }
         .company-info { line-height: 1.3; }
         h2 { text-align: center; margin: 20px 0 8px; color: #d00; }
@@ -391,6 +391,24 @@ function inDanhSach() {
         .watermark img {
           width: ${watermarkSize}px;
         }
+        .table-container {
+  position: relative;
+}
+
+.watermark-inside {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-20deg);
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.watermark-inside img {
+  width: ${watermarkSize}px;
+}
+        
       </style>
     </head>
     <body>
@@ -433,7 +451,9 @@ function inDanhSach() {
           </tr>
         </tfoot>
       </table>
-
+      <div class="watermark-inside">
+    <img src="${logoURL}" alt="Watermark">
+    </div>  
       <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
 
       <div class="sign">
@@ -445,9 +465,7 @@ function inDanhSach() {
         </div>
       </div>
 
-      <div class="watermark">
-        <img src="${logoURL}" alt="Watermark">
-      </div>
+      
 
       <script>window.print();</script>
     </body>
