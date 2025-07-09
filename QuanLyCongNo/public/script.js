@@ -234,13 +234,29 @@ function xoaDaChon() {
 
 function thanhToan() {
   const chks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
-  if (chks.length === 0) return Swal.fire('⚠️ Chưa chọn dòng nào', '', 'warning');
+  if (chks.length === 0)
+    return Swal.fire('⚠️ Chưa chọn dòng nào', '', 'warning');
+
+  // Kiểm tra nếu có dòng nào đã thanh toán
+  const daThanhToan = Array.from(chks).some(chk => {
+    const row = chk.closest('tr');
+    return row.classList.contains('row-paid');
+  });
+
+  if (daThanhToan) {
+    Swal.fire('❌ Dòng đã được thanh toán trước đó!', 'Vui lòng bỏ chọn các dòng đã thanh toán.', 'error');
+    return;
+  }
 
   Swal.fire({
-    title: 'Xác nhận đã thanh toán?', icon: 'question', showCancelButton: true,
-    confirmButtonText: 'Đồng ý', cancelButtonText: 'Huỷ'
+    title: 'Xác nhận đã thanh toán?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Đồng ý',
+    cancelButtonText: 'Huỷ'
   }).then(result => {
     if (!result.isConfirmed) return;
+
     const reqs = Array.from(chks).map(chk => {
       return fetch('/thanhtoan', {
         method: 'POST',
@@ -248,10 +264,10 @@ function thanhToan() {
         body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
       });
     });
+
     Promise.all(reqs).then(() => loadData());
   });
 }
-
 function inDanhSach() {
   const ds = document.querySelectorAll('#ds tr');
   let rows = [];
