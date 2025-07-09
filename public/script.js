@@ -56,7 +56,7 @@ function initNhapHang() {
   const detailBtn = document.getElementById('detailBtn');
   const searchInput = document.getElementById('searchSupplier');
   const btnSearch = document.getElementById('btnSearchSupplier');
-  const suggestions = document.getElementById('suggestions');
+  const suggestionsBox = document.getElementById('suggestions');
 
   dateInput.valueAsDate = new Date();
   let items = [];
@@ -132,25 +132,30 @@ function initNhapHang() {
     window.open('/chi-tiet-phieu-nhap?ngay=' + dateInput.value, '_blank');
   });
 
-  // Tìm kiếm đại lý
-  btnSearch.addEventListener('click', async () => {
-    const name = searchInput.value.trim();
-    if (!name) return alert('Nhập tên cần tìm');
-    const res = await fetch('/api/search-supplier?kw=' + encodeURIComponent(name));
-    const data = await res.json();
-    if (!data.length) return alert('Không tìm thấy kết quả phù hợp');
-
-    suggestions.innerHTML = '';
-    data.forEach(d => {
-      const div = document.createElement('div');
-      div.textContent = `${d.daily} (${d.ngay.slice(0,10)})`;
-      div.className = 'suggest-item';
-      div.addEventListener('click', () => {
-        supplierInput.value = d.daily;
-        dateInput.value = d.ngay.slice(0, 10);
-        suggestions.innerHTML = '';
+  // 🔍 Tìm theo tên đại lý
+  btnSearch.addEventListener('click', () => {
+    const keyword = searchInput.value.trim();
+    if (!keyword) return alert('Nhập tên đại lý để tìm');
+    fetch('/api/stock/search?kw=' + encodeURIComponent(keyword))
+      .then(res => res.json())
+      .then(data => {
+        suggestionsBox.innerHTML = '';
+        if (!data.length) {
+          suggestionsBox.innerHTML = '<i>Không tìm thấy</i>';
+          return;
+        }
+        data.forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'suggest-item';
+          const ngay = new Date(r.ngay).toISOString().split('T')[0];
+          div.textContent = `${r.daily} (${ngay}) – ${r.tongtien.toLocaleString()}đ`;
+          div.addEventListener('click', () => {
+            supplierInput.value = r.daily;
+            dateInput.value = ngay;
+            window.open('/chi-tiet-phieu-nhap?ngay=' + ngay, '_blank');
+          });
+          suggestionsBox.appendChild(div);
+        });
       });
-      suggestions.appendChild(div);
-    });
   });
 }
