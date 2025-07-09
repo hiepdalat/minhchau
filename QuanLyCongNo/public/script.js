@@ -83,22 +83,29 @@ function initCongNo() {
 
   let allData = [];
 
-  function renderTable(data) {
-    tbody.innerHTML = '';
-    data.forEach((item, index) => {
+ function renderTable(data) {
+  const tbody = document.querySelector('#ds');
+  tbody.innerHTML = '';
+
+  data.forEach(doc => {
+    const ten = doc.ten;
+    const ngay = doc.ngay;
+
+    doc.hanghoa.forEach((hh, index) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><input type="checkbox" data-id="${item._id}"></td>
-        <td>${item.tenkhach}</td>
-        <td>${item.ngay}</td>
-        <td>${item.noidung}</td>
-        <td>${item.soluong}</td>
-        <td>${Number(item.dongia).toLocaleString()}</td>
-        <td>${(item.soluong * item.dongia).toLocaleString()}</td>
+        <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
+        <td>${ten}</td>
+        <td>${ngay}</td>
+        <td>${hh.noidung}</td>
+        <td>${hh.soluong}</td>
+        <td>${Number(hh.dongia).toLocaleString()}</td>
+        <td>${(hh.soluong * hh.dongia).toLocaleString()}</td>
       `;
       tbody.appendChild(tr);
     });
-  }
+  });
+}
 
   function getRandomRows(arr, n = 10) {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
