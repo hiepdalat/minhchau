@@ -78,7 +78,7 @@ let monTam = [];
 function initCongNo() {
   console.log('🔁 Trang công nợ');
 
-  const tbody = document.querySelector('#ds tbody');
+  const tbody = document.getElementById('ds');
   const btnTim = document.getElementById('btnTim');
   const inputTim = document.getElementById('timten');
 
