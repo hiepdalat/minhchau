@@ -6,115 +6,86 @@
   <title>Quản Lý Nhập Hàng</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="stylenhap.css" />
+  <style>
+    .suggest-item {
+      background: #f0f0f0;
+      padding: 5px;
+      margin-top: 2px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .suggest-item:hover {
+      background: #d0ebff;
+    }
+  </style>
 </head>
 <body data-page="nhaphang">
+  <header class="header-container">
+    <h1>Nhập Hàng Vào Kho</h1>
 
-<header class="header-container">
-  <h1>Nhập Hàng Vào Kho</h1>
-
-  <!-- Vùng tìm kiếm đại lý -->
-  <div class="card">
-    <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
-   <div style="display:flex; gap:10px;">
-  <input type="text" id="searchSupplier" placeholder="Nhập tên hoặc vài ký tự..." autocomplete="off" style="flex:1" />
-  <button id="btnSearchSupplier" class="btn btn-secondary"><i class="fa fa-search"></i> Tìm</button>
-</div>
-    <div id="suggestions" style="border:1px solid #ccc; max-height:150px; overflow:auto; margin-top:5px;"></div>
-    <button id="loadOrdersBtn" class="btn btn-info" style="margin-top:10px;">
-      <i class="fa fa-list"></i> Chi tiết đơn hàng
-    </button>
-  </div>
-
-  <!-- Thông tin chung -->
-  <div class="card grid-2">
-    <div>
-      <label for="supplier">Tên đại lý</label>
-      <input type="text" id="supplier" placeholder="Nhập tên đại lý" />
+    <!-- Vùng tìm kiếm -->
+    <div class="card">
+      <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
+      <div style="display: flex; gap: 10px; margin-top: 5px;">
+        <input id="searchSupplier" class="form-control" placeholder="Nhập tên đại lý">
+        <button id="btnSearchSupplier" class="btn btn-primary">Tìm</button>
+      </div>
+      <div id="suggestions" style="margin-top: 10px;"></div>
+      <br>
+      <button id="detailBtn" class="btn btn-secondary">
+        <i class="fa fa-file-alt"></i> Chi tiết đơn hàng
+      </button>
     </div>
-    <div>
-      <label for="date">Ngày nhập</label>
-      <input type="date" id="date" />
-    </div>
-  </div>
 
-  <!-- Thêm mặt hàng -->
-  <div class="card">
-    <div class="grid-2">
+    <!-- Thông tin chung -->
+    <div class="card grid-2">
       <div>
-        <label for="product">Tên hàng</label>
-        <input type="text" id="product" placeholder="Nhập tên hàng" />
+        <label for="supplier">Tên đại lý</label>
+        <input type="text" id="supplier" placeholder="Nhập tên đại lý" />
       </div>
       <div>
-        <label for="unit">Đơn vị tính</label>
-        <input type="text" id="unit" placeholder="Ví dụ: cái, kg, hộp" />
-      </div>
-      <div>
-        <label for="qty">Số lượng</label>
-        <input type="number" min="1" id="qty" value="1" />
-      </div>
-      <div>
-        <label for="price">Đơn giá</label>
-        <input type="number" min="0" id="price" value="0" />
-      </div>
-      <div>
-        <label for="discount">CK (%)</label>
-        <input type="number" min="0" id="discount" value="0" />
-      </div>
-      <div class="align-end">
-        <button id="addItem" class="btn btn-primary">
-          <i class="fa fa-plus"></i> Thêm món
-        </button>
+        <label for="date">Ngày nhập</label>
+        <input type="date" id="date" />
       </div>
     </div>
-  </div>
 
-  <!-- Danh sách tạm -->
-  <div class="card">
-    <table id="itemsTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Tên hàng</th>
-          <th>ĐVT</th>
-          <th>SL</th>
-          <th>Đơn giá</th>
-          <th>CK (%)</th>
-          <th>G-nhập</th>
-          <th>Thành tiền</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="7" class="text-right">Tổng tiền:</td>
-          <td id="grandTotal" class="total">0</td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+    <!-- Thêm mặt hàng -->
+    <div class="card">
+      <div class="grid-2">
+        <div><label for="product">Tên hàng</label><input type="text" id="product" placeholder="Nhập tên hàng" /></div>
+        <div><label for="unit">Đơn vị tính</label><input type="text" id="unit" placeholder="Ví dụ: cái, kg, hộp" /></div>
+        <div><label for="qty">Số lượng</label><input type="number" min="1" id="qty" value="1" /></div>
+        <div><label for="price">Đơn giá</label><input type="number" min="0" id="price" value="0" /></div>
+        <div><label for="discount">CK (%)</label><input type="number" min="0" id="discount" value="0" /></div>
+        <div class="align-end">
+          <button id="addItem" class="btn btn-primary"><i class="fa fa-plus"></i> Thêm món</button>
+        </div>
+      </div>
+    </div>
 
-  <!-- Hành động -->
-  <div class="card text-right">
-    <button id="saveBtn" class="btn btn-success">
-      <i class="fa fa-save"></i> Lưu phiếu nhập
-    </button>
-    <button id="detailBtn" class="btn btn-primary">
-      <i class="fa fa-file-alt"></i> Chi tiết phiếu nhập
-    </button>
-  </div>
+    <!-- Danh sách tạm -->
+    <div class="card">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th>#</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th><th>CK (%)</th><th>G-nhập</th><th>Thành tiền</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="7" class="text-right">Tổng tiền:</td><td id="grandTotal" class="total">0</td><td></td></tr>
+        </tfoot>
+      </table>
+    </div>
 
-  <div class="card text-right">
-    <button id="logoutBtn" class="btn btn-danger" onclick="dangXuat()">
-      <i class="fa fa-sign-out-alt"></i> Đăng xuất
-    </button>
-  </div>
-</header>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="script.js" defer></script>
+    <!-- Hành động -->
+    <div class="card text-right">
+      <button id="saveBtn" class="btn btn-success"><i class="fa fa-save"></i> Lưu phiếu nhập</button>
+      <button id="logoutBtn" class="btn btn-danger"><i class="fa fa-sign-out-alt"></i> Đăng xuất</button>
+    </div>
+  </header>
+  <script src="script.js" defer></script>
 </body>
 </html>
