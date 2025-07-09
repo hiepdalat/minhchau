@@ -319,11 +319,10 @@ function inDanhSach() {
   const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
   const Tien = ["", "nghìn", "triệu", "tỷ"];
 
-  if (num == 0) return "Không đồng";
+  if (num === 0) return "Không đồng";
 
   let result = "";
   let lan = 0;
-  let isFirstGroup = true;
 
   while (num > 0) {
     let so = num % 1000;
@@ -333,13 +332,11 @@ function inDanhSach() {
       let tram = Math.floor(so / 100);
       let chuc = Math.floor((so % 100) / 10);
       let donvi = so % 10;
-
       let str = "";
 
-      // Chỉ thêm "không trăm" nếu không phải nhóm đầu tiên và nhóm có giá trị
       if (tram > 0) {
         str += ChuSo[tram] + " trăm ";
-      } else if (lan > 0 && (chuc > 0 || donvi > 0)) {
+      } else if (chuc > 0 || donvi > 0) {
         str += "không trăm ";
       }
 
@@ -360,7 +357,6 @@ function inDanhSach() {
     }
 
     lan++;
-    isFirstGroup = false;
   }
 
   return result.trim().replace(/\s+/g, ' ') + " đồng chẵn";
