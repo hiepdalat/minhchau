@@ -362,7 +362,7 @@ function inDanhSach() {
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
         .header { display: flex; align-items: center; }
-        .header img { height: 240px; margin-right: 16px; }
+        .header img { height: 300px; margin-right: 16px; }
         .company-info h1 { margin: 0; color: #d00; font-size: 22px; }
         .company-info { line-height: 1.3; }
         h2 { text-align: center; margin: 20px 0 8px; color: #d00; }
@@ -397,8 +397,8 @@ function inDanhSach() {
 
 .watermark-inside {
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%;       /* Giữa chiều cao bảng */
+  left: 50%;      /* Giữa chiều ngang bảng */
   transform: translate(-50%, -50%) rotate(-20deg);
   opacity: 0.08;
   pointer-events: none;
@@ -430,7 +430,7 @@ function inDanhSach() {
         <div><strong>Người mua hàng:</strong><span class="dots-line"></span></div>
         <div><strong>Địa chỉ:</strong><span class="dots-line"></span></div>
       </div>
-
+      <div class="table-container">
       <table>
         <thead>
           <tr>
@@ -453,7 +453,8 @@ function inDanhSach() {
       </table>
       <div class="watermark-inside">
     <img src="${logoURL}" alt="Watermark">
-    </div>  
+  </div>
+</div>
       <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
 
       <div class="sign">
