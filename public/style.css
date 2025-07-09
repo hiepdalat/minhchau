@@ -160,7 +160,11 @@ td:nth-child(3) {
   color: #fff !important;
   font-weight: bold;
 }
-
+.row-paid {
+  background-color: #fa1e1e !important;
+  color: #fff !important;
+  font-weight: bold;
+}
 @media (max-width: 768px) {
   body {
     font-size: 14px;
