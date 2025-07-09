@@ -78,14 +78,63 @@ let monTam = [];
 function initCongNo() {
   console.log('🔁 Trang công nợ');
 
-  document.getElementById('search')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') loadData(e.target.value.trim());
-  });
+  const tbody = document.querySelector('#ds tbody');
+  const btnTim = document.getElementById('btnTim');
+  const inputTim = document.getElementById('timten');
 
-  window.addEventListener('load', () => {
-    loadData();
-  });
+  let allData = []; // Dữ liệu toàn bộ từ server
 
+  // Hàm vẽ bảng từ mảng data bất kỳ
+  function renderTable(data) {
+    tbody.innerHTML = '';
+    data.forEach((item, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox" data-id="${item._id}"></td>
+        <td>${item.tenkhach}</td>
+        <td>${item.ngay}</td>
+        <td>${item.noidung}</td>
+        <td>${item.soluong}</td>
+        <td>${Number(item.dongia).toLocaleString()}</td>
+        <td>${(item.soluong * item.dongia).toLocaleString()}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Trộn mảng và lấy 10 dòng ngẫu nhiên
+  function getRandomRows(arr, n = 10) {
+    return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
+  }
+
+  // Load dữ liệu từ server
+  fetch('/api/congno')
+    .then(res => res.json())
+    .then(data => {
+      allData = data;
+      const random10 = getRandomRows(allData, 10);
+      renderTable(random10); // ✅ Hiển thị 10 dòng ngẫu nhiên đầu
+    })
+    .catch(err => {
+      console.error('❌ Lỗi khi load công nợ:', err);
+      tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
+    });
+
+  // Bắt sự kiện nút "Tìm"
+  btnTim.onclick = () => {
+    const keyword = inputTim.value.trim().toLowerCase();
+    if (!keyword) {
+      // Nếu để trống, load lại random 10 dòng
+      renderTable(getRandomRows(allData, 10));
+    } else {
+      const matched = allData.filter(row =>
+        row.tenkhach.toLowerCase().includes(keyword)
+      );
+      renderTable(matched); // ✅ Hiển thị toàn bộ dòng khớp
+    }
+  };
+}
+ 
   document.getElementById('checkAll')?.addEventListener('change', function() {
     chonTatCa(this);
   });
@@ -104,38 +153,35 @@ function loadData(keyword = '') {
       const tbody = document.getElementById('ds');
       tbody.innerHTML = '';
 
-     let count = 0;
-for (const doc of data) {
-  const { ten, ngay, hanghoa, _id } = doc;
-  for (let i = 0; i < hanghoa.length; i++) {
-    if (count >= 10) break;
-    const hh = hanghoa[i];
-    const tr = document.createElement('tr');
-    const thanhTien = hh.soluong * hh.dongia;
+      for (const doc of data) {
+        const { ten, ngay, hanghoa, _id } = doc;
 
-    tr.innerHTML = `
-      <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
-      <td>${ten}</td>
-      <td>${ngay}</td>
-      <td>${hh.noidung}</td>
-      <td>${hh.soluong}</td>
-      <td>${hh.dongia}</td>
-      <td>${thanhTien}</td>
-    `;
-    if (hh.thanhtoan) tr.classList.add('row-paid');
+        for (let i = 0; i < hanghoa.length; i++) {
+          const hh = hanghoa[i];
+          const tr = document.createElement('tr');
+          const thanhTien = hh.soluong * hh.dongia;
 
-    const checkbox = tr.querySelector('input[type="checkbox"]');
-    checkbox.addEventListener('change', capNhatTongCong);
+          tr.innerHTML = `
+            <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
+            <td>${ten}</td>
+            <td>${ngay}</td>
+            <td>${hh.noidung}</td>
+            <td>${hh.soluong}</td>
+            <td>${hh.dongia.toLocaleString()}</td>
+            <td>${thanhTien.toLocaleString()}</td>
+          `;
+          if (hh.thanhtoan) tr.classList.add('row-paid');
 
-    tbody.appendChild(tr);
-    count++;
-  }
-  if (count >= 10) break;
-}
+          const checkbox = tr.querySelector('input[type="checkbox"]');
+          checkbox.addEventListener('change', capNhatTongCong);
+
+          tbody.appendChild(tr);
+        }
+      }
+
       capNhatTongCong();
     });
 }
-
 function chonTatCa(checkbox) {
  document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
   chk.checked = checkbox.checked;
@@ -302,6 +348,7 @@ function inDanhSach() {
   function numberToVietnamese(num) {
   const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
   const Tien = ["", "nghìn", "triệu", "tỷ"];
+
   if (num == 0) return "Không đồng";
 
   let result = "";
@@ -319,20 +366,21 @@ function inDanhSach() {
 
       let str = "";
 
+      // Chỉ thêm "không trăm" nếu không phải nhóm đầu tiên và nhóm có giá trị
       if (tram > 0) {
         str += ChuSo[tram] + " trăm ";
-      } else if (!isFirstGroup && (chuc > 0 || donvi > 0)) {
+      } else if (lan > 0 && (chuc > 0 || donvi > 0)) {
         str += "không trăm ";
       }
 
       if (chuc > 1) {
         str += ChuSo[chuc] + " mươi ";
-        if (donvi == 1) str += "mốt ";
-        else if (donvi == 5) str += "lăm ";
+        if (donvi === 1) str += "mốt ";
+        else if (donvi === 5) str += "lăm ";
         else if (donvi > 0) str += ChuSo[donvi] + " ";
-      } else if (chuc == 1) {
+      } else if (chuc === 1) {
         str += "mười ";
-        if (donvi == 5) str += "lăm ";
+        if (donvi === 5) str += "lăm ";
         else if (donvi > 0) str += ChuSo[donvi] + " ";
       } else if (donvi > 0) {
         str += "linh " + ChuSo[donvi] + " ";
@@ -365,7 +413,7 @@ function inDanhSach() {
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
         .header { display: flex; align-items: center; }
-        .header img { height: 300px; margin-right: 16px; }
+        .header img { height: 280px; margin-right: 16px; }
         .company-info h1 { margin: 0; color: #d00; font-size: 22px; }
         .company-info { line-height: 1.3; }
         h2 { text-align: center; margin: 20px 0 8px; color: #d00; }
