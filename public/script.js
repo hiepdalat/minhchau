@@ -299,36 +299,55 @@ function inDanhSach() {
   }
 
   function numberToVietnamese(n) {
-    const ChuSo = [' không',' một',' hai',' ba',' bốn',' năm',' sáu',' bảy',' tám',' chín'];
-    n = Math.round(n);
-    if (n === 0) return 'Không đồng';
-    let s = '', lan = 0;
-    while (n > 0) {
-      const n3 = n % 1000;
-      if (n3) {
-        let str3 = '';
-        const tram = Math.floor(n3 / 100);
-        const chuc = Math.floor((n3 % 100) / 10);
-        const don  = n3 % 10;
-        str3 += ChuSo[tram] + ' trăm';
-        if (chuc === 0 && don > 0) str3 += ' linh';
-        if (chuc > 1) str3 += ChuSo[chuc] + ' mươi';
-        if (chuc === 1) str3 += ' mười';
-        if (don > 0 && chuc !== 1) {
-          if (don === 5) str3 += ' lăm';
-          else str3 += ChuSo[don];
+    const dv = ['','nghìn','triệu','tỷ'];
+    const cs = ['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+
+    function doc3so(num) {
+      let [tram, chuc, donvi] = [Math.floor(num/100), Math.floor((num%100)/10), num%10];
+      let str = '';
+
+      if (tram > 0) str += cs[tram] + ' trăm';
+      else if (chuc > 0 || donvi > 0) str += 'không trăm';
+
+      if (chuc > 1) str += ' ' + cs[chuc] + ' mươi';
+      else if (chuc === 1) str += ' mười';
+      else if (donvi > 0 && tram > 0) str += ' linh';
+
+      if (donvi > 0) {
+        if (chuc === 0 || chuc === 1) {
+          if (donvi === 5 && chuc !== 0) str += ' lăm';
+          else str += ' ' + cs[donvi];
+        } else {
+          if (donvi === 1) str += ' mốt';
+          else if (donvi === 5) str += ' lăm';
+          else str += ' ' + cs[donvi];
         }
-        s = str3 + ['',' nghìn',' triệu',' tỷ'][lan] + s;
+      }
+
+      return str.trim();
+    }
+
+    if (n === 0) return 'Không đồng';
+
+    let str = '';
+    let i = 0;
+    while (n > 0) {
+      const part = n % 1000;
+      if (part > 0) {
+        const prefix = doc3so(part) + ' ' + dv[i];
+        str = prefix + ' ' + str;
       }
       n = Math.floor(n / 1000);
-      lan++;
+      i++;
     }
-    return s.trim() + ' đồng chẵn';
+
+    return str.replace(/\s+/g, ' ').trim() + ' đồng chẵn';
   }
 
-  const ngayIn = new Date().toLocaleDateString('vi-VN');
+  const ngayIn = new Date();
+  const formattedDate = `${ngayIn.getDate()}/${ngayIn.getMonth() + 1}/${ngayIn.getFullYear()}`;
   const chu = numberToVietnamese(tong);
-  const logoURL = 'logomc.png'; // sử dụng ảnh từ thư mục public
+  const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
 
   const html = `
     <html>
@@ -351,14 +370,20 @@ function inDanhSach() {
         .sign div { text-align: center; }
         .watermark {
           position: absolute;
-          top: 30%;
+          top: 35%;
           left: 50%;
           transform: translate(-50%, -50%) rotate(-20deg);
-          opacity: 0.08;
+          opacity: 0.8;
           z-index: 0;
         }
         .watermark img {
           width: 300px;
+        }
+        .dot-line {
+        display: inline-block;
+        border-bottom: 1px dotted #000;
+        width: 65%;
+        margin-left: 10px;
         }
       </style>
     </head>
@@ -368,18 +393,18 @@ function inDanhSach() {
         <div class="company-info">
           <h1>Điện Nước Minh Châu</h1>
           <div>Mã số thuế: 8056681027-001</div>
-          <div>Địa chỉ: Chợ Xuân Thọ - Phường Xuân Trường - TP Đà Lạt</div>
+          <div>Địa chỉ: Chợ Xuân Thọ - P. Xuân Trường - TP Đà Lạt</div>
           <div>Điện thoại: 0973778279 – Zalo: 0938039084</div>
           <div>Số tài khoản: 9973778279 – Ngân hàng Vietcombank – Dương Xuân Hiệp</div>
         </div>
       </div>
 
       <h2>HÓA ĐƠN BÁN HÀNG</h2>
-      <div><strong>Ngày:</strong> ${ngayIn}</div>
+      <div><strong>Ngày:</strong> ${formattedDate}</div>
 
       <div class="info">
-        <div><strong>Người mua hàng:</strong> ___________________________________</div>
-        <div><strong>Địa chỉ:</strong> __________________________________________</div>
+        <div><strong>Người mua hàng:</strong> <span class="dot-line"></span></div>
+        <div><strong>Địa chỉ:</strong> <span class="dot-line"></span></div>
       </div>
 
       <table>
@@ -412,7 +437,7 @@ function inDanhSach() {
         </div>
         <div>
           NGƯỜI BÁN HÀNG<br>
-          Ngày ${ngayIn}<br>
+          Ngày ${formattedDate}<br>
           (Ký, ghi rõ họ tên)
         </div>
       </div>
@@ -421,9 +446,7 @@ function inDanhSach() {
         <img src="${logoURL}" alt="Watermark">
       </div>
 
-      <script>
-        window.print();
-      </script>
+      <script>window.print();</script>
     </body>
     </html>
   `;
