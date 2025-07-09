@@ -1,26 +1,24 @@
-// script.js – Hoàn chỉnh chức năng tìm đại lý + xem chi tiết đơn hàng theo ngày
+// script.js – Gộp từ công nợ + nhập hàng + bán hàng + tìm kiếm
 
 const SESSION_IDLE_LIMIT = 5 * 60 * 1000;
 let idleTimer;
-
 function resetIdleTimer() {
   clearTimeout(idleTimer);
   idleTimer = setTimeout(() => {
     Swal.fire({
       icon: 'info',
       title: 'Phiên làm việc đã hết',
-      text: 'Bạn đã không hoạt động quá 5 phút – vui lòng đăng nhập lại.',
+      text: 'Bạn đã không hoạt động quá 5 phút – vui lòng đăng nhập lại.'
     }).then(() => window.location.href = '/logout');
   }, SESSION_IDLE_LIMIT);
 }
-['click','mousemove','keydown','scroll','touchstart'].forEach(evt =>
-  document.addEventListener(evt, resetIdleTimer));
+['click','mousemove','keydown','scroll','touchstart'].forEach(evt => document.addEventListener(evt, resetIdleTimer));
 resetIdleTimer();
 
-// Ticker ngày
+// ================= TICKER NGÀY ===================
 (() => {
   const thuVN = ['Chủ nhật','Hai','Ba','Tư','Năm','Sáu','Bảy'];
-  function buildText(){
+  function buildText() {
     const d = new Date();
     return `Hôm nay thứ ${thuVN[d.getDay()]} ngày ${d.getDate().toString().padStart(2,'0')} tháng ${(d.getMonth()+1).toString().padStart(2,'0')} năm ${d.getFullYear()} – Chúc bạn một ngày làm việc thật hiệu quả!`;
   }
@@ -30,17 +28,15 @@ resetIdleTimer();
   });
 })();
 
-// Xử lý đăng xuất
-function dangXuat() {
-  fetch('/logout', { method: 'POST' }).finally(() => window.location.href = '/index.html');
-}
-
-// Phân trang xử lý
-window.addEventListener('DOMContentLoaded', () => {
+// ================= HỖ TRỢ ĐA TRANG ===================
+document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
+  if (page === 'congno') initCongNo();
   if (page === 'nhaphang') initNhapHang();
+  if (page === 'banhang') initBanHang();
 });
 
+// ============== MODULE NHẬP HÀNG ===================
 function initNhapHang() {
   const supplierInput = document.getElementById('supplier');
   const dateInput = document.getElementById('date');
@@ -55,9 +51,8 @@ function initNhapHang() {
   const saveBtn = document.getElementById('saveBtn');
   const detailBtn = document.getElementById('detailBtn');
   const searchInput = document.getElementById('searchSupplier');
-  const btnSearch = document.getElementById('btnSearchSupplier');
-  const suggestionsBox = document.getElementById('suggestions');
-
+  const searchBtn = document.getElementById('btnSearch');
+  const tableSearch = document.getElementById('searchResult');
   dateInput.valueAsDate = new Date();
   let items = [];
 
@@ -86,10 +81,7 @@ function initNhapHang() {
     const qty = +qtyInput.value;
     const price = +priceInput.value;
     const discount = +discountInput.value || 0;
-    if (!name || !unit || qty <= 0) {
-      alert('Vui lòng nhập đầy đủ thông tin sản phẩm.');
-      return;
-    }
+    if (!name || !unit || qty <= 0) return alert('Vui lòng nhập đầy đủ thông tin sản phẩm.');
     items.push({ name, unit, qty, price, discount });
     productInput.value = unitInput.value = '';
     qtyInput.value = 1;
@@ -132,30 +124,37 @@ function initNhapHang() {
     window.open('/chi-tiet-phieu-nhap?ngay=' + dateInput.value, '_blank');
   });
 
-  // 🔍 Tìm theo tên đại lý
-  btnSearch.addEventListener('click', () => {
-    const keyword = searchInput.value.trim();
-    if (!keyword) return alert('Nhập tên đại lý để tìm');
-    fetch('/api/stock/search?kw=' + encodeURIComponent(keyword))
+  // ======== Tìm kiếm đại lý ========
+  searchBtn?.addEventListener('click', () => {
+    const name = searchInput.value.trim();
+    if (!name) return;
+    fetch('/api/stock/search?ten=' + encodeURIComponent(name))
       .then(res => res.json())
       .then(data => {
-        suggestionsBox.innerHTML = '';
-        if (!data.length) {
-          suggestionsBox.innerHTML = '<i>Không tìm thấy</i>';
-          return;
-        }
-        data.forEach(r => {
-          const div = document.createElement('div');
-          div.className = 'suggest-item';
-          const ngay = new Date(r.ngay).toISOString().split('T')[0];
-          div.textContent = `${r.daily} (${ngay}) – ${r.tongtien.toLocaleString()}đ`;
-          div.addEventListener('click', () => {
-            supplierInput.value = r.daily;
-            dateInput.value = ngay;
-            window.open('/chi-tiet-phieu-nhap?ngay=' + ngay, '_blank');
-          });
-          suggestionsBox.appendChild(div);
+        tableSearch.innerHTML = '';
+        if (!data.length) return tableSearch.innerHTML = '<tr><td colspan="5">Không tìm thấy</td></tr>';
+        data.forEach((r, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td><input type="checkbox" data-ngay="${r.ngay.slice(0,10)}"></td><td>${r.daily}</td><td>${r.ngay.slice(0,10)}</td><td>${r.tongtien.toLocaleString()}</td><td>${r.items.length} món</td>`;
+          tableSearch.appendChild(tr);
         });
       });
   });
+
+  document.getElementById('btnDetailDonHang')?.addEventListener('click', () => {
+    const checked = tableSearch.querySelector('input[type="checkbox"]:checked');
+    if (!checked) return alert('Chọn đơn hàng cần xem');
+    const ngay = checked.dataset.ngay;
+    window.open('/chi-tiet-phieu-nhap?ngay=' + ngay, '_blank');
+  });
+}
+
+function initCongNo() {
+  console.log('▶ Trang công nợ');
+  // placeholder
+}
+
+function initBanHang() {
+  console.log('▶ Trang bán hàng');
+  // placeholder
 }
