@@ -104,37 +104,43 @@ function loadData(keyword = '') {
       const tbody = document.getElementById('ds');
       tbody.innerHTML = '';
 
-      data.forEach(doc => {
-        const { ten, ngay, hanghoa, _id } = doc;
-        hanghoa.forEach((hh, i) => {
-          const tr = document.createElement('tr');
-          const thanhTien = hh.soluong * hh.dongia;
+     let count = 0;
+for (const doc of data) {
+  const { ten, ngay, hanghoa, _id } = doc;
+  for (let i = 0; i < hanghoa.length; i++) {
+    if (count >= 10) break;
+    const hh = hanghoa[i];
+    const tr = document.createElement('tr');
+    const thanhTien = hh.soluong * hh.dongia;
 
-          tr.innerHTML = `
-            <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
-            <td>${ten}</td>
-            <td>${ngay}</td>
-            <td>${hh.noidung}</td>
-            <td>${hh.soluong}</td>
-            <td>${hh.dongia}</td>
-            <td>${thanhTien}</td>
-          `;
-          if (hh.thanhtoan) tr.classList.add('row-paid');
+    tr.innerHTML = `
+      <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
+      <td>${ten}</td>
+      <td>${ngay}</td>
+      <td>${hh.noidung}</td>
+      <td>${hh.soluong}</td>
+      <td>${hh.dongia}</td>
+      <td>${thanhTien}</td>
+    `;
+    if (hh.thanhtoan) tr.classList.add('row-paid');
 
-          const checkbox = tr.querySelector('input[type="checkbox"]');
-          checkbox.addEventListener('change', capNhatTongCong);
+    const checkbox = tr.querySelector('input[type="checkbox"]');
+    checkbox.addEventListener('change', capNhatTongCong);
 
-          tbody.appendChild(tr);
-        });
-      });
-
+    tbody.appendChild(tr);
+    count++;
+  }
+  if (count >= 10) break;
+}
       capNhatTongCong();
     });
 }
 
 function chonTatCa(checkbox) {
-  document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => chk.checked = checkbox.checked);
-  capNhatTongCong();
+ document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
+  chk.checked = checkbox.checked;
+  chk.dispatchEvent(new Event('change'));
+});
 }
 
 function themMon() {
