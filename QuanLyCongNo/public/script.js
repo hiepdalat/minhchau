@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================== MODULE: CÔNG NỢ =====================
-// script.js – xử lý công nợ
+let monTam = [];
 
 function initCongNo() {
   console.log('🔁 Trang công nợ');
@@ -103,14 +103,12 @@ function loadData(keyword = '') {
     .then(data => {
       const tbody = document.getElementById('ds');
       tbody.innerHTML = '';
-      let tong = 0;
 
       data.forEach(doc => {
         const { ten, ngay, hanghoa, _id } = doc;
         hanghoa.forEach((hh, i) => {
           const tr = document.createElement('tr');
           const thanhTien = hh.soluong * hh.dongia;
-          tong += thanhTien;
 
           tr.innerHTML = `
             <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
@@ -122,19 +120,21 @@ function loadData(keyword = '') {
             <td>${thanhTien}</td>
           `;
           if (hh.thanhtoan) tr.classList.add('row-paid');
+
+          const checkbox = tr.querySelector('input[type="checkbox"]');
+          checkbox.addEventListener('change', capNhatTongCong);
+
           tbody.appendChild(tr);
         });
       });
 
-      const tongRow = document.getElementById('tongCongRow');
-      const tongVal = document.getElementById('tongCongValue');
-      tongVal.textContent = tong.toLocaleString();
-      tongRow.style.display = tong ? '' : 'none';
+      capNhatTongCong();
     });
 }
 
 function chonTatCa(checkbox) {
   document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => chk.checked = checkbox.checked);
+  capNhatTongCong();
 }
 
 function themMon() {
@@ -292,6 +292,23 @@ function inDanhSach() {
   `);
   printWindow.document.close();
   printWindow.print();
+}
+
+function capNhatTongCong() {
+  const checkboxes = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  let tong = 0;
+
+  checkboxes.forEach(chk => {
+    const tr = chk.closest('tr');
+    const cells = tr.querySelectorAll('td');
+    const thanhTien = parseFloat(cells[6]?.innerText?.replace(/,/g, '') || '0');
+    tong += thanhTien;
+  });
+
+  const tongRow = document.getElementById('tongCongRow');
+  const tongVal = document.getElementById('tongCongValue');
+  tongVal.textContent = tong.toLocaleString();
+  tongRow.style.display = checkboxes.length > 0 ? '' : 'none';
 }
 
 function dangXuat() {
