@@ -272,13 +272,14 @@ function inDanhSach() {
   const rows = [];
   let stt = 1;
   let tong = 0;
+
   document.querySelectorAll('#ds tr').forEach(tr => {
     const chk = tr.querySelector('input[type="checkbox"]');
     if (chk?.checked) {
       const cells = tr.querySelectorAll('td');
-      const noidung   = cells[3].innerText;
-      const sl        = cells[4].innerText;
-      const dongia    = cells[5].innerText;
+      const noidung = cells[3].innerText;
+      const sl = cells[4].innerText;
+      const dongia = cells[5].innerText;
       const thanhtien = parseFloat(cells[6].innerText.replace(/,/g, ''));
       tong += thanhtien;
       rows.push(`
@@ -298,56 +299,60 @@ function inDanhSach() {
     return;
   }
 
-  function numberToVietnamese(n) {
-    const dv = ['','nghìn','triệu','tỷ'];
-    const cs = ['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+  function numberToVietnamese(num) {
+    const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+    const Tien = ["", "nghìn", "triệu", "tỷ"];
+    if (num == 0) return "Không đồng";
 
-    function doc3so(num) {
-      let [tram, chuc, donvi] = [Math.floor(num/100), Math.floor((num%100)/10), num%10];
-      let str = '';
+    let result = "";
+    let lan = 0;
 
-      if (tram > 0) str += cs[tram] + ' trăm';
-      else if (chuc > 0 || donvi > 0) str += 'không trăm';
+    while (num > 0) {
+      let so = num % 1000;
+      num = Math.floor(num / 1000);
 
-      if (chuc > 1) str += ' ' + cs[chuc] + ' mươi';
-      else if (chuc === 1) str += ' mười';
-      else if (donvi > 0 && tram > 0) str += ' linh';
+      if (so > 0) {
+        let tram = Math.floor(so / 100);
+        let chuc = Math.floor((so % 100) / 10);
+        let donvi = so % 10;
 
-      if (donvi > 0) {
-        if (chuc === 0 || chuc === 1) {
-          if (donvi === 5 && chuc !== 0) str += ' lăm';
-          else str += ' ' + cs[donvi];
-        } else {
-          if (donvi === 1) str += ' mốt';
-          else if (donvi === 5) str += ' lăm';
-          else str += ' ' + cs[donvi];
+        let str = "";
+        if (tram > 0) {
+          str += ChuSo[tram] + " trăm ";
+        } else if (lan > 0 && (chuc > 0 || donvi > 0)) {
+          str += "không trăm ";
         }
+
+        if (chuc > 1) {
+          str += ChuSo[chuc] + " mươi ";
+          if (donvi == 1) str += "mốt ";
+          else if (donvi == 5) str += "lăm ";
+          else if (donvi > 0) str += ChuSo[donvi] + " ";
+        } else if (chuc == 1) {
+          str += "mười ";
+          if (donvi == 5) str += "lăm ";
+          else if (donvi > 0) str += ChuSo[donvi] + " ";
+        } else if (donvi > 0) {
+          str += "linh " + ChuSo[donvi] + " ";
+        }
+
+        result = str.trim() + " " + Tien[lan] + " " + result.trim();
       }
 
-      return str.trim();
+      lan++;
     }
 
-    if (n === 0) return 'Không đồng';
-
-    let str = '';
-    let i = 0;
-    while (n > 0) {
-      const part = n % 1000;
-      if (part > 0) {
-        const prefix = doc3so(part) + ' ' + dv[i];
-        str = prefix + ' ' + str;
-      }
-      n = Math.floor(n / 1000);
-      i++;
-    }
-
-    return str.replace(/\s+/g, ' ').trim() + ' đồng chẵn';
+    return result.trim().replace(/\s+/g, ' ') + " đồng chẵn";
   }
 
-  const ngayIn = new Date();
-  const formattedDate = `${ngayIn.getDate()}/${ngayIn.getMonth() + 1}/${ngayIn.getFullYear()}`;
+  const ngayIn = new Date().toLocaleDateString('vi-VN');
   const chu = numberToVietnamese(tong);
   const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
+
+  // Tự động điều chỉnh size watermark
+  const watermarkSize = rows.length <= 5 ? 180 :
+                        rows.length <= 10 ? 250 :
+                        rows.length <= 20 ? 300 : 360;
 
   const html = `
     <html>
@@ -357,11 +362,17 @@ function inDanhSach() {
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
         .header { display: flex; align-items: center; }
-        .header img { height: 60px; margin-right: 16px; }
-        .company-info h1 { margin: 0; color: #d00; font-size: 20px; }
+        .header img { height: 160px; margin-right: 16px; }
+        .company-info h1 { margin: 0; color: #d00; font-size: 22px; }
         .company-info { line-height: 1.3; }
         h2 { text-align: center; margin: 20px 0 8px; color: #d00; }
-        .info div { margin: 4px 0; }
+        .info div { margin: 6px 0; }
+        .dots-line {
+          border-bottom: 1px dotted #000;
+          display: inline-block;
+          width: 85%;
+          margin-left: 10px;
+        }
         table { width: 100%; border-collapse: collapse; margin-top: 16px; }
         th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 14px; }
         tfoot td { font-weight: bold; }
@@ -370,20 +381,15 @@ function inDanhSach() {
         .sign div { text-align: center; }
         .watermark {
           position: absolute;
-          top: 35%;
+          top: 45%;
           left: 50%;
           transform: translate(-50%, -50%) rotate(-20deg);
-          opacity: 0.8;
+          opacity: 0.3;
           z-index: 0;
+          pointer-events: none;
         }
         .watermark img {
-          width: 300px;
-        }
-        .dot-line {
-        display: inline-block;
-        border-bottom: 1px dotted #000;
-        width: 65%;
-        margin-left: 10px;
+          width: ${watermarkSize}px;
         }
       </style>
     </head>
@@ -392,19 +398,19 @@ function inDanhSach() {
         <img src="${logoURL}" alt="Logo">
         <div class="company-info">
           <h1>Điện Nước Minh Châu</h1>
-          <div>Mã số thuế: 8056681027-001</div>
-          <div>Địa chỉ: Chợ Xuân Thọ - P. Xuân Trường - TP Đà Lạt</div>
-          <div>Điện thoại: 0973778279 – Zalo: 0938039084</div>
-          <div>Số tài khoản: 9973778279 – Ngân hàng Vietcombank – Dương Xuân Hiệp</div>
+          <div>MST: 8056681027-001</div>
+          <div>Chợ Xuân Thọ – P. Xuân Trường – TP Đà Lạt</div>
+          <div>ĐT: 0973778279 – Zalo: 0938039084</div>
+          <div>STK: 9973778279 – Vietcombank – Dương Xuân Hiệp</div>
         </div>
       </div>
 
       <h2>HÓA ĐƠN BÁN HÀNG</h2>
-      <div><strong>Ngày:</strong> ${formattedDate}</div>
+      <div><strong>Ngày:</strong> ${ngayIn}</div>
 
       <div class="info">
-        <div><strong>Người mua hàng:</strong> <span class="dot-line"></span></div>
-        <div><strong>Địa chỉ:</strong> <span class="dot-line"></span></div>
+        <div><strong>Người mua hàng:</strong><span class="dots-line"></span></div>
+        <div><strong>Địa chỉ:</strong><span class="dots-line"></span></div>
       </div>
 
       <table>
@@ -422,7 +428,7 @@ function inDanhSach() {
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4">Tổng cộng hàng</td>
+            <td colspan="4">Tổng cộng</td>
             <td>${tong.toLocaleString()}</td>
           </tr>
         </tfoot>
@@ -432,13 +438,10 @@ function inDanhSach() {
 
       <div class="sign">
         <div>
-          NGƯỜI MUA HÀNG<br>
-          (Ký, ghi rõ họ tên)
+          NGƯỜI MUA HÀNG<br>(Ký, ghi rõ họ tên)
         </div>
         <div>
-          NGƯỜI BÁN HÀNG<br>
-          Ngày ${formattedDate}<br>
-          (Ký, ghi rõ họ tên)
+          NGƯỜI BÁN HÀNG<br>Ngày ${ngayIn}<br>(Ký, ghi rõ họ tên)
         </div>
       </div>
 
