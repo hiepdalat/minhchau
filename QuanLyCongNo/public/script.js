@@ -82,9 +82,8 @@ function initCongNo() {
   const btnTim = document.getElementById('btnTim');
   const inputTim = document.getElementById('timten');
 
-  let allData = []; // Dữ liệu toàn bộ từ server
+  let allData = [];
 
-  // Hàm vẽ bảng từ mảng data bất kỳ
   function renderTable(data) {
     tbody.innerHTML = '';
     data.forEach((item, index) => {
@@ -102,91 +101,53 @@ function initCongNo() {
     });
   }
 
-  // Trộn mảng và lấy 10 dòng ngẫu nhiên
   function getRandomRows(arr, n = 10) {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
 
-  // Load dữ liệu từ server
   fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
       allData = data;
       const random10 = getRandomRows(allData, 10);
-      renderTable(random10); // ✅ Hiển thị 10 dòng ngẫu nhiên đầu
+      renderTable(random10);
     })
     .catch(err => {
       console.error('❌ Lỗi khi load công nợ:', err);
       tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
     });
 
-  // Bắt sự kiện nút "Tìm"
   btnTim.onclick = () => {
     const keyword = inputTim.value.trim().toLowerCase();
     if (!keyword) {
-      // Nếu để trống, load lại random 10 dòng
       renderTable(getRandomRows(allData, 10));
     } else {
       const matched = allData.filter(row =>
         row.tenkhach.toLowerCase().includes(keyword)
       );
-      renderTable(matched); // ✅ Hiển thị toàn bộ dòng khớp
+      renderTable(matched);
     }
   };
-}
- 
+
   document.getElementById('checkAll')?.addEventListener('change', function() {
     chonTatCa(this);
   });
-
   document.getElementById('btnLuu')?.addEventListener('click', luuTatCa);
   document.getElementById('btnXoa')?.addEventListener('click', xoaDaChon);
   document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
   document.getElementById('btnThem')?.addEventListener('click', themMon);
-
-
-function loadData(keyword = '') {
-  fetch('/timkiem?ten=' + encodeURIComponent(keyword))
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.getElementById('ds');
-      tbody.innerHTML = '';
-
-      for (const doc of data) {
-        const { ten, ngay, hanghoa, _id } = doc;
-
-        for (let i = 0; i < hanghoa.length; i++) {
-          const hh = hanghoa[i];
-          const tr = document.createElement('tr');
-          const thanhTien = hh.soluong * hh.dongia;
-
-          tr.innerHTML = `
-            <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
-            <td>${ten}</td>
-            <td>${ngay}</td>
-            <td>${hh.noidung}</td>
-            <td>${hh.soluong}</td>
-            <td>${hh.dongia.toLocaleString()}</td>
-            <td>${thanhTien.toLocaleString()}</td>
-          `;
-          if (hh.thanhtoan) tr.classList.add('row-paid');
-
-          const checkbox = tr.querySelector('input[type="checkbox"]');
-          checkbox.addEventListener('change', capNhatTongCong);
-
-          tbody.appendChild(tr);
-        }
-      }
-
-      capNhatTongCong();
-    });
 }
+
 function chonTatCa(checkbox) {
- document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
-  chk.checked = checkbox.checked;
-  chk.dispatchEvent(new Event('change'));
-});
+  document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
+    chk.checked = checkbox.checked;
+    chk.dispatchEvent(new Event('change'));
+  });
+}
+
+function dangXuat() {
+  fetch('/logout').then(() => location.href = '/index.html');
 }
 
 function themMon() {
@@ -314,6 +275,15 @@ function thanhToan() {
     Promise.all(reqs).then(() => loadData());
   });
 }
+function loadData() {
+  fetch('/api/congno')
+    .then(res => res.json())
+    .then(data => {
+      allData = data;
+      renderTable(getRandomRows(allData, 10));
+    });
+}
+
 function inDanhSach() {
   const rows = [];
   let stt = 1;
@@ -534,9 +504,6 @@ function capNhatTongCong() {
   tongRow.style.display = checkboxes.length > 0 ? '' : 'none';
 }
 
-function dangXuat() {
-  fetch('/logout').then(() => location.href = '/index.html');
-}
 
 // ===================== MODULE: NHẬP HÀNG =====================
 function initNhapHang() {
