@@ -108,6 +108,7 @@ function initCongNo() {
   fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
+      console.log('📦 Dữ liệu công nợ:', data);   // << THÊM DÒNG NÀY
       allData = data;
       const random10 = getRandomRows(allData, 10);
       renderTable(random10);
