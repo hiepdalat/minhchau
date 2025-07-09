@@ -269,53 +269,169 @@ function thanhToan() {
   });
 }
 function inDanhSach() {
-  const ds = document.querySelectorAll('#ds tr');
-  let rows = [];
-  let tongTien = 0;
+  const rows = [];
   let stt = 1;
-
-  ds.forEach(row => {
-    const chk = row.querySelector('input[type="checkbox"]');
+  let tong = 0;
+  document.querySelectorAll('#ds tr').forEach(tr => {
+    const chk = tr.querySelector('input[type="checkbox"]');
     if (chk?.checked) {
-      const cells = row.querySelectorAll('td');
-      const thanhTien = +(cells[6].innerText || 0);
+      const cells = tr.querySelectorAll('td');
+      const noidung   = cells[3].innerText;
+      const sl        = cells[4].innerText;
+      const dongia    = cells[5].innerText;
+      const thanhtien = parseFloat(cells[6].innerText.replace(/,/g, ''));
+      tong += thanhtien;
       rows.push(`
         <tr>
           <td>${stt++}</td>
-          <td>${cells[1].innerText}</td>
-          <td>${cells[2].innerText}</td>
-          <td>${cells[3].innerText}</td>
-          <td>${cells[4].innerText}</td>
-          <td>${cells[5].innerText}</td>
-          <td>${cells[6].innerText}</td>
+          <td>${noidung}</td>
+          <td>${sl}</td>
+          <td>${Number(dongia).toLocaleString()}</td>
+          <td>${thanhtien.toLocaleString()}</td>
         </tr>
       `);
-      tongTien += thanhTien;
     }
   });
 
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <html><head><title>Danh sách công nợ</title>
-    <style>
-      body { font-family: sans-serif; padding: 20px; }
-      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-      th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-      th { background-color: #eee; }
-    </style>
-    </head><body>
-      <h2>Danh sách công nợ đã chọn</h2>
-      <table>
-        <tr><th>STT</th><th>Khách</th><th>Ngày</th><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
-        ${rows.join('')}
-        <tr><td colspan="6"><b>Tổng cộng</b></td><td><b>${tongTien.toLocaleString()}</b></td></tr>
-      </table>
-    </body></html>
-  `);
-  printWindow.document.close();
-  printWindow.print();
-}
+  if (!rows.length) {
+    Swal.fire('⚠️ Vui lòng chọn ít nhất 1 dòng để in hóa đơn', '', 'warning');
+    return;
+  }
 
+  function numberToVietnamese(n) {
+    const ChuSo = [' không',' một',' hai',' ba',' bốn',' năm',' sáu',' bảy',' tám',' chín'];
+    n = Math.round(n);
+    if (n === 0) return 'Không đồng';
+    let s = '', lan = 0;
+    while (n > 0) {
+      const n3 = n % 1000;
+      if (n3) {
+        let str3 = '';
+        const tram = Math.floor(n3 / 100);
+        const chuc = Math.floor((n3 % 100) / 10);
+        const don  = n3 % 10;
+        str3 += ChuSo[tram] + ' trăm';
+        if (chuc === 0 && don > 0) str3 += ' linh';
+        if (chuc > 1) str3 += ChuSo[chuc] + ' mươi';
+        if (chuc === 1) str3 += ' mười';
+        if (don > 0 && chuc !== 1) {
+          if (don === 5) str3 += ' lăm';
+          else str3 += ChuSo[don];
+        }
+        s = str3 + ['',' nghìn',' triệu',' tỷ'][lan] + s;
+      }
+      n = Math.floor(n / 1000);
+      lan++;
+    }
+    return s.trim() + ' đồng chẵn';
+  }
+
+  const ngayIn = new Date().toLocaleDateString('vi-VN');
+  const chu = numberToVietnamese(tong);
+  const logoURL = 'logomc.png'; // sử dụng ảnh từ thư mục public
+
+  const html = `
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Hóa đơn bán hàng</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
+        .header { display: flex; align-items: center; }
+        .header img { height: 60px; margin-right: 16px; }
+        .company-info h1 { margin: 0; color: #d00; font-size: 20px; }
+        .company-info { line-height: 1.3; }
+        h2 { text-align: center; margin: 20px 0 8px; color: #d00; }
+        .info div { margin: 4px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 14px; }
+        tfoot td { font-weight: bold; }
+        .amount-text { margin-top: 16px; font-style: italic; }
+        .sign { display: flex; justify-content: space-between; margin-top: 40px; }
+        .sign div { text-align: center; }
+        .watermark {
+          position: absolute;
+          top: 30%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-20deg);
+          opacity: 0.08;
+          z-index: 0;
+        }
+        .watermark img {
+          width: 300px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <img src="${logoURL}" alt="Logo">
+        <div class="company-info">
+          <h1>Điện Nước Minh Châu</h1>
+          <div>Mã số thuế: 8056681027-001</div>
+          <div>Địa chỉ: Chợ Xuân Thọ - Phường Xuân Trường - TP Đà Lạt</div>
+          <div>Điện thoại: 0973778279 – Zalo: 0938039084</div>
+          <div>Số tài khoản: 9973778279 – Ngân hàng Vietcombank – Dương Xuân Hiệp</div>
+        </div>
+      </div>
+
+      <h2>HÓA ĐƠN BÁN HÀNG</h2>
+      <div><strong>Ngày:</strong> ${ngayIn}</div>
+
+      <div class="info">
+        <div><strong>Người mua hàng:</strong> ___________________________________</div>
+        <div><strong>Địa chỉ:</strong> __________________________________________</div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên hàng hóa, dịch vụ</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.join('')}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">Tổng cộng hàng</td>
+            <td>${tong.toLocaleString()}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
+
+      <div class="sign">
+        <div>
+          NGƯỜI MUA HÀNG<br>
+          (Ký, ghi rõ họ tên)
+        </div>
+        <div>
+          NGƯỜI BÁN HÀNG<br>
+          Ngày ${ngayIn}<br>
+          (Ký, ghi rõ họ tên)
+        </div>
+      </div>
+
+      <div class="watermark">
+        <img src="${logoURL}" alt="Watermark">
+      </div>
+
+      <script>
+        window.print();
+      </script>
+    </body>
+    </html>
+  `;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
 function capNhatTongCong() {
   const checkboxes = document.querySelectorAll('#ds input[type="checkbox"]:checked');
   let tong = 0;
