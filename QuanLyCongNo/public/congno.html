@@ -10,41 +10,53 @@
   <link rel="stylesheet" href="/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
-    /* Responsive: cuộn bảng ngang khi màn hình hẹp */
-    .table-wrapper {
+  /* Responsive: bảng không tràn ngang */
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .table-wrapper table {
+    table-layout: fixed; /* Ép bảng co theo khung */
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .table-wrapper th,
+  .table-wrapper td {
+    white-space: normal;     /* Cho phép xuống dòng */
+    word-wrap: break-word;   /* Xuống dòng khi dài */
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+  }
+
+  /* Cột Nội dung - tùy chọn: giới hạn chiều rộng tối đa */
+  .table-wrapper td:nth-child(4),
+  .table-wrapper th:nth-child(4) {
+    max-width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    body { font-size: 14px; }
+
+    input, button {
+      font-size: 14px;
+      padding: 6px 8px;
+    }
+
+    .card input {
+      display: block;
       width: 100%;
-      overflow-x: auto;
+      margin-bottom: 8px;
     }
 
-    table {
+    .card button {
       width: 100%;
-      border-collapse: collapse;
+      margin-bottom: 8px;
     }
-
-    th, td {
-      white-space: nowrap;
-    }
-
-    @media (max-width: 768px) {
-      body { font-size: 14px; }
-
-      input, button {
-        font-size: 14px;
-        padding: 6px 8px;
-      }
-
-      .card input {
-        display: block;
-        width: 100%;
-        margin-bottom: 8px;
-      }
-
-      .card button {
-        width: 100%;
-        margin-bottom: 8px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body class="congno-body">
 <header class="header-container">
