@@ -68,10 +68,9 @@ resetIdleTimer();
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'congno') initCongNo();
-  if (page === 'nhaphang') initNhapHang();
-  if (page === 'banhang') initBanHang();
+  else if (page === 'khohang') initKhoHang();
+  else if (page === 'banhang') initBanHang();
 });
-
 // ===================== MODULE: CÔNG NỢ =====================
 let monTam = [];
 
