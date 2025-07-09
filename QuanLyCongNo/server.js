@@ -16,15 +16,7 @@ mongoose.connect(MONGO_URI)
     console.error('❌ Lỗi MongoDB:', err);
     process.exit(1);
   });
-app.get('/api/congno', requireLogin, async (req, res) => {
-  try {
-    const data = await CongNo.find({});
-    res.json(data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json([]);
-  }
-});
+
 // ======= EXPRESS APP & CẤU HÌNH =======
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -65,7 +57,15 @@ function requireLogin(req, res, next) {
   res.set('Cache-Control', 'no-store');
   next();
 }
-
+app.get('/api/congno', requireLogin, async (req, res) => {
+  try {
+    const data = await CongNo.find({});
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json([]);
+  }
+});
 // ======= SCHEMA NHẬP HÀNG =======
 const itemSchema = new mongoose.Schema({
   tenhang:   { type: String, required: true },
