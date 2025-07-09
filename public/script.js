@@ -431,7 +431,9 @@ function inDanhSach() {
       </div>
 
       <h2>HÓA ĐƠN BÁN HÀNG</h2>
-      <div><strong>Ngày:</strong> ${ngayIn}</div>
+    <div style="text-align: center; font-size: 14px; color: #000; margin-top: -8px;">
+  Ngày: ${ngayIn}
+</div>
 
       <div class="info">
         <div><strong>Người mua hàng:</strong><span class="dots-line"></span></div>
