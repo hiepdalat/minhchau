@@ -16,7 +16,15 @@ mongoose.connect(MONGO_URI)
     console.error('❌ Lỗi MongoDB:', err);
     process.exit(1);
   });
-
+app.get('/api/congno', requireLogin, async (req, res) => {
+  try {
+    const data = await CongNo.find({});
+    res.json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json([]);
+  }
+});
 // ======= EXPRESS APP & CẤU HÌNH =======
 const app = express();
 const PORT = process.env.PORT || 10000;
