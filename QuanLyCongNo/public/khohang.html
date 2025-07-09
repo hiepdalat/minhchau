@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -6,16 +6,22 @@
   <title>Quản Lý Nhập Hàng</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="stylenhap.css" />
- 
 </head>
-<body>
-     
- <header class="header-container">
+<body data-page="nhaphang">
 
- 
-     <h1>Nhập Hàng Vào Kho</h1>
-     
-  
+<header class="header-container">
+  <h1>Nhập Hàng Vào Kho</h1>
+
+  <!-- Vùng tìm kiếm đại lý -->
+  <div class="card">
+    <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
+    <input type="text" id="searchSupplier" placeholder="Nhập tên hoặc vài ký tự..." autocomplete="off" />
+    <div id="suggestions" style="border:1px solid #ccc; max-height:150px; overflow:auto; margin-top:5px;"></div>
+    <button id="loadOrdersBtn" class="btn btn-info" style="margin-top:10px;">
+      <i class="fa fa-list"></i> Chi tiết đơn hàng
+    </button>
+  </div>
+
   <!-- Thông tin chung -->
   <div class="card grid-2">
     <div>
@@ -97,11 +103,15 @@
       <i class="fa fa-file-alt"></i> Chi tiết phiếu nhập
     </button>
   </div>
-<div class="card text-right">
-  <button id="logoutBtn" class="btn btn-danger">
-    <i class="fa fa-sign-out-alt"></i> Đăng xuất
-  </button>
-</div>
-  <script src="scriptnhap.js" defer></script>
+
+  <div class="card text-right">
+    <button id="logoutBtn" class="btn btn-danger" onclick="dangXuat()">
+      <i class="fa fa-sign-out-alt"></i> Đăng xuất
+    </button>
+  </div>
+</header>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="script.js" defer></script>
 </body>
 </html>
