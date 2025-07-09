@@ -244,12 +244,12 @@ function thanhToan() {
   });
 
   if (daThanhToan) {
-    Swal.fire('❌ Dòng đã được thanh toán trước đó!', 'Vui lòng bỏ chọn các dòng đã thanh toán.', 'error');
+    Swal.fire('❌ Khách này đã được thanh toán trước đó!', 'Vui lòng bỏ chọn các dòng đã thanh toán.', 'error');
     return;
   }
 
   Swal.fire({
-    title: 'Xác nhận đã thanh toán?',
+    title: 'Xác nhận thanh toán cho khách?',
     icon: 'question',
     showCancelButton: true,
     confirmButtonText: 'Đồng ý',
