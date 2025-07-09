@@ -144,7 +144,7 @@ function initCongNo() {
   document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
   document.getElementById('btnThem')?.addEventListener('click', themMon);
-}
+
 
 function loadData(keyword = '') {
   fetch('/timkiem?ten=' + encodeURIComponent(keyword))
