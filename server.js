@@ -40,7 +40,7 @@ app.use(session({
   cookie: { maxAge: 5 * 60 * 1000 } // 5 phút
 }));
 
-// ======= SCHEMA CÔNG NỢ =======
+// ======= SCHEMA =======
 const HangHoaSchema = new mongoose.Schema({
   noidung: String,
   soluong: Number,
@@ -66,7 +66,6 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// ======= SCHEMA NHẬP HÀNG =======
 const itemSchema = new mongoose.Schema({
   tenhang:   { type: String, required: true },
   dvt:       { type: String, required: true },
@@ -87,9 +86,7 @@ const receiptSchema = new mongoose.Schema({
 const StockReceipt = mongoose.model('StockReceipt', receiptSchema);
 
 // ======= ĐĂNG NHẬP / ĐĂNG XUẤT =======
-const USERS = {
-  minhchau: '0938039084'
-};
+const USERS = { minhchau: '0938039084' };
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -224,6 +221,36 @@ app.get('/chi-tiet-phieu-nhap', async (req, res) => {
     console.error(err);
     res.status(500).send('Lỗi server');
   }
+});
+
+// ======= API GỢI Ý TÊN ĐẠI LÝ =======
+app.get('/api/search-supplier', async (req, res) => {
+  const kw = (req.query.kw || '').trim();
+  if (!kw) return res.json([]);
+  const regex = new RegExp(kw, 'i');
+  const names = await StockReceipt.distinct('daily', { daily: regex });
+  res.json(names);
+});
+
+app.get('/api/supplier-orders', async (req, res) => {
+  const name = req.query.name;
+  if (!name) return res.json([]);
+  const docs = await StockReceipt.aggregate([
+    { $match: { daily: name } },
+    { $group: {
+      _id: { $dateToString: { format: '%Y-%m-%d', date: '$ngay' } },
+      soluong: { $sum: { $size: '$items' } },
+      tongtien: { $sum: '$tongtien' }
+    } },
+    { $project: {
+      ngay: '$_id',
+      soluong: 1,
+      tongtien: 1,
+      _id: 0
+    } },
+    { $sort: { ngay: -1 } }
+  ]);
+  res.json(docs);
 });
 
 // ======= KHỞI ĐỘNG SERVER =======
