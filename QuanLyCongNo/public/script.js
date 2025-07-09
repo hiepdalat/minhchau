@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================== MODULE: CÔNG NỢ =====================
+// script.js – xử lý công nợ
+
 function initCongNo() {
   console.log('🔁 Trang công nợ');
 
@@ -94,140 +96,153 @@ function initCongNo() {
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
   document.getElementById('btnThem')?.addEventListener('click', themMon);
 }
+
 function loadData(keyword = '') {
-  fetch('/api/congno?search=' + encodeURIComponent(keyword))
+  fetch('/timkiem?ten=' + encodeURIComponent(keyword))
     .then(res => res.json())
     .then(data => {
       const tbody = document.getElementById('ds');
       tbody.innerHTML = '';
-      data.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="checkbox"></td>
-          <td>${index + 1}</td>
-          <td>${item.khach}</td>
-          <td>${item.noidung}</td>
-          <td>${item.soluong}</td>
-          <td>${item.dongia}</td>
-          <td>${item.soluong * item.dongia}</td>
-          <td>${item.ngay}</td>
-          <td>${item.thanhtoan ? '✅' : ''}</td>
-        `;
-        if (item.thanhtoan) tr.classList.add('row-paid');
-        tbody.appendChild(tr);
+      let tong = 0;
+
+      data.forEach(doc => {
+        const { ten, ngay, hanghoa, _id } = doc;
+        hanghoa.forEach((hh, i) => {
+          const tr = document.createElement('tr');
+          const thanhTien = hh.soluong * hh.dongia;
+          tong += thanhTien;
+
+          tr.innerHTML = `
+            <td><input type="checkbox" data-id="${_id}" data-index="${i}"></td>
+            <td>${ten}</td>
+            <td>${ngay}</td>
+            <td>${hh.noidung}</td>
+            <td>${hh.soluong}</td>
+            <td>${hh.dongia}</td>
+            <td>${thanhTien}</td>
+          `;
+          if (hh.thanhtoan) tr.classList.add('row-paid');
+          tbody.appendChild(tr);
+        });
       });
+
+      const tongRow = document.getElementById('tongCongRow');
+      const tongVal = document.getElementById('tongCongValue');
+      tongVal.textContent = tong.toLocaleString();
+      tongRow.style.display = tong ? '' : 'none';
     });
 }
 
 function chonTatCa(checkbox) {
-  const rows = document.querySelectorAll('#ds tr');
-  rows.forEach(row => {
-    const chk = row.querySelector('input[type="checkbox"]');
-    if (chk) chk.checked = checkbox.checked;
-  });
+  document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => chk.checked = checkbox.checked);
 }
 
-function luuTatCa() {
-  const rows = document.querySelectorAll('#ds tr');
-  const data = [];
-  rows.forEach(row => {
-    const cells = row.querySelectorAll('td');
-    const khach = cells[2]?.innerText.trim();
-    const noidung = cells[3]?.innerText.trim();
-    const soluong = parseFloat(cells[4]?.innerText.trim()) || 0;
-    const dongia = parseFloat(cells[5]?.innerText.trim()) || 0;
-    const ngay = cells[7]?.innerText.trim();
-    const thanhtoan = cells[8]?.innerText.includes('✅');
-    if (khach && noidung) {
-      data.push({ khach, noidung, soluong, dongia, ngay, thanhtoan });
-    }
-  });
+function themMon() {
+  const noidung = document.getElementById('nd')?.value.trim();
+  const soluong = parseFloat(document.getElementById('sl')?.value) || 0;
+  const dongia = parseFloat(document.getElementById('dg')?.value) || 0;
 
-  fetch('/api/congno/luu', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(res => res.json())
-    .then(data => {
-      Swal.fire('✅ Lưu thành công', '', 'success');
-    });
-}
-
-function xoaDaChon() {
-  const rows = document.querySelectorAll('#ds tr');
-  const toDelete = [];
-  rows.forEach(row => {
-    const chk = row.querySelector('input[type="checkbox"]');
-    if (chk?.checked) {
-      const khach = row.cells[2]?.innerText.trim();
-      const noidung = row.cells[3]?.innerText.trim();
-      const ngay = row.cells[7]?.innerText.trim();
-      toDelete.push({ khach, noidung, ngay });
-    }
-  });
-
-  if (toDelete.length === 0) {
-    Swal.fire('⚠️ Chưa chọn dòng nào', '', 'warning');
+  if (!noidung || soluong <= 0 || dongia <= 0) {
+    Swal.fire('❌ Thiếu hoặc sai thông tin', '', 'warning');
     return;
   }
 
+  monTam.push({ noidung, soluong, dongia });
+  renderTam();
+
+  document.getElementById('nd').value = '';
+  document.getElementById('sl').value = '';
+  document.getElementById('dg').value = '';
+}
+
+function renderTam() {
+  const box = document.getElementById('monTamBox');
+  const tb = document.getElementById('bangTam');
+  tb.innerHTML = '';
+
+  if (monTam.length === 0) return box.style.display = 'none';
+  box.style.display = '';
+
+  monTam.forEach((m, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${m.noidung}</td>
+      <td>${m.soluong}</td>
+      <td>${m.dongia}</td>
+      <td>${(m.soluong * m.dongia).toLocaleString()}</td>
+      <td><button onclick="xoaMon(${i})">❌</button></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function xoaMon(i) {
+  monTam.splice(i, 1);
+  renderTam();
+}
+
+function luuTatCa() {
+  const ten = document.getElementById('ten')?.value.trim();
+  const ngay = document.getElementById('ngay')?.value.trim();
+
+  if (!ten || !ngay || monTam.length === 0) {
+    Swal.fire('⚠️ Thiếu thông tin hoặc chưa có món nào', '', 'warning');
+    return;
+  }
+
+  fetch('/them', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ten, ngay, hanghoa: monTam })
+  }).then(res => res.json()).then(data => {
+    if (data.success) {
+      Swal.fire('✅ Đã lưu công nợ', '', 'success');
+      monTam = [];
+      renderTam();
+      loadData();
+    } else {
+      Swal.fire('❌ Lỗi khi lưu', '', 'error');
+    }
+  });
+}
+
+function xoaDaChon() {
+  const chks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  if (chks.length === 0) return Swal.fire('⚠️ Chưa chọn dòng nào', '', 'warning');
+
   Swal.fire({
-    title: 'Xóa những dòng đã chọn?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Xóa',
-    cancelButtonText: 'Hủy'
+    title: 'Xoá các dòng đã chọn?', icon: 'warning', showCancelButton: true,
+    confirmButtonText: 'Xoá', cancelButtonText: 'Huỷ'
   }).then(result => {
-    if (result.isConfirmed) {
-      fetch('/api/congno/xoa', {
+    if (!result.isConfirmed) return;
+    const reqs = Array.from(chks).map(chk => {
+      return fetch('/xoa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(toDelete)
-      }).then(res => res.json())
-        .then(() => {
-          loadData();
-          Swal.fire('✅ Đã xóa', '', 'success');
-        });
-    }
+        body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
+      });
+    });
+    Promise.all(reqs).then(() => loadData());
   });
 }
 
 function thanhToan() {
-  const rows = document.querySelectorAll('#ds tr');
-  const toPay = [];
-  rows.forEach(row => {
-    const chk = row.querySelector('input[type="checkbox"]');
-    if (chk?.checked) {
-      const khach = row.cells[2]?.innerText.trim();
-      const noidung = row.cells[3]?.innerText.trim();
-      const ngay = row.cells[7]?.innerText.trim();
-      toPay.push({ khach, noidung, ngay });
-    }
-  });
-
-  if (toPay.length === 0) {
-    Swal.fire('⚠️ Chưa chọn dòng nào để thanh toán', '', 'warning');
-    return;
-  }
+  const chks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
+  if (chks.length === 0) return Swal.fire('⚠️ Chưa chọn dòng nào', '', 'warning');
 
   Swal.fire({
-    title: 'Xác nhận đã thanh toán?',
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonText: 'Đã thanh toán',
-    cancelButtonText: 'Hủy'
+    title: 'Xác nhận đã thanh toán?', icon: 'question', showCancelButton: true,
+    confirmButtonText: 'Đồng ý', cancelButtonText: 'Huỷ'
   }).then(result => {
-    if (result.isConfirmed) {
-      fetch('/api/congno/thanhtoan', {
+    if (!result.isConfirmed) return;
+    const reqs = Array.from(chks).map(chk => {
+      return fetch('/thanhtoan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(toPay)
-      }).then(res => res.json())
-        .then(() => {
-          loadData();
-          Swal.fire('✅ Đã thanh toán', '', 'success');
-        });
-    }
+        body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
+      });
+    });
+    Promise.all(reqs).then(() => loadData());
   });
 }
 
@@ -245,6 +260,7 @@ function inDanhSach() {
       rows.push(`
         <tr>
           <td>${stt++}</td>
+          <td>${cells[1].innerText}</td>
           <td>${cells[2].innerText}</td>
           <td>${cells[3].innerText}</td>
           <td>${cells[4].innerText}</td>
@@ -268,9 +284,9 @@ function inDanhSach() {
     </head><body>
       <h2>Danh sách công nợ đã chọn</h2>
       <table>
-        <tr><th>STT</th><th>Khách</th><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+        <tr><th>STT</th><th>Khách</th><th>Ngày</th><th>Nội dung</th><th>Số lượng</th><th>Đơn giá</th><th>Thành tiền</th></tr>
         ${rows.join('')}
-        <tr><td colspan="5"><b>Tổng cộng</b></td><td><b>${tongTien}</b></td></tr>
+        <tr><td colspan="6"><b>Tổng cộng</b></td><td><b>${tongTien.toLocaleString()}</b></td></tr>
       </table>
     </body></html>
   `);
@@ -278,30 +294,10 @@ function inDanhSach() {
   printWindow.print();
 }
 
-function themMon() {
-  const khach = document.getElementById('tenKhach')?.value.trim();
-  const ngay = document.getElementById('ngayNhap')?.value.trim();
-  const noidung = document.getElementById('noiDung')?.value.trim();
-  const soluong = parseFloat(document.getElementById('soLuong')?.value) || 0;
-  const dongia = parseFloat(document.getElementById('donGia')?.value) || 0;
-
-  if (!khach || !ngay || !noidung || soluong <= 0 || dongia <= 0) {
-    Swal.fire('❌ Thiếu hoặc sai thông tin', 'Vui lòng điền đúng các trường bắt buộc.', 'warning');
-    return;
-  }
-
-  fetch('/api/congno/them', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ khach, ngay, noidung, soluong, dongia })
-  }).then(res => res.json())
-    .then(() => {
-      loadData();
-      document.getElementById('noiDung').value = '';
-      document.getElementById('soLuong').value = '';
-      document.getElementById('donGia').value = '';
-    });
+function dangXuat() {
+  fetch('/logout').then(() => location.href = '/index.html');
 }
+
 // ===================== MODULE: NHẬP HÀNG =====================
 function initNhapHang() {
   console.log('🔁 Trang nhập hàng');
