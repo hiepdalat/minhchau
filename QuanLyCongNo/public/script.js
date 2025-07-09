@@ -300,58 +300,61 @@ function inDanhSach() {
   }
 
   function numberToVietnamese(num) {
-    const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
-    const Tien = ["", "nghìn", "triệu", "tỷ"];
-    if (num == 0) return "Không đồng";
+  const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+  const Tien = ["", "nghìn", "triệu", "tỷ"];
+  if (num == 0) return "Không đồng";
 
-    let result = "";
-    let lan = 0;
+  let result = "";
+  let lan = 0;
+  let isFirstGroup = true;
 
-    while (num > 0) {
-      let so = num % 1000;
-      num = Math.floor(num / 1000);
+  while (num > 0) {
+    let so = num % 1000;
+    num = Math.floor(num / 1000);
 
-      if (so > 0) {
-        let tram = Math.floor(so / 100);
-        let chuc = Math.floor((so % 100) / 10);
-        let donvi = so % 10;
+    if (so > 0) {
+      let tram = Math.floor(so / 100);
+      let chuc = Math.floor((so % 100) / 10);
+      let donvi = so % 10;
 
-        let str = "";
-        if (tram > 0) {
-          str += ChuSo[tram] + " trăm ";
-        } else if (lan > 0 && (chuc > 0 || donvi > 0)) {
-          str += "không trăm ";
-        }
+      let str = "";
 
-        if (chuc > 1) {
-          str += ChuSo[chuc] + " mươi ";
-          if (donvi == 1) str += "mốt ";
-          else if (donvi == 5) str += "lăm ";
-          else if (donvi > 0) str += ChuSo[donvi] + " ";
-        } else if (chuc == 1) {
-          str += "mười ";
-          if (donvi == 5) str += "lăm ";
-          else if (donvi > 0) str += ChuSo[donvi] + " ";
-        } else if (donvi > 0) {
-          str += "linh " + ChuSo[donvi] + " ";
-        }
-
-        result = str.trim() + " " + Tien[lan] + " " + result.trim();
+      if (tram > 0) {
+        str += ChuSo[tram] + " trăm ";
+      } else if (!isFirstGroup && (chuc > 0 || donvi > 0)) {
+        str += "không trăm ";
       }
 
-      lan++;
+      if (chuc > 1) {
+        str += ChuSo[chuc] + " mươi ";
+        if (donvi == 1) str += "mốt ";
+        else if (donvi == 5) str += "lăm ";
+        else if (donvi > 0) str += ChuSo[donvi] + " ";
+      } else if (chuc == 1) {
+        str += "mười ";
+        if (donvi == 5) str += "lăm ";
+        else if (donvi > 0) str += ChuSo[donvi] + " ";
+      } else if (donvi > 0) {
+        str += "linh " + ChuSo[donvi] + " ";
+      }
+
+      result = str.trim() + " " + Tien[lan] + " " + result.trim();
     }
 
-    return result.trim().replace(/\s+/g, ' ') + " đồng chẵn";
+    lan++;
+    isFirstGroup = false;
   }
+
+  return result.trim().replace(/\s+/g, ' ') + " đồng chẵn";
+}
 
   const ngayIn = new Date().toLocaleDateString('vi-VN');
   const chu = numberToVietnamese(tong);
   const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
 
   // Tự động điều chỉnh size watermark
-  const watermarkSize = rows.length <= 5 ? 180 :
-                        rows.length <= 10 ? 250 :
+  const watermarkSize = rows.length <= 5 ? 260 :
+                        rows.length <= 10 ? 350 :
                         rows.length <= 20 ? 300 : 360;
 
   const html = `
@@ -379,18 +382,7 @@ function inDanhSach() {
         .amount-text { margin-top: 16px; font-style: italic; }
         .sign { display: flex; justify-content: space-between; margin-top: 40px; }
         .sign div { text-align: center; }
-        .watermark {
-          position: absolute;
-          top: 45%;
-          left: 50%;
-          transform: translate(-50%, -50%) rotate(-20deg);
-          opacity: 0.3;
-          z-index: 0;
-          pointer-events: none;
-        }
-        .watermark img {
-          width: ${watermarkSize}px;
-        }
+        
         .table-container {
   position: relative;
 }
@@ -400,7 +392,7 @@ function inDanhSach() {
   top: 50%;       /* Giữa chiều cao bảng */
   left: 50%;      /* Giữa chiều ngang bảng */
   transform: translate(-50%, -50%) rotate(-20deg);
-  opacity: 0.08;
+  opacity: 0.3;
   pointer-events: none;
   z-index: 0;
 }
