@@ -137,8 +137,10 @@ for (const doc of data) {
 }
 
 function chonTatCa(checkbox) {
-  document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => chk.checked = checkbox.checked);
-  capNhatTongCong();
+ document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
+  chk.checked = checkbox.checked;
+  chk.dispatchEvent(new Event('change'));
+});
 }
 
 function themMon() {
