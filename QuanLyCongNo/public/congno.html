@@ -50,7 +50,11 @@
       width: 100%;
       margin-bottom: 8px;
     }
-
+.user-info {
+  font-weight: bold;
+  color: #0077cc;
+  margin-right: 16px;
+}
     .card button {
       width: 100%;
       margin-bottom: 8px;
@@ -62,7 +66,9 @@
 <header class="header-container">
   <div class="header-top">
     <h2>Quản Lý Công Nợ</h2>
-    <button onclick="dangXuat()" class="btn-logout">Đăng xuất</button>
+     <div class="user-info">Xin chào, minhchau</div>
+  <button onclick="dangXuat()" class="btn-logout">🚪 Đăng xuất</button>
+</div>
   </div>
   <div id="dateTicker">
     <div class="ticker__wrap" id="tickerWrap"></div>
@@ -75,8 +81,8 @@
   <input type="text" id="nd" placeholder="Nội dung">
   <input type="number" id="sl" placeholder="Số lượng">
   <input type="number" id="dg" placeholder="Đơn giá">
-  <button onclick="themMon()">➕ Thêm món</button>
-  <button onclick="luuTatCa()">💾 Lưu tất cả</button>
+  <button id="btnThem">➕ Thêm món</button>
+  <button id="btnLuu">💾 Lưu tất cả</button>
 </div>
 
 <div class="card" id="monTamBox" style="display:none;">
@@ -92,11 +98,11 @@
 </div>
 
 <div class="card">
-  <input type="text" id="search" placeholder="Tìm tên khách...">
-  <button onclick="loadData(document.getElementById('search').value)">🔍 Tìm</button>
-  <button onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
-  <button onclick="thanhToan()">💰 Thanh Toán</button>
-  <button onclick="inDanhSach()">📩 In Danh Sách</button>
+  <input type="text" id="timten" placeholder="Tìm tên khách...">
+  <button id="btnTim">🔍 Tìm</button>
+  <button id="btnXoa" onclick="xoaDaChon()">🗑️ Xoá đã chọn</button>
+  <button id="btnThanhToan" onclick="thanhToan()">💰 Thanh Toán</button>
+  <button id="btnIn" onclick="inDanhSach()">📩 In Danh Sách</button>
 </div>
 
 <h3 style="text-align:center;">Dữ Liệu Đã Lưu</h3>
