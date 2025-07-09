@@ -15,7 +15,10 @@
   <!-- Vùng tìm kiếm đại lý -->
   <div class="card">
     <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
-    <input type="text" id="searchSupplier" placeholder="Nhập tên hoặc vài ký tự..." autocomplete="off" />
+    <div style="display:flex; gap:10px;">
+  <input type="text" id="searchSupplier" placeholder="Nhập tên hoặc vài ký tự..." autocomplete="off" style="flex:1" />
+  <button id="btnSearchSupplier" class="btn btn-secondary"><i class="fa fa-search"></i> Tìm</button>
+</div>
     <div id="suggestions" style="border:1px solid #ccc; max-height:150px; overflow:auto; margin-top:5px;"></div>
     <button id="loadOrdersBtn" class="btn btn-info" style="margin-top:10px;">
       <i class="fa fa-list"></i> Chi tiết đơn hàng
