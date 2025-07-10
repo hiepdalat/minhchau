@@ -247,12 +247,19 @@ function luuTatCa() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ten, ngay, hanghoa: monTam })
   }).then(res => res.json()).then(data => {
-    if (data.success) {
-      Swal.fire('✅ Đã lưu công nợ', '', 'success');
-      monTam = [];
-      renderTam();
-      loadData();
-    } else {
+   if (data.success) {
+  Swal.fire('✅ Đã lưu công nợ', '', 'success');
+  monTam = [];
+  renderTam();
+  loadData().then(() => {
+    // Nếu đang có từ khóa tìm, tự động tìm lại sau khi load
+    const keyword = boDau(document.getElementById('timten')?.value.trim() || '');
+    if (keyword) {
+      const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
+      renderTable(matched);
+    }
+  });
+} else {
       Swal.fire('❌ Lỗi khi lưu', '', 'error');
     }
   });
@@ -315,14 +322,14 @@ function thanhToan() {
   });
 }
 function loadData() {
- fetch('/api/congno')
+  return fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
       allData = data;
       renderTable(getRandomRows(allData, 10));
+      return data;
     });
 }
-
 function inDanhSach() {
   const rows = [];
   let stt = 1;
@@ -547,7 +554,7 @@ function capNhatTongCong() {
     const tr = chk.closest('tr');
     const cells = tr.querySelectorAll('td');
     const thanhTien = parseFloat(cells[6]?.innerText?.replace(/\./g, '').replace(/,/g, '') || '0');
-    
+   
     tong += thanhTien;
   });
 
