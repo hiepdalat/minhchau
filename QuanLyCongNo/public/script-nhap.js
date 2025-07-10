@@ -204,4 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const link = `/chi-tiet-phieu-nhap?ngay=${encodeURIComponent(ngay)}`;
     window.open(link, "_blank");
   });
+  document.getElementById("btnLogout").addEventListener("click", () => {
+  window.location.href = "/logout";
+});
 });
