@@ -630,12 +630,7 @@ function capNhatTongCong() {
   tongVal.textContent = tong.toLocaleString();
   tongRow.style.display = checkboxes.length > 0 ? '' : 'none';
 }
-document.addEventListener('DOMContentLoaded', () => {
-  const page = document.body.dataset.page;
-  if (page === 'congno') {
-    initCongNo();
-  }
-});
+
 
 // ===================== MODULE: NHẬP HÀNG =====================
 function initNhapHang() {
