@@ -1,259 +1,157 @@
-// 📦 GỘP CẢ 3 SERVER: đăng nhập + công nợ + nhập hàng + bán hàng
-require('dotenv').config();
-const path = require('path');
-const express = require('express');
-const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo');
+document.addEventListener("DOMContentLoaded", () => {
+  const danhSachTam = [];
 
-// ======= MONGODB KẾT NỐI =======
-const MONGO_URI = process.env.MONGO_URI ||
-  'mongodb+srv://xuanhiep1112:r7aVuSkE8DEXVEyU@quanlycongno.vvimbfe.mongodb.net/QuanLyCongNo?retryWrites=true&w=majority';
+  // DOM Elements
+  const supplierEl = document.getElementById("supplier");
+  const dateEl = document.getElementById("date");
+  const productEl = document.getElementById("product");
+  const unitEl = document.getElementById("unit");
+  const qtyEl = document.getElementById("qty");
+  const priceEl = document.getElementById("price");
+  const discountEl = document.getElementById("discount");
+  const addItemBtn = document.getElementById("addItem");
+  const saveBtn = document.getElementById("saveBtn");
+  const tableBody = document.querySelector("#itemsTable tbody");
+  const grandTotalEl = document.getElementById("grandTotal");
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Đã kết nối MongoDB'))
-  .catch(err => {
-    console.error('❌ Lỗi MongoDB:', err);
-    process.exit(1);
+  function formatMoney(v) {
+    return Number(v).toLocaleString("vi-VN");
+  }
+
+  function renderTable() {
+    tableBody.innerHTML = "";
+
+    if (danhSachTam.length === 0) {
+      tableBody.innerHTML = '<tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>';
+      grandTotalEl.textContent = "0";
+      return;
+    }
+
+    let total = 0;
+
+    danhSachTam.forEach((item, index) => {
+      const giaNhap = item.price * (1 - item.discount / 100);
+      const thanhTien = giaNhap * item.qty;
+      total += thanhTien;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${item.product}</td>
+        <td>${item.unit}</td>
+        <td>${item.qty}</td>
+        <td>${formatMoney(item.price)}</td>
+        <td>${item.discount}%</td>
+        <td>${formatMoney(giaNhap.toFixed(0))}</td>
+        <td>${formatMoney(thanhTien.toFixed(0))}</td>
+        <td><button onclick="xoaMuc(${index})">❌</button></td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    grandTotalEl.textContent = formatMoney(total.toFixed(0));
+  }
+
+  // Hàm xoá món
+  window.xoaMuc = function (index) {
+    danhSachTam.splice(index, 1);
+    renderTable();
+  };
+
+  // Thêm món vào danh sách tạm
+  addItemBtn.addEventListener("click", () => {
+    const item = {
+      product: productEl.value.trim(),
+      unit: unitEl.value.trim(),
+      qty: parseInt(qtyEl.value),
+      price: parseFloat(priceEl.value),
+      discount: parseFloat(discountEl.value)
+    };
+
+    if (!item.product || !item.unit || isNaN(item.qty) || isNaN(item.price)) {
+      alert("Vui lòng nhập đầy đủ thông tin mặt hàng.");
+      return;
+    }
+
+    danhSachTam.push(item);
+    renderTable();
+
+    // Reset form nhập
+    productEl.value = "";
+    unitEl.value = "";
+    qtyEl.value = 1;
+    priceEl.value = 0;
+    discountEl.value = 0;
+    productEl.focus();
   });
 
-// ======= EXPRESS APP & CẤU HÌNH =======
-const app = express();
-const PORT = process.env.PORT || 10000;
+  // Lưu phiếu nhập
+  saveBtn.addEventListener("click", () => {
+    const supplier = supplierEl.value.trim();
+    const date = dateEl.value;
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+    if (!supplier || !date || danhSachTam.length === 0) {
+      alert("Vui lòng nhập đầy đủ thông tin và ít nhất 1 món hàng.");
+      return;
+    }
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'mat_khau_bi_mat',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: MONGO_URI }),
-  cookie: { maxAge: 1 * 60 * 60 * 1000 } // 1 tiếng
-}));
+    const payload = {
+      supplier,
+      date,
+      items: danhSachTam
+    };
 
-// ======= SCHEMA CÔNG NỢ =======
-const HangHoaSchema = new mongoose.Schema({
-  noidung: String,
-  soluong: Number,
-  dongia: Number,
-  thanhtoan: { type: Boolean, default: false }
-}, { _id: false });
-
-const CongNoSchema = new mongoose.Schema({
-  ten: String,
-  ten_khongdau: String,
-  ngay: String,
-  hanghoa: [HangHoaSchema]
+    fetch("/api/nhap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Lỗi mạng");
+      return res.json();
+    })
+    .then(data => {
+      alert("✅ Đã lưu phiếu nhập thành công!");
+      // Reset lại form
+      supplierEl.value = "";
+      dateEl.value = "";
+      danhSachTam.length = 0;
+      renderTable();
+    })
+    .catch(err => {
+      console.error(err);
+      alert("❌ Không thể lưu phiếu nhập.");
+    });
+  });
 });
-const CongNo = mongoose.model('CongNo', CongNoSchema);
+document.getElementById("btnSearchSupplier").addEventListener("click", async () => {
+  const keyword = document.getElementById("searchSupplier").value.trim();
+  if (!keyword) return;
 
-function removeDiacritics(str) {
-  return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-}
-
-function requireLogin(req, res, next) {
-  if (!req.session.user) return res.redirect('/index.html');
-  res.set('Cache-Control', 'no-store');
-  next();
-}
-app.get('/api/congno', requireLogin, async (req, res) => {
   try {
-    const data = await CongNo.find({});
-    res.json(data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json([]);
-  }
-});
-// ======= SCHEMA NHẬP HÀNG =======
-const itemSchema = new mongoose.Schema({
-  tenhang:   { type: String, required: true },
-  dvt:       { type: String, required: true },
-  soluong:   { type: Number, required: true },
-  dongia:    { type: Number, required: true },
-  ck:        { type: Number, default: 0 },
-  gianhap:   { type: Number, required: true },
-  thanhtien: { type: Number, required: true }
-}, { _id: false });
+    const res = await fetch(`/timkiem?ten=${encodeURIComponent(keyword)}`);
+    const data = await res.json();
 
-const receiptSchema = new mongoose.Schema({
-  ngay:     { type: Date, required: true },
-  daily:    { type: String, required: true },
-  items:    [itemSchema],
-  tongtien: { type: Number, required: true }
-}, { timestamps: true });
+    const wrap = document.getElementById("suggestions");
+    wrap.innerHTML = "";
 
-const StockReceipt = mongoose.model('StockReceipt', receiptSchema);
+    if (!data.length) {
+      wrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
+      return;
+    }
 
-// ======= SCHEMA KHO HÀNG =======
-const productSchema = new mongoose.Schema({
-  code: String,
-  name: String,
-  unit: String,
-  qty_on_hand: Number,
-  price: Number
-});
-const Product = mongoose.model('Product', productSchema);
-
-// ======= ĐĂNG NHẬP / ĐĂNG XUẤT =======
-const USERS = {
-  minhchau: '0938039084'
-};
-
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  if (USERS[username] && USERS[username] === password) {
-    req.session.user = { username };
-    return res.redirect('/congno');
-  }
-  res.status(401).send('Sai tài khoản hoặc mật khẩu');
-});
-
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => res.redirect('/index.html'));
-});
-
-app.get('/congno', requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'congno.html'));
-});
-
-app.get('/khohang', requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'khohang.html'));
-});
-
-app.get('/banhang', requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'banhang.html'));
-});
-
-app.get('/session-check', (req, res) => {
-  if (req.session.user) res.sendStatus(200);
-  else res.sendStatus(401);
-});
-
-// ======= API CÔNG NỢ =======
-app.post('/them', requireLogin, async (req, res) => {
-  const { ten, ngay, hanghoa } = req.body;
-  if (!ten || !ngay || !Array.isArray(hanghoa) || hanghoa.length === 0) {
-    return res.status(400).json({ success: false });
-  }
-  try {
-    await new CongNo({ ten, ten_khongdau: removeDiacritics(ten), ngay, hanghoa }).save();
-    res.json({ success: true });
-  } catch {
-    res.status(500).json({ success: false });
-  }
-});
-
-app.get('/timkiem', requireLogin, async (req, res) => {
-  const kw = removeDiacritics(req.query.ten || '');
-  try {
-    const data = await CongNo.find({ ten_khongdau: { $regex: kw, $options: 'i' } });
-    res.json(data);
-  } catch {
-    res.status(500).json([]);
-  }
-});
-
-app.post('/xoa', requireLogin, async (req, res) => {
-  const { id, index } = req.body;
-  if (!id || index === undefined) return res.status(400).json({ success: false });
-  try {
-    const congno = await CongNo.findById(id);
-    if (!congno) return res.status(404).json({ success: false });
-
-    congno.hanghoa.splice(index, 1);
-    if (congno.hanghoa.length === 0) await CongNo.findByIdAndDelete(id);
-    else await congno.save();
-
-    res.json({ success: true });
-  } catch {
-    res.status(500).json({ success: false });
-  }
-});
-
-app.post('/thanhtoan', requireLogin, async (req, res) => {
-  const { id, index } = req.body;
-  try {
-    const doc = await CongNo.findById(id);
-    if (!doc || !doc.hanghoa[index]) return res.status(404).send('Không tìm thấy');
-
-    doc.hanghoa[index].thanhtoan = true;
-    await doc.save();
-    res.send({ ok: true });
-  } catch (e) {
-    console.error(e);
-    res.status(500).send('Lỗi server');
-  }
-});
-
-// ======= API NHẬP HÀNG =======
-app.post('/api/stock/receive', requireLogin, async (req, res) => {
-  try {
-    const { supplier, date, items } = req.body;
-    if (!supplier || !date || !items?.length) return res.status(400).json({ error: 'Thiếu dữ liệu' });
-
-    const mapped = items.map((it) => {
-      const giaNhap = it.price * (1 - it.discount / 100);
-      const thanhTien = giaNhap * it.qty;
-      return {
-        tenhang: it.name,
-        dvt: it.unit,
-        soluong: it.qty,
-        dongia: it.price,
-        ck: it.discount,
-        gianhap: giaNhap,
-        thanhtien: thanhTien
+    data.forEach(entry => {
+      const div = document.createElement("div");
+      div.className = "suggest-item";
+      div.textContent = entry.ten;
+      div.onclick = () => {
+        document.getElementById("supplier").value = entry.ten;
+        wrap.innerHTML = "";
       };
+      wrap.appendChild(div);
     });
-    const tongtien = mapped.reduce((s, x) => s + x.thanhtien, 0);
-    const receipt = await StockReceipt.create({ ngay: new Date(date), daily: supplier, items: mapped, tongtien });
-    res.json({ id: receipt._id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error("Lỗi tìm đại lý:", err);
+    Swal.fire("Lỗi", "Không thể tìm đại lý", "error");
   }
 });
-
-app.get('/chi-tiet-phieu-nhap', requireLogin, async (req, res) => {
-  try {
-    const { ngay } = req.query;
-    if (!ngay) return res.status(400).send('Thiếu tham số ngày');
-
-    const start = new Date(ngay);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(ngay);
-    end.setHours(23, 59, 59, 999);
-
-    const receipts = await StockReceipt.find({ ngay: { $gte: start, $lte: end } });
-    if (!receipts.length) return res.send(`<h3>Không có phiếu nhập ngày ${ngay}</h3>`);
-
-    let html = `<h2>Chi tiết phiếu nhập ngày ${ngay}</h2>`;
-    receipts.forEach((r) => {
-      html += `<h3>Đại lý: ${r.daily}</h3><table border="1" cellspacing="0" cellpadding="4"><tr><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th><th>CK</th><th>Giá nhập</th><th>Thành tiền</th></tr>`;
-      r.items.forEach((i) => {
-        html += `<tr><td>${i.tenhang}</td><td>${i.dvt}</td><td>${i.soluong}</td><td>${i.dongia.toLocaleString()}</td><td>${i.ck}%</td><td>${i.gianhap.toLocaleString()}</td><td>${i.thanhtien.toLocaleString()}</td></tr>`;
-      });
-      html += `<tr><td colspan="6" align="right"><b>Tổng:</b></td><td><b>${r.tongtien.toLocaleString()}</b></td></tr></table><br/>`;
-    });
-
-    res.send(html);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Lỗi server');
-  }
-});
-
-// ======= API SẢN PHẨM (cho bán hàng) =======
-app.get('/api/products/stock', requireLogin, async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.json(products);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Lỗi server');
-  }
-});
-
-// ======= KHỞI ĐỘNG SERVER =======
-app.listen(PORT, () => console.log(`🚀 Server chạy tại http://localhost:${PORT}`));
