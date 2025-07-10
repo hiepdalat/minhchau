@@ -150,41 +150,44 @@ function initCongNo() {
   }
 
   function loadDataAndRender() {
-    fetch('/api/congno')
-      .then(res => res.json())
-      .then(data => {
-        allData = data;
-        const keyword = boDau(inputTim.value.trim());
-        if (!keyword) {
-          renderTable(getRandomRows(allData, 10));
-        } else {
-          const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
-          renderTable(matched);
-        }
-      });
-  }
-
-  btnTim.onclick = loadDataAndRender;
-
-  document.getElementById('btnLuu')?.addEventListener('click', () => {
-    luuTatCa(() => loadDataAndRender());
-  });
-
   fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
-      console.log('📦 Dữ liệu công nợ:', data);
       allData = data;
-      renderTable(getRandomRows(allData, 10));
+      const keyword = boDau(inputTim.value.trim());
+      if (!keyword) {
+        renderTable(getRandomRows(allData, 10));
+      } else {
+        const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
+        renderTable(matched);
+      }
     })
     .catch(err => {
       console.error('❌ Lỗi khi load công nợ:', err);
       tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
     });
+}
 
-  document.getElementById('checkAll')?.addEventListener('change', function () {
-    chonTatCa(this);
+// Bắt sự kiện khi click nút Tìm
+btnTim.onclick = loadDataAndRender;
+
+// Gọi hàm lưu và sau đó gọi lại loadDataAndRender
+document.getElementById('btnLuu')?.addEventListener('click', () => {
+  luuTatCa(() => {
+    Swal.fire('✅ Đã lưu công nợ', '', 'success');
+    monTam = [];
+    renderTam();
+    loadDataAndRender();
   });
+});
+
+// Gọi khi trang load lần đầu (tự động hiển thị 10 dòng ngẫu nhiên)
+loadDataAndRender();
+
+// Sự kiện chọn tất cả checkbox
+document.getElementById('checkAll')?.addEventListener('change', function () {
+  chonTatCa(this);
+});
   document.getElementById('btnXoa')?.addEventListener('click', xoaDaChon);
   document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
@@ -245,7 +248,7 @@ function xoaMon(i) {
   renderTam();
 }
 
-function luuTatCa() {
+function luuTatCa(callback) {
   const ten = document.getElementById('ten')?.value.trim();
   const ngay = document.getElementById('ngay')?.value.trim();
 
@@ -259,36 +262,18 @@ function luuTatCa() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ten, ngay, hanghoa: monTam })
   })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      Swal.fire('✅ Đã lưu công nợ', '', 'success');
-      monTam = [];         // 💥 Xóa dữ liệu tạm sau khi lưu
-      renderTam();         // 💡 Cập nhật lại bảng tạm
-
-      return loadData();   // 🔁 Load lại toàn bộ dữ liệu công nợ từ server
-    } else {
-      throw new Error(data.message || 'Lưu thất bại');
-    }
-  })
-  .then(() => {
-    // 🔍 Nếu đang có từ khóa tìm thì tự tìm lại
-    const keyword = boDau(document.getElementById('timten')?.value.trim() || '');
-    if (keyword) {
-      const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
-      renderTable(matched);
-    } else {
-      renderTable(getRandomRows(allData, 10));
-    }
-  })
-  .catch(err => {
-    console.error('❌ Lỗi khi lưu công nợ:', err);
-    Swal.fire('Lỗi khi lưu dữ liệu', err.message || '', 'error');
-  });
-} else {
-      Swal.fire('❌ Lỗi khi lưu', '', 'error');
-    }
-  });
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        if (typeof callback === 'function') callback();
+      } else {
+        Swal.fire('❌ Lưu thất bại', '', 'error');
+      }
+    })
+    .catch(err => {
+      console.error('❌ Lỗi khi lưu:', err);
+      Swal.fire('❌ Không thể kết nối máy chủ', '', 'error');
+    });
 }
 
 function xoaDaChon() {
