@@ -1,121 +1,207 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
-  const supplierInput = document.getElementById('supplier');
-  const dateInput = document.getElementById('date');
-  const productInput = document.getElementById('product');
-  const unitInput = document.getElementById('unit');
-  const qtyInput = document.getElementById('qty');
-  const priceInput = document.getElementById('price');
-  const discountInput = document.getElementById('discount');
-  const addItemBtn = document.getElementById('addItem');
-  const tableBody = document.querySelector('#itemsTable tbody');
-  const grandTotalCell = document.getElementById('grandTotal');
-  const saveBtn = document.getElementById('saveBtn');
-  const detailBtn = document.getElementById('detailBtn');
+// ========================= script-nhap.js =========================
+document.addEventListener("DOMContentLoaded", () => {
+  const danhSachTam = [];
 
-  let items = [];
-  dateInput.valueAsDate = new Date();
+  // DOM Elements
+  const supplierEl = document.getElementById("supplier");
+  const dateEl = document.getElementById("date");
+  const productEl = document.getElementById("product");
+  const unitEl = document.getElementById("unit");
+  const qtyEl = document.getElementById("qty");
+  const priceEl = document.getElementById("price");
+  const discountEl = document.getElementById("discount");
+  const addItemBtn = document.getElementById("addItem");
+  const saveBtn = document.getElementById("saveBtn");
+  const tableBody = document.querySelector("#itemsTable tbody");
+  const grandTotalEl = document.getElementById("grandTotal");
+  const searchBtn = document.getElementById("btnSearchSupplier");
+  const suggestionsWrap = document.getElementById("suggestions");
+  const detailBtn = document.getElementById("detailBtn");
 
-  function renderTable() {
-    tableBody.innerHTML = '';
-    if (items.length === 0) {
-      tableBody.innerHTML = '<tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>';
-      grandTotalCell.textContent = 0;
-      return;
-    }
-    let total = 0;
-    items.forEach((it, idx) => {
-      const giaNhap = it.price * (1 - it.discount / 100);
-      const thanhTien = giaNhap * it.qty;
-      total += thanhTien;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td>${it.name}</td>
-        <td>${it.unit}</td>
-        <td>${it.qty}</td>
-        <td>${it.price.toLocaleString()}</td>
-        <td>${it.discount}%</td>
-        <td>${giaNhap.toLocaleString()}</td>
-        <td>${thanhTien.toLocaleString()}</td>
-        <td><button class="btn btn-danger btn-sm" data-idx="${idx}"><i class="fa fa-trash"></i></button></td>
-      `;
-      tableBody.appendChild(tr);
-    });
-    grandTotalCell.textContent = total.toLocaleString();
+  function formatMoney(v) {
+    return Number(v).toLocaleString("vi-VN");
   }
 
-  addItemBtn.addEventListener('click', () => {
-    const name = productInput.value.trim();
-    const unit = unitInput.value.trim();
-    const qty = +qtyInput.value;
-    const price = +priceInput.value;
-    const discount = +discountInput.value || 0;
+  function renderTable() {
+    tableBody.innerHTML = "";
 
-    if (!name || !unit || qty <= 0) {
-      alert('Vui lòng nhập đầy đủ thông tin sản phẩm.');
+    if (danhSachTam.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="9">Chưa có mặt hàng</td></tr>';
+      grandTotalEl.textContent = "0";
       return;
     }
 
-    items.push({ name, unit, qty, price, discount });
-    productInput.value = '';
-    unitInput.value = '';
-    qtyInput.value = 1;
-    priceInput.value = 0;
-    discountInput.value = 0;
-    productInput.focus();
+    let total = 0;
+
+    danhSachTam.forEach((item, index) => {
+      const giaNhap = item.price * (1 - item.discount / 100);
+      const thanhTien = giaNhap * item.qty;
+      total += thanhTien;
+
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index + 1}</td>
+        <td>${item.product}</td>
+        <td>${item.unit}</td>
+        <td>${item.qty}</td>
+        <td>${formatMoney(item.price)}</td>
+        <td>${item.discount}%</td>
+        <td>${formatMoney(giaNhap.toFixed(0))}</td>
+        <td>${formatMoney(thanhTien.toFixed(0))}</td>
+        <td><button onclick="xoaMuc(${index})">❌</button></td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    grandTotalEl.textContent = formatMoney(total.toFixed(0));
+  }
+
+  window.xoaMuc = function (index) {
+    danhSachTam.splice(index, 1);
     renderTable();
-  });
+  };
 
-  tableBody.addEventListener('click', e => {
-    const btn = e.target.closest('button[data-idx]');
-    if (btn) {
-      const idx = +btn.dataset.idx;
-      items.splice(idx, 1);
-      renderTable();
-    }
-  });
-
-  saveBtn.addEventListener('click', () => {
-    if (!supplierInput.value) {
-      alert('Vui lòng nhập tên đại lý');
-      return;
-    }
-    if (items.length === 0) {
-      alert('Chưa có mặt hàng nào');
-      return;
-    }
-    const payload = {
-      supplier: supplierInput.value,
-      date: dateInput.value,
-      items
+  addItemBtn.addEventListener("click", () => {
+    const item = {
+      product: productEl.value.trim(),
+      unit: unitEl.value.trim(),
+      qty: parseInt(qtyEl.value),
+      price: parseFloat(priceEl.value),
+      discount: parseFloat(discountEl.value)
     };
-    fetch('/api/stock/receive', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+
+    if (!item.product || !item.unit || isNaN(item.qty) || isNaN(item.price)) {
+      alert("Vui lòng nhập đầy đủ thông tin mặt hàng.");
+      return;
+    }
+
+    danhSachTam.push(item);
+    renderTable();
+
+    productEl.value = "";
+    unitEl.value = "";
+    qtyEl.value = 1;
+    priceEl.value = 0;
+    discountEl.value = 0;
+    productEl.focus();
+  });
+
+  saveBtn.addEventListener("click", () => {
+    const supplier = supplierEl.value.trim();
+    const date = dateEl.value;
+
+    if (!supplier || !date || danhSachTam.length === 0) {
+      alert("Vui lòng nhập đầy đủ thông tin và ít nhất 1 món hàng.");
+      return;
+    }
+
+    const payload = { supplier, date, items: danhSachTam };
+
+    fetch("/api/nhap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
-      .then(r => r.json())
-      .then(res => {
-        alert('Đã lưu phiếu nhập #' + res.id);
-        items = [];
+      .then(res => res.json())
+      .then(() => {
+        alert("✅ Đã lưu phiếu nhập thành công!");
+        supplierEl.value = "";
+        dateEl.value = "";
+        danhSachTam.length = 0;
         renderTable();
       })
       .catch(err => {
         console.error(err);
-        alert('Lỗi khi lưu phiếu');
+        alert("❌ Không thể lưu phiếu nhập.");
       });
   });
 
-  detailBtn.addEventListener('click', () => {
-    const date = dateInput.value;
-    if (!date) {
-      alert('Vui lòng chọn ngày để xem chi tiết phiếu nhập');
+  searchBtn.addEventListener("click", async () => {
+    const keyword = document.getElementById("searchSupplier").value.trim();
+    if (!keyword) return;
+
+    try {
+      const res = await fetch(`/timkiem?ten=${encodeURIComponent(keyword)}`);
+      const data = await res.json();
+
+      suggestionsWrap.innerHTML = "";
+
+      if (!data.length) {
+        suggestionsWrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
+        return;
+      }
+
+      data.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "suggest-item";
+        div.textContent = entry.ten;
+        div.onclick = () => {
+          document.getElementById("supplier").value = entry.ten;
+          suggestionsWrap.innerHTML = "";
+          taiKetQuaTheoTenDaily(entry.ten);
+        };
+        suggestionsWrap.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Lỗi tìm đại lý:", err);
+      Swal.fire("Lỗi", "Không thể tìm đại lý", "error");
+    }
+  });
+
+  async function taiKetQuaTheoTenDaily(daily) {
+    try {
+      const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(daily)}`);
+      const data = await res.json();
+
+      const tbody = document.getElementById("bangKetQua");
+      if (!tbody) return;
+
+      tbody.innerHTML = "";
+      document.getElementById("khungKetQua").style.display = "block";
+
+      if (!data.length) {
+        tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
+        return;
+      }
+
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.ngay}</td>
+          <td>${item.tenhang}</td>
+          <td>${item.dvt}</td>
+          <td>${item.soluong}</td>
+          <td>${item.dongia.toLocaleString()}</td>
+          <td>${item.ck}%</td>
+          <td>${item.gianhap.toLocaleString()}</td>
+          <td>${item.thanhtien.toLocaleString()}</td>
+        `;
+        row.addEventListener("click", () => {
+          row.classList.toggle("selected-row");
+          row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+        });
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu:", err);
+      Swal.fire("Lỗi", "Không thể tải dữ liệu", "error");
+    }
+  }
+
+  detailBtn.addEventListener("click", () => {
+    const table = document.getElementById("bangKetQua");
+    if (!table) return;
+
+    const rows = table.querySelectorAll("tr[data-selected='true']");
+    if (rows.length === 0) {
+      Swal.fire("Thông báo", "Vui lòng chọn một dòng hàng để xem chi tiết", "info");
       return;
     }
-    window.open('/chi-tiet-phieu-nhap?ngay=' + date, '_blank');
+
+    const ngay = rows[0].cells[0].textContent.trim();
+    if (!ngay) return;
+
+    const link = `/chi-tiet-phieu-nhap?ngay=${encodeURIComponent(ngay)}`;
+    window.open(link, "_blank");
   });
-   document.getElementById('logoutBtn')?.addEventListener('click', () => {
-  fetch('/logout', { method: 'POST' })
-    .finally(() => window.location.href = '/index.html');
-});
 });
