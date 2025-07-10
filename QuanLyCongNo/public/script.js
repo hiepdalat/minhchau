@@ -291,7 +291,7 @@ function xoaDaChon() {
         body: JSON.stringify({ id: chk.dataset.id, index: chk.dataset.index })
       });
     });
-    Promise.all(reqs).then(() => loadData());
+    Promise.all(reqs).then(() => loadDataAndRender());
   });
 }
 
