@@ -679,6 +679,7 @@ function taiDanhSachKho() {
       tbody.innerHTML = '';
       data.forEach((item, i) => {
         const tr = document.createElement('tr');
+        if (hh.thanhtoan) tr.classList.add('row-paid');
         tr.innerHTML = `
           <td>${i + 1}</td>
           <td>${item.maHang}</td>
