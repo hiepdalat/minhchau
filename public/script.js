@@ -65,33 +65,31 @@ resetIdleTimer();
 })();
 
 // ===================== HỖ TRỢ ĐA TRANG =====================
-
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'congno') initCongNo();
-  else if (page === 'khohang') initKhoHang();
-  else if (page === 'banhang') initBanHang();
+  else if (page === 'khohang') initKhoHang?.();
+  else if (page === 'banhang') initBanHang?.();
 });
+
 // ===================== MODULE: CÔNG NỢ =====================
 let monTam = [];
-
 function initCongNo() {
   console.log('🔁 Trang công nợ');
 
   const tbody = document.getElementById('ds');
   const btnTim = document.getElementById('btnTim');
   const inputTim = document.getElementById('timten');
-
-  // 🔹 Thêm khai báo các input dùng để thêm món
   const inputND = document.getElementById('nd');
   const inputSL = document.getElementById('sl');
   const inputDG = document.getElementById('dg');
+
+  let allData = [];
 
   inputTim.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') btnTim.click();
   });
 
-  // 🔹 Bắt Enter ở các input để thêm món
   [inputND, inputSL, inputDG].forEach(input => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
@@ -99,72 +97,52 @@ function initCongNo() {
         const sl = +inputSL.value;
         const dg = +inputDG.value;
 
-        if (!nd) {
-          Swal.fire('⚠️ Thiếu nội dung', 'Vui lòng nhập nội dung', 'warning');
-          inputND.focus();
-          return;
-        }
-        if (!sl || sl <= 0) {
-          Swal.fire('⚠️ Thiếu số lượng', 'Số lượng phải lớn hơn 0', 'warning');
-          inputSL.focus();
-          return;
-        }
-        if (dg < 0 || inputDG.value.trim() === '') {
-          Swal.fire('⚠️ Thiếu đơn giá', 'Vui lòng nhập đơn giá hợp lệ', 'warning');
-          inputDG.focus();
-          return;
-        }
+        if (!nd) return Swal.fire('⚠️ Thiếu nội dung', '', 'warning').then(() => inputND.focus());
+        if (!sl || sl <= 0) return Swal.fire('⚠️ Thiếu số lượng', '', 'warning').then(() => inputSL.focus());
+        if (dg < 0 || inputDG.value.trim() === '') return Swal.fire('⚠️ Thiếu đơn giá', '', 'warning').then(() => inputDG.focus());
 
-        themMon(); // ✅ Gọi khi hợp lệ
+        themMon();
       }
     });
   });
-
-  let allData = [];
 
   function boDau(str) {
     return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
   }
 
-function renderTable(data) {
-  const tbody = document.getElementById('ds');
-  tbody.innerHTML = '';
+  function renderTable(data) {
+    tbody.innerHTML = '';
+    data.forEach((doc, docIndex) => {
+      const ten = doc.ten || '';
+      const ngay = doc.ngay || '';
 
-  data.forEach((doc, docIndex) => {
-    const ten = doc.ten || '';
-    const ngay = doc.ngay || '';
+      (doc.hanghoa || []).forEach((hh, index) => {
+        const sl = parseFloat(hh.soluong) || 0;
+        const gia = parseFloat(String(hh.dongia).toString().replace(/[.,]/g, '')) || 0;
+        const tien = sl * gia;
 
-    (doc.hanghoa || []).forEach((hh, index) => {
-      const sl = parseFloat(hh.soluong) || 0;
-      const gia = parseFloat(String(hh.dongia).toString().replace(/[.,]/g, '')) || 0;
-      const tien = sl * gia;
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
-        <td>${ten}</td>
-        <td>${ngay}</td>
-        <td>${hh.noidung || ''}</td>
-        <td>${sl}</td>
-        <td>${gia.toLocaleString()}</td>
-        <td>${tien.toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
+          <td>${ten}</td>
+          <td>${ngay}</td>
+          <td>${hh.noidung || ''}</td>
+          <td>${sl}</td>
+          <td>${gia.toLocaleString()}</td>
+          <td>${tien.toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     });
-  });
 
-  // Gọi lại hàm cập nhật tổng cho checkbox đang chọn
-  capNhatTongCong();
-}
-  // 🔁 Gắn lại sự kiện onchange cho tất cả checkbox sau khi render
-  const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
-  checkboxes.forEach(chk => {
-    chk.addEventListener('change', capNhatTongCong);
-  });
+    capNhatTongCong();
 
-  // 🧮 Cập nhật tổng ngay nếu đang có checkbox nào đã được giữ trạng thái checked (nếu cần)
-  capNhatTongCong();
-}
+    const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(chk => {
+      chk.addEventListener('change', capNhatTongCong);
+    });
+  }
+
   function getRandomRows(arr, n = 10) {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
@@ -174,8 +152,7 @@ function renderTable(data) {
     .then(data => {
       console.log('📦 Dữ liệu công nợ:', data);
       allData = data;
-      const random10 = getRandomRows(allData, 10);
-      renderTable(random10);
+      renderTable(getRandomRows(allData, 10));
     })
     .catch(err => {
       console.error('❌ Lỗi khi load công nợ:', err);
@@ -187,9 +164,7 @@ function renderTable(data) {
     if (!keyword) {
       renderTable(getRandomRows(allData, 10));
     } else {
-      const matched = allData.filter(row =>
-        boDau(row.ten || '').includes(keyword)
-      );
+      const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
       renderTable(matched);
     }
   };
@@ -202,7 +177,7 @@ function renderTable(data) {
   document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
   document.getElementById('btnThem')?.addEventListener('click', themMon);
-
+}
 function chonTatCa(checkbox) {
   document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
     chk.checked = checkbox.checked;
@@ -340,7 +315,7 @@ function thanhToan() {
   });
 }
 function loadData() {
-  fetch('/api/congno')
+ fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
       allData = data;
