@@ -332,7 +332,10 @@ function thanhToan() {
       });
     });
 
-    Promise.all(reqs).then(() => loadData());
+    Promise.all(reqs).then(() => {
+  loadDataAndRender();   // Load lại bảng sau thanh toán
+  setTimeout(() => inDanhSach(), 500); // In danh sách sau khi đã cập nhật DOM
+});
   });
 }
 function loadData() {
