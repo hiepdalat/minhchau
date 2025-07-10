@@ -127,29 +127,37 @@ function initCongNo() {
   }
 
   function renderTable(data) {
-    const tbody = document.querySelector('#ds');
-    tbody.innerHTML = '';
+  const tbody = document.getElementById('ds');
+  tbody.innerHTML = '';
 
-    data.forEach(doc => {
-      const ten = doc.ten;
-      const ngay = doc.ngay;
+  data.forEach((doc, docIndex) => {
+    const ten = doc.ten;
+    const ngay = doc.ngay;
 
-      doc.hanghoa.forEach((hh, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
-          <td>${ten}</td>
-          <td>${ngay}</td>
-          <td>${hh.noidung}</td>
-          <td>${hh.soluong}</td>
-          <td>${Number(hh.dongia).toLocaleString()}</td>
-          <td>${(hh.soluong * hh.dongia).toLocaleString()}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+    doc.hanghoa.forEach((hh, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
+        <td>${ten}</td>
+        <td>${ngay}</td>
+        <td>${hh.noidung}</td>
+        <td>${hh.soluong}</td>
+        <td>${Number(hh.dongia).toLocaleString()}</td>
+        <td>${(hh.soluong * hh.dongia).toLocaleString()}</td>
+      `;
+      tbody.appendChild(tr);
     });
-  }
+  });
 
+  // 🔁 Gắn lại sự kiện onchange cho tất cả checkbox sau khi render
+  const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
+  checkboxes.forEach(chk => {
+    chk.addEventListener('change', capNhatTongCong);
+  });
+
+  // 🧮 Cập nhật tổng ngay nếu đang có checkbox nào đã được giữ trạng thái checked (nếu cần)
+  capNhatTongCong();
+}
   function getRandomRows(arr, n = 10) {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
