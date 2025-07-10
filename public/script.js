@@ -181,9 +181,6 @@ document.getElementById('btnLuu')?.addEventListener('click', () => {
   });
 });
 
-// Gọi khi trang load lần đầu (tự động hiển thị 10 dòng ngẫu nhiên)
-loadDataAndRender();
-
 // Sự kiện chọn tất cả checkbox
 document.getElementById('checkAll')?.addEventListener('change', function () {
   chonTatCa(this);
