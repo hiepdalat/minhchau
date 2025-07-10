@@ -222,6 +222,8 @@ function themMon() {
   document.getElementById('nd').value = '';
   document.getElementById('sl').value = '';
   document.getElementById('dg').value = '';
+   // 👉 Tự động focus lại ô nội dung để nhập tiếp
+  document.getElementById('nd').focus();
 }
 
 function renderTam() {
