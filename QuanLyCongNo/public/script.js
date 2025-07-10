@@ -464,47 +464,104 @@ function inDanhSach() {
       <meta charset="UTF-8">
       <title>Hóa đơn bán hàng</title>
       <style>
-        body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
-        
-        .header { display: flex; gap: 20px; align-items: flex-start; center; margin-bottom: 10px; }
-        .header img { height: 280px; margin-right: 16px; }
-        .company-info h1 { margin: 0; color: #d00; font-size: 22px; }
-        .company-info { line-height: 1.3; }
-       
-        h2 { text-align: center; margin: 0; margin-bottom: 5px; color: red; }
-        .info div { margin: 6px 0; }
-        .dots-line {
-          border-bottom: 1px dotted #000;
-          display: inline-block;
-          width: 85%;
-          margin-left: 10px;
-        }
-        table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 14px; }
-        tfoot td { font-weight: bold; }
-        .amount-text { margin-top: 16px; font-style: italic; }
-        .sign { display: flex; justify-content: space-between; margin-top: 40px; }
-        .sign div { text-align: center; }
-        
-        .table-container {
-  position: relative;
-}
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    color: #000;
+    position: relative;
+  }
 
-.watermark-inside {
-  position: absolute;
-  top: 50%;       /* Giữa chiều cao bảng */
-  left: 50%;      /* Giữa chiều ngang bảng */
-  transform: translate(-50%, -50%) rotate(-20deg);
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 0;
-}
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 8px; /* 📌 Giảm khoảng cách dưới logo */
+  }
 
-.watermark-inside img {
-  width: ${watermarkSize}px;
-}
-        
-      </style>
+  .header img {
+    height: 120px; /* 🧱 Thu gọn chiều cao logo cho gọn */
+    margin-right: 8px;
+  }
+
+  .company-info {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .company-info h1 {
+    margin: 0;
+    color: #d00;
+    font-size: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    color: red;
+    margin: 10px 0 4px 0; /* ✅ Rút gọn khoảng trắng trước/sau */
+    font-size: 20px;
+  }
+
+  .info div {
+    margin: 6px 0;
+  }
+
+  .dots-line {
+    border-bottom: 1px dotted #000;
+    display: inline-block;
+    width: 85%;
+    margin-left: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+
+  th, td {
+    border: 1px solid #000;
+    padding: 6px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  tfoot td {
+    font-weight: bold;
+  }
+
+  .amount-text {
+    margin-top: 16px;
+    font-style: italic;
+  }
+
+  .sign {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+
+  .sign div {
+    text-align: center;
+  }
+
+  .table-container {
+    position: relative;
+  }
+
+  .watermark-inside {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .watermark-inside img {
+    width: 220px; /* 🧊 Tùy chỉnh logo mờ trong bảng */
+  }
+</style>
     </head>
     <body>
       <div class="header">
