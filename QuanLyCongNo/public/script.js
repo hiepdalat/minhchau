@@ -258,18 +258,32 @@ function luuTatCa() {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ten, ngay, hanghoa: monTam })
-  }).then(res => res.json()).then(data => {
-   if (data.success) {
-  Swal.fire('✅ Đã lưu công nợ', '', 'success');
-  monTam = [];
-  renderTam();
-  loadData().then(() => {
-    // Nếu đang có từ khóa tìm, tự động tìm lại sau khi load
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      Swal.fire('✅ Đã lưu công nợ', '', 'success');
+      monTam = [];         // 💥 Xóa dữ liệu tạm sau khi lưu
+      renderTam();         // 💡 Cập nhật lại bảng tạm
+
+      return loadData();   // 🔁 Load lại toàn bộ dữ liệu công nợ từ server
+    } else {
+      throw new Error(data.message || 'Lưu thất bại');
+    }
+  })
+  .then(() => {
+    // 🔍 Nếu đang có từ khóa tìm thì tự tìm lại
     const keyword = boDau(document.getElementById('timten')?.value.trim() || '');
     if (keyword) {
       const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
       renderTable(matched);
+    } else {
+      renderTable(getRandomRows(allData, 10));
     }
+  })
+  .catch(err => {
+    console.error('❌ Lỗi khi lưu công nợ:', err);
+    Swal.fire('Lỗi khi lưu dữ liệu', err.message || '', 'error');
   });
 } else {
       Swal.fire('❌ Lỗi khi lưu', '', 'error');
