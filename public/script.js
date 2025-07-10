@@ -82,33 +82,74 @@ function initCongNo() {
   const btnTim = document.getElementById('btnTim');
   const inputTim = document.getElementById('timten');
 
-  let allData = [];
-   function boDau(str) {
-    return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
-  }
-  function renderTable(data) {
-  const tbody = document.querySelector('#ds');
-  tbody.innerHTML = '';
+  // 🔹 Thêm khai báo các input dùng để thêm món
+  const inputND = document.getElementById('nd');
+  const inputSL = document.getElementById('sl');
+  const inputDG = document.getElementById('dg');
 
-  data.forEach(doc => {
-    const ten = doc.ten;
-    const ngay = doc.ngay;
+  inputTim.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') btnTim.click();
+  });
 
-    doc.hanghoa.forEach((hh, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
-        <td>${ten}</td>
-        <td>${ngay}</td>
-        <td>${hh.noidung}</td>
-        <td>${hh.soluong}</td>
-        <td>${Number(hh.dongia).toLocaleString()}</td>
-        <td>${(hh.soluong * hh.dongia).toLocaleString()}</td>
-      `;
-      tbody.appendChild(tr);
+  // 🔹 Bắt Enter ở các input để thêm món
+  [inputND, inputSL, inputDG].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const nd = inputND.value.trim();
+        const sl = +inputSL.value;
+        const dg = +inputDG.value;
+
+        if (!nd) {
+          Swal.fire('⚠️ Thiếu nội dung', 'Vui lòng nhập nội dung', 'warning');
+          inputND.focus();
+          return;
+        }
+        if (!sl || sl <= 0) {
+          Swal.fire('⚠️ Thiếu số lượng', 'Số lượng phải lớn hơn 0', 'warning');
+          inputSL.focus();
+          return;
+        }
+        if (dg < 0 || inputDG.value.trim() === '') {
+          Swal.fire('⚠️ Thiếu đơn giá', 'Vui lòng nhập đơn giá hợp lệ', 'warning');
+          inputDG.focus();
+          return;
+        }
+
+        themMon(); // ✅ Gọi khi hợp lệ
+      }
     });
   });
-}
+
+  let allData = [];
+
+  function boDau(str) {
+    return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  }
+
+  function renderTable(data) {
+    const tbody = document.querySelector('#ds');
+    tbody.innerHTML = '';
+
+    data.forEach(doc => {
+      const ten = doc.ten;
+      const ngay = doc.ngay;
+
+      doc.hanghoa.forEach((hh, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
+          <td>${ten}</td>
+          <td>${ngay}</td>
+          <td>${hh.noidung}</td>
+          <td>${hh.soluong}</td>
+          <td>${Number(hh.dongia).toLocaleString()}</td>
+          <td>${(hh.soluong * hh.dongia).toLocaleString()}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  }
+
   function getRandomRows(arr, n = 10) {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
@@ -116,7 +157,7 @@ function initCongNo() {
   fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
-      console.log('📦 Dữ liệu công nợ:', data);   // << THÊM DÒNG NÀY
+      console.log('📦 Dữ liệu công nợ:', data);
       allData = data;
       const random10 = getRandomRows(allData, 10);
       renderTable(random10);
@@ -126,7 +167,7 @@ function initCongNo() {
       tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
     });
 
- btnTim.onclick = () => {
+  btnTim.onclick = () => {
     const keyword = boDau(inputTim.value.trim());
     if (!keyword) {
       renderTable(getRandomRows(allData, 10));
@@ -135,10 +176,10 @@ function initCongNo() {
         boDau(row.ten || '').includes(keyword)
       );
       renderTable(matched);
-  }
-};
+    }
+  };
 
-  document.getElementById('checkAll')?.addEventListener('change', function() {
+  document.getElementById('checkAll')?.addEventListener('change', function () {
     chonTatCa(this);
   });
   document.getElementById('btnLuu')?.addEventListener('click', luuTatCa);
@@ -147,7 +188,6 @@ function initCongNo() {
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
   document.getElementById('btnThem')?.addEventListener('click', themMon);
 }
-
 function chonTatCa(checkbox) {
   document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
     chk.checked = checkbox.checked;
