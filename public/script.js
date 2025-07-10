@@ -189,7 +189,10 @@ document.getElementById('checkAll')?.addEventListener('change', function () {
   document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
   document.getElementById('btnThem')?.addEventListener('click', themMon);
+
+   loadDataAndRender();
 }
+
 function chonTatCa(checkbox) {
   document.querySelectorAll('#ds input[type="checkbox"]').forEach(chk => {
     chk.checked = checkbox.checked;
