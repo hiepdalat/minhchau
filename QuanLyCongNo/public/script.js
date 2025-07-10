@@ -65,6 +65,7 @@ resetIdleTimer();
 })();
 
 // ===================== HỖ TRỢ ĐA TRANG =====================
+
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
   if (page === 'congno') initCongNo();
@@ -77,13 +78,15 @@ let monTam = [];
 function initCongNo() {
   console.log('🔁 Trang công nợ');
 
- const tbody = document.getElementById('ds');
+  const tbody = document.getElementById('ds');
   const btnTim = document.getElementById('btnTim');
   const inputTim = document.getElementById('timten');
 
   let allData = [];
-
- function renderTable(data) {
+   function boDau(str) {
+    return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  }
+  function renderTable(data) {
   const tbody = document.querySelector('#ds');
   tbody.innerHTML = '';
 
@@ -106,7 +109,6 @@ function initCongNo() {
     });
   });
 }
-
   function getRandomRows(arr, n = 10) {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
@@ -125,14 +127,14 @@ function initCongNo() {
     });
 
  btnTim.onclick = () => {
-  const keyword = inputTim.value.trim().toLowerCase();
-  if (!keyword) {
-    renderTable(getRandomRows(allData, 10));
-  } else {
-    const matched = allData.filter(row =>
-      (row.ten || '').toLowerCase().includes(keyword)
-    );
-    renderTable(matched);
+    const keyword = boDau(inputTim.value.trim());
+    if (!keyword) {
+      renderTable(getRandomRows(allData, 10));
+    } else {
+      const matched = allData.filter(row =>
+        boDau(row.ten || '').includes(keyword)
+      );
+      renderTable(matched);
   }
 };
 
@@ -322,7 +324,7 @@ function inDanhSach() {
     return;
   }
 
- function numberToVietnamese(num) {
+  function numberToVietnamese(num) {
   const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
   const Tien = ["", "nghìn", "triệu", "tỷ"];
 
@@ -437,7 +439,7 @@ function inDanhSach() {
       </div>
 
       <h2>HÓA ĐƠN BÁN HÀNG</h2>
-     <div style="text-align: center; font-size: 14px; color: #000; margin-top: -8px;">
+    <div style="text-align: center; font-size: 14px; color: #000; margin-top: -8px;">
   Ngày: ${ngayIn}
 </div>
 
