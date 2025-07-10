@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       items: danhSachTam
     };
 
-    fetch("/api/nhap", {
+    fetch("/api/stock/receive", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -123,35 +123,72 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("❌ Không thể lưu phiếu nhập.");
     });
   });
-});
-document.getElementById("btnSearchSupplier").addEventListener("click", async () => {
-  const keyword = document.getElementById("searchSupplier").value.trim();
-  if (!keyword) return;
 
-  try {
-    const res = await fetch(`/timkiem?ten=${encodeURIComponent(keyword)}`);
-    const data = await res.json();
+  // Tìm tên đại lý
+  document.getElementById("btnSearchSupplier").addEventListener("click", async () => {
+    const keyword = document.getElementById("searchSupplier").value.trim();
+    if (!keyword) return;
 
-    const wrap = document.getElementById("suggestions");
-    wrap.innerHTML = "";
+    try {
+      const res = await fetch(`/timkiem?ten=${encodeURIComponent(keyword)}`);
+      const data = await res.json();
 
-    if (!data.length) {
-      wrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
-      return;
+      const wrap = document.getElementById("suggestions");
+      wrap.innerHTML = "";
+
+      if (!data.length) {
+        wrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
+        return;
+      }
+
+      data.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "suggest-item";
+        div.textContent = entry.ten;
+        div.onclick = () => {
+          document.getElementById("supplier").value = entry.ten;
+          wrap.innerHTML = "";
+          taiKetQuaTheoTenDaily(entry.ten); // Gọi luôn sau khi chọn
+        };
+        wrap.appendChild(div);
+      });
+    } catch (err) {
+      console.error("Lỗi tìm đại lý:", err);
+      Swal.fire("Lỗi", "Không thể tìm đại lý", "error");
     }
+  });
 
-    data.forEach(entry => {
-      const div = document.createElement("div");
-      div.className = "suggest-item";
-      div.textContent = entry.ten;
-      div.onclick = () => {
-        document.getElementById("supplier").value = entry.ten;
-        wrap.innerHTML = "";
-      };
-      wrap.appendChild(div);
-    });
-  } catch (err) {
-    console.error("Lỗi tìm đại lý:", err);
-    Swal.fire("Lỗi", "Không thể tìm đại lý", "error");
+  // Hàm tải danh sách mặt hàng đã nhập theo tên đại lý
+  async function taiKetQuaTheoTenDaily(daily) {
+    try {
+      const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(daily)}`);
+      const data = await res.json();
+
+      const tbody = document.getElementById("bangKetQua");
+      tbody.innerHTML = "";
+      document.getElementById("khungKetQua").style.display = "block";
+
+      if (!data.length) {
+        tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
+        return;
+      }
+
+      data.forEach(item => {
+        const row = `<tr>
+          <td>${item.ngay}</td>
+          <td>${item.tenhang}</td>
+          <td>${item.dvt}</td>
+          <td>${item.soluong}</td>
+          <td>${item.dongia.toLocaleString()}</td>
+          <td>${item.ck}%</td>
+          <td>${item.gianhap.toLocaleString()}</td>
+          <td>${item.thanhtien.toLocaleString()}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML("beforeend", row);
+      });
+    } catch (err) {
+      console.error("Lỗi tải dữ liệu:", err);
+      Swal.fire("Lỗi", "Không thể tải dữ liệu", "error");
+    }
   }
 });
