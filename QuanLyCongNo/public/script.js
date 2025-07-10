@@ -352,7 +352,7 @@ function inDanhSach() {
       const cells = tr.querySelectorAll('td');
       const noidung = cells[3].innerText;
       const sl = cells[4].innerText;
-      const dongia = cells[5].innerText;
+      const dongia = parseFloat(cells[5].innerText.replace(/\./g, '').replace(/,/g, '')) || 0;
       const thanhtien = parseFloat(cells[6].innerText.replace(/,/g, ''));
       tong += thanhtien;
       rows.push(`
@@ -373,7 +373,7 @@ function inDanhSach() {
   }
 
 
- function numberToVietnamese(num) {
+ function numberToVietnamese(number) {
   if (typeof number !== 'number' || isNaN(number)) return 'Số không hợp lệ';
   if (number === 0) return 'Không đồng chẵn';
 
