@@ -364,51 +364,65 @@ function inDanhSach() {
     return;
   }
 
-  function numberToVietnamese(num) {
-  const ChuSo = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
-  const Tien = ["", "nghìn", "triệu", "tỷ"];
 
-  if (num === 0) return "Không đồng";
+  function docSoThanhChu(number) {
+  if (typeof number !== 'number' || isNaN(number)) return 'Số không hợp lệ';
+  if (number === 0) return 'Không đồng chẵn';
 
-  let result = "";
-  let lan = 0;
+  const dv = ['đồng', 'nghìn', 'triệu', 'tỷ'];
+  const so = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
 
-  while (num > 0) {
-    let so = num % 1000;
-    num = Math.floor(num / 1000);
+  function doc3so(n, dayDu = false, laDauTien = false) {
+    let [tram, chuc, donvi] = [
+      Math.floor(n / 100),
+      Math.floor((n % 100) / 10),
+      n % 10
+    ];
+    let ketQua = '';
 
-    if (so > 0) {
-      let tram = Math.floor(so / 100);
-      let chuc = Math.floor((so % 100) / 10);
-      let donvi = so % 10;
-      let str = "";
-
-      if (tram > 0) {
-        str += ChuSo[tram] + " trăm ";
-      } else if (chuc > 0 || donvi > 0) {
-        str += "không trăm ";
-      }
-
-      if (chuc > 1) {
-        str += ChuSo[chuc] + " mươi ";
-        if (donvi === 1) str += "mốt ";
-        else if (donvi === 5) str += "lăm ";
-        else if (donvi > 0) str += ChuSo[donvi] + " ";
-      } else if (chuc === 1) {
-        str += "mười ";
-        if (donvi === 5) str += "lăm ";
-        else if (donvi > 0) str += ChuSo[donvi] + " ";
-      } else if (donvi > 0) {
-        str += "linh " + ChuSo[donvi] + " ";
-      }
-
-      result = str.trim() + " " + Tien[lan] + " " + result.trim();
+    // Không đọc "không trăm" ở nhóm đầu tiên
+    if (tram > 0 || (!laDauTien && dayDu)) {
+      ketQua += so[tram] + ' trăm';
+      if (chuc === 0 && donvi > 0) ketQua += ' lẻ';
+    } else if (chuc === 0 && donvi > 0 && !laDauTien) {
+      ketQua += ' lẻ';
     }
 
-    lan++;
+    if (chuc > 1) {
+      ketQua += ' ' + so[chuc] + ' mươi';
+      if (donvi === 1) ketQua += ' mốt';
+      else if (donvi === 5) ketQua += ' lăm';
+      else if (donvi > 0) ketQua += ' ' + so[donvi];
+    } else if (chuc === 1) {
+      ketQua += ' mười';
+      if (donvi === 5) ketQua += ' lăm';
+      else if (donvi > 0) ketQua += ' ' + so[donvi];
+    } else if (donvi > 0 && chuc === 0) {
+      ketQua += ' ' + so[donvi];
+    }
+
+    return ketQua.trim();
   }
 
-  return result.trim().replace(/\s+/g, ' ') + " đồng chẵn";
+  const parts = [];
+  while (number > 0) {
+    parts.push(number % 1000);
+    number = Math.floor(number / 1000);
+  }
+
+  let chu = '';
+  for (let i = parts.length - 1; i >= 0; i--) {
+    if (parts[i] !== 0) {
+      const laDau = (i === parts.length - 1);
+      const phan = doc3so(parts[i], i !== parts.length - 1, laDau);
+      chu += phan + ' ' + dv[i] + ' ';
+    } else if (i === 0 && chu !== '') {
+      chu += dv[i] + ' ';
+    }
+  }
+
+  chu = chu.trim().replace(/\s+/g, ' ');
+  return chu.charAt(0).toUpperCase() + chu.slice(1) + ' chẵn';
 }
 
   const ngayIn = new Date().toLocaleDateString('vi-VN');
