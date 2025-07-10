@@ -6,86 +6,55 @@
   <title>Quản Lý Nhập Hàng</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <style>
-    .suggest-item {
-      background: #f0f0f0;
-      padding: 5px;
-      margin-top: 2px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    .suggest-item:hover {
-      background: #d0ebff;
-    }
-  </style>
 </head>
-<body data-page="nhaphang" class="congno-body">
+<body data-page="nhaphang">
   <header class="header-container">
     <div class="header-top">
       <h2>Nhập Hàng Vào Kho</h2>
-      <button id="logoutBtn" class="btn-logout">🚪 Đăng xuất</button>
+      <button id="logoutBtn" class="btn-logout">📲 Đăng xuất</button>
     </div>
   </header>
 
   <!-- Thông tin chung -->
   <div class="card">
-    <div class="grid-2">
-      <div>
-        <label for="supplier">Tên đại lý</label>
-        <input type="text" id="supplier" placeholder="Nhập tên đại lý" />
-      </div>
-      <div>
-        <label for="date">Ngày nhập</label>
-        <input type="date" id="date" />
-      </div>
-    </div>
+    <input type="text" id="supplier" placeholder="Tên đại lý">
+    <input type="date" id="date">
   </div>
 
   <!-- Thêm mặt hàng -->
   <div class="card">
-    <div class="grid-2">
-      <div><label for="product">Tên hàng</label><input type="text" id="product" placeholder="Nhập tên hàng" /></div>
-      <div><label for="unit">Đơn vị tính</label><input type="text" id="unit" placeholder="Ví dụ: cái, kg, hộp" /></div>
-      <div><label for="qty">Số lượng</label><input type="number" min="1" id="qty" value="1" /></div>
-      <div><label for="price">Đơn giá</label><input type="number" min="0" id="price" value="0" /></div>
-      <div><label for="discount">CK (%)</label><input type="number" min="0" id="discount" value="0" /></div>
-      <div class="align-end" style="display: flex; gap: 10px;">
-        <button id="addItem"><i class="fa fa-plus"></i> Thêm món</button>
-        <button id="saveBtn"><i class="fa fa-save"></i> Lưu phiếu nhập</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tìm tên đại lý + chi tiết đơn hàng -->
-  <div class="card">
-    <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
-    <div style="display: flex; gap: 10px; margin-top: 5px;">
-      <input id="searchSupplier" class="form-control" placeholder="Nhập tên đại lý">
-      <button id="btnSearchSupplier">Tìm</button>
-    </div>
-    <div id="suggestions" style="margin-top: 10px;"></div>
-    <br>
-    <button id="detailBtn">
-      <i class="fa fa-file-alt"></i> Chi tiết đơn hàng
-    </button>
+    <input type="text" id="product" placeholder="Tên hàng">
+    <input type="text" id="unit" placeholder="Đơn vị tính (ví dụ: cái, kg, hộp)">
+    <input type="number" id="qty" placeholder="Số lượng" min="1" value="1">
+    <input type="number" id="price" placeholder="Đơn giá" min="0" value="0">
+    <input type="number" id="discount" placeholder="CK (%)" min="0" value="0">
+    <button id="addItem" class="btn btn-primary">➕ Thêm món</button>
+    <button id="saveBtn" class="btn btn-success">💾 Lưu phiếu nhập</button>
   </div>
 
   <!-- Danh sách tạm -->
-  <div class="card table-wrapper">
+  <div class="card">
     <table id="itemsTable">
       <thead>
         <tr>
-          <th>#</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th><th>CK (%)</th><th>G-nhập</th><th>Thành tiền</th><th></th>
+          <th>#</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th><th>CK (%)</th><th>Giá nhập</th><th>Thành tiền</th><th></th>
         </tr>
       </thead>
       <tbody>
         <tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>
       </tbody>
       <tfoot>
-        <tr><td colspan="7" style="text-align:right;">Tổng tiền:</td><td id="grandTotal" class="total">0</td><td></td></tr>
+        <tr><td colspan="7" style="text-align:right">Tổng tiền:</td><td id="grandTotal">0</td><td></td></tr>
       </tfoot>
     </table>
+  </div>
+
+  <!-- Vùng tìm kiếm -->
+  <div class="card">
+    <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
+    <input id="searchSupplier" placeholder="Nhập tên đại lý">
+    <button id="btnSearchSupplier">Tìm</button>
+    <button id="detailBtn" class="btn btn-secondary">📋 Chi tiết đơn hàng</button>
   </div>
 
   <script src="/script-nhap.js" defer></script>
