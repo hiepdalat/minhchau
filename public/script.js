@@ -352,15 +352,16 @@ function inDanhSach() {
       const cells = tr.querySelectorAll('td');
       const noidung = cells[3].innerText;
       const sl = cells[4].innerText;
-      const dongia = parseFloat(cells[5].innerText.replace(/\./g, '').replace(/,/g, '')) || 0;
-      const thanhtien = parseFloat(cells[6].innerText.replace(/,/g, ''));
+       const dongiaStr = cells[5].innerText;
+      const dongia = parseFloat(dongiaStr.replace(/\./g, '').replace(/,/g, '')) || 0;
+      const thanhtien = dongia * parseFloat(sl) || 0;
       tong += thanhtien;
       rows.push(`
         <tr>
           <td>${stt++}</td>
           <td>${noidung}</td>
           <td>${sl}</td>
-          <td>${Number(dongia).toLocaleString()}</td>
+          <td>${dongia.toLocaleString()}</td>
           <td>${thanhtien.toLocaleString()}</td>
         </tr>
       `);
