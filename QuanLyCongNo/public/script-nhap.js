@@ -1,3 +1,4 @@
+// ========================= script-nhap.js =========================
 document.addEventListener("DOMContentLoaded", () => {
   const danhSachTam = [];
 
@@ -13,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const saveBtn = document.getElementById("saveBtn");
   const tableBody = document.querySelector("#itemsTable tbody");
   const grandTotalEl = document.getElementById("grandTotal");
+  const searchBtn = document.getElementById("btnSearchSupplier");
+  const suggestionsWrap = document.getElementById("suggestions");
+  const detailBtn = document.getElementById("detailBtn");
 
   function formatMoney(v) {
     return Number(v).toLocaleString("vi-VN");
@@ -22,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tableBody.innerHTML = "";
 
     if (danhSachTam.length === 0) {
-      tableBody.innerHTML = '<tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="9">Chưa có mặt hàng</td></tr>';
       grandTotalEl.textContent = "0";
       return;
     }
@@ -52,13 +56,11 @@ document.addEventListener("DOMContentLoaded", () => {
     grandTotalEl.textContent = formatMoney(total.toFixed(0));
   }
 
-  // Hàm xoá món
   window.xoaMuc = function (index) {
     danhSachTam.splice(index, 1);
     renderTable();
   };
 
-  // Thêm món vào danh sách tạm
   addItemBtn.addEventListener("click", () => {
     const item = {
       product: productEl.value.trim(),
@@ -76,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
     danhSachTam.push(item);
     renderTable();
 
-    // Reset form nhập
     productEl.value = "";
     unitEl.value = "";
     qtyEl.value = 1;
@@ -85,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
     productEl.focus();
   });
 
-  // Lưu phiếu nhập
   saveBtn.addEventListener("click", () => {
     const supplier = supplierEl.value.trim();
     const date = dateEl.value;
@@ -95,37 +95,28 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const payload = {
-      supplier,
-      date,
-      items: danhSachTam
-    };
+    const payload = { supplier, date, items: danhSachTam };
 
-    fetch("/api/stock/receive", {
+    fetch("/api/nhap", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     })
-    .then(res => {
-      if (!res.ok) throw new Error("Lỗi mạng");
-      return res.json();
-    })
-    .then(data => {
-      alert("✅ Đã lưu phiếu nhập thành công!");
-      // Reset lại form
-      supplierEl.value = "";
-      dateEl.value = "";
-      danhSachTam.length = 0;
-      renderTable();
-    })
-    .catch(err => {
-      console.error(err);
-      alert("❌ Không thể lưu phiếu nhập.");
-    });
+      .then(res => res.json())
+      .then(() => {
+        alert("✅ Đã lưu phiếu nhập thành công!");
+        supplierEl.value = "";
+        dateEl.value = "";
+        danhSachTam.length = 0;
+        renderTable();
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Không thể lưu phiếu nhập.");
+      });
   });
 
-  // Tìm tên đại lý
-  document.getElementById("btnSearchSupplier").addEventListener("click", async () => {
+  searchBtn.addEventListener("click", async () => {
     const keyword = document.getElementById("searchSupplier").value.trim();
     if (!keyword) return;
 
@@ -133,11 +124,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`/timkiem?ten=${encodeURIComponent(keyword)}`);
       const data = await res.json();
 
-      const wrap = document.getElementById("suggestions");
-      wrap.innerHTML = "";
+      suggestionsWrap.innerHTML = "";
 
       if (!data.length) {
-        wrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
+        suggestionsWrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
         return;
       }
 
@@ -147,10 +137,10 @@ document.addEventListener("DOMContentLoaded", () => {
         div.textContent = entry.ten;
         div.onclick = () => {
           document.getElementById("supplier").value = entry.ten;
-          wrap.innerHTML = "";
-          taiKetQuaTheoTenDaily(entry.ten); // Gọi luôn sau khi chọn
+          suggestionsWrap.innerHTML = "";
+          taiKetQuaTheoTenDaily(entry.ten);
         };
-        wrap.appendChild(div);
+        suggestionsWrap.appendChild(div);
       });
     } catch (err) {
       console.error("Lỗi tìm đại lý:", err);
@@ -158,13 +148,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Hàm tải danh sách mặt hàng đã nhập theo tên đại lý
   async function taiKetQuaTheoTenDaily(daily) {
     try {
       const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(daily)}`);
       const data = await res.json();
 
       const tbody = document.getElementById("bangKetQua");
+      if (!tbody) return;
+
       tbody.innerHTML = "";
       document.getElementById("khungKetQua").style.display = "block";
 
@@ -174,7 +165,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       data.forEach(item => {
-        const row = `<tr>
+        const row = document.createElement("tr");
+        row.innerHTML = `
           <td>${item.ngay}</td>
           <td>${item.tenhang}</td>
           <td>${item.dvt}</td>
@@ -183,12 +175,33 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${item.ck}%</td>
           <td>${item.gianhap.toLocaleString()}</td>
           <td>${item.thanhtien.toLocaleString()}</td>
-        </tr>`;
-        tbody.insertAdjacentHTML("beforeend", row);
+        `;
+        row.addEventListener("click", () => {
+          row.classList.toggle("selected-row");
+          row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+        });
+        tbody.appendChild(row);
       });
     } catch (err) {
       console.error("Lỗi tải dữ liệu:", err);
       Swal.fire("Lỗi", "Không thể tải dữ liệu", "error");
     }
   }
+
+  detailBtn.addEventListener("click", () => {
+    const table = document.getElementById("bangKetQua");
+    if (!table) return;
+
+    const rows = table.querySelectorAll("tr[data-selected='true']");
+    if (rows.length === 0) {
+      Swal.fire("Thông báo", "Vui lòng chọn một dòng hàng để xem chi tiết", "info");
+      return;
+    }
+
+    const ngay = rows[0].cells[0].textContent.trim();
+    if (!ngay) return;
+
+    const link = `/chi-tiet-phieu-nhap?ngay=${encodeURIComponent(ngay)}`;
+    window.open(link, "_blank");
+  });
 });
