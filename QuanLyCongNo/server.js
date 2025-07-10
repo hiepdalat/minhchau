@@ -214,7 +214,36 @@ app.post('/api/stock/receive', requireLogin, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
+  try {
+    const kw = removeDiacritics(req.query.ten || '');
+    const all = await StockReceipt.find();
+    const matched = all.filter(r => removeDiacritics(r.daily).includes(kw));
 
+    // Gộp tất cả mặt hàng
+    let result = [];
+    matched.forEach(r => {
+      r.items.forEach(item => {
+        result.push({
+          ngay: r.ngay.toISOString().split('T')[0],
+          daily: r.daily,
+          tenhang: item.tenhang,
+          dvt: item.dvt,
+          soluong: item.soluong,
+          dongia: item.dongia,
+          ck: item.ck,
+          gianhap: item.gianhap,
+          thanhtien: item.thanhtien
+        });
+      });
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json([]);
+  }
+});
 app.get('/chi-tiet-phieu-nhap', requireLogin, async (req, res) => {
   try {
     const { ngay } = req.query;
