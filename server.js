@@ -257,15 +257,49 @@ app.get('/chi-tiet-phieu-nhap', requireLogin, async (req, res) => {
     const receipts = await StockReceipt.find({ ngay: { $gte: start, $lte: end } });
     if (!receipts.length) return res.send(`<h3>Không có phiếu nhập ngày ${ngay}</h3>`);
 
-    let html = `<h2>Chi tiết phiếu nhập ngày ${ngay}</h2>`;
-    receipts.forEach((r) => {
-      html += `<h3>Đại lý: ${r.daily}</h3><table border="1" cellspacing="0" cellpadding="4"><tr><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th><th>CK</th><th>Giá nhập</th><th>Thành tiền</th></tr>`;
-      r.items.forEach((i) => {
-        html += `<tr><td>${i.tenhang}</td><td>${i.dvt}</td><td>${i.soluong}</td><td>${i.dongia.toLocaleString()}</td><td>${i.ck}%</td><td>${i.gianhap.toLocaleString()}</td><td>${i.thanhtien.toLocaleString()}</td></tr>`;
+    let html = `<div style="max-width:800px; margin:auto; font-family:Arial; color:#000">
+      <h2 style="text-align:center">🧾 PHIẾU NHẬP HÀNG</h2>
+      <p><b>Ngày:</b> ${ngay}</p>`;
+
+    receipts.forEach((r, i) => {
+      html += `
+        <p><b>Đại lý:</b> ${r.daily}</p>
+        <table border="1" cellspacing="0" cellpadding="6" width="100%" style="border-collapse:collapse; margin-bottom:20px;">
+          <thead>
+            <tr style="background:#f0f0f0">
+              <th>STT</th>
+              <th>Tên hàng</th>
+              <th>ĐVT</th>
+              <th>SL</th>
+              <th>Đơn giá</th>
+              <th>CK</th>
+              <th>Giá nhập</th>
+              <th>Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>`;
+      r.items.forEach((item, idx) => {
+        html += `<tr>
+          <td>${idx + 1}</td>
+          <td>${item.tenhang}</td>
+          <td>${item.dvt}</td>
+          <td>${item.soluong}</td>
+          <td>${item.dongia.toLocaleString()}</td>
+          <td>${item.ck}%</td>
+          <td>${item.gianhap.toLocaleString()}</td>
+          <td>${item.thanhtien.toLocaleString()}</td>
+        </tr>`;
       });
-      html += `<tr><td colspan="6" align="right"><b>Tổng:</b></td><td><b>${r.tongtien.toLocaleString()}</b></td></tr></table><br/>`;
+      html += `
+        <tr>
+          <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
+          <td><b>${r.tongtien.toLocaleString()}</b></td>
+        </tr>
+        </tbody>
+        </table>`;
     });
 
+    html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></div>`;
     res.send(html);
   } catch (err) {
     console.error(err);
