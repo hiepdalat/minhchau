@@ -126,16 +126,15 @@ function initCongNo() {
     return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
   }
 
- function renderTable(data) {
+function renderTable(data) {
   const tbody = document.getElementById('ds');
   tbody.innerHTML = '';
 
   data.forEach((doc, docIndex) => {
-    const ten = doc.ten;
-    const ngay = doc.ngay;
+    const ten = doc.ten || '';
+    const ngay = doc.ngay || '';
 
-    doc.hanghoa.forEach((hh, index) => {
-      // Ép kiểu đúng, loại bỏ dấu . hoặc , nếu có
+    (doc.hanghoa || []).forEach((hh, index) => {
       const sl = parseFloat(hh.soluong) || 0;
       const gia = parseFloat(String(hh.dongia).toString().replace(/[.,]/g, '')) || 0;
       const tien = sl * gia;
@@ -145,7 +144,7 @@ function initCongNo() {
         <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
         <td>${ten}</td>
         <td>${ngay}</td>
-        <td>${hh.noidung}</td>
+        <td>${hh.noidung || ''}</td>
         <td>${sl}</td>
         <td>${gia.toLocaleString()}</td>
         <td>${tien.toLocaleString()}</td>
@@ -154,7 +153,8 @@ function initCongNo() {
     });
   });
 
-  capNhatTongCong(); // Gọi lại để cập nhật tổng nếu cần
+  // Gọi lại hàm cập nhật tổng cho checkbox đang chọn
+  capNhatTongCong();
 }
   // 🔁 Gắn lại sự kiện onchange cho tất cả checkbox sau khi render
   const checkboxes = tbody.querySelectorAll('input[type="checkbox"]');
