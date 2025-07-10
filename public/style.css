@@ -187,7 +187,35 @@ td:nth-child(3) {
     font-size: 13px;
   }
 }
+/* ==== TỐI ƯU KHUNG "DỮ LIỆU ĐÃ LƯU" ==== */
+#ds th:nth-child(1),
+#ds td:nth-child(1) {
+  width: 36px;
+  text-align: center;
+}
 
+#ds th:nth-child(3),
+#ds td:nth-child(3) {
+  width: 110px;
+  white-space: nowrap;
+}
+
+#ds th:nth-child(5),
+#ds td:nth-child(5),
+#ds th:nth-child(6),
+#ds td:nth-child(6),
+#ds th:nth-child(7),
+#ds td:nth-child(7) {
+  width: 90px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+#ds th:nth-child(4),
+#ds td:nth-child(4) {
+  max-width: 240px;
+  word-break: break-word;
+}
 @keyframes spinBorder {
   to {
     transform: rotate(360deg);
