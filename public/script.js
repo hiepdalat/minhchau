@@ -149,7 +149,7 @@ function initCongNo() {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
 
-  function loadDataAndRender() {
+  window.loadDataAndRender = function() {
   fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
