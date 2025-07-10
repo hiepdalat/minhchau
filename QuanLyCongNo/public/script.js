@@ -373,7 +373,7 @@ function inDanhSach() {
   }
 
 
-  function docSoThanhChu(number) {
+ function numberToVietnamese(num) {
   if (typeof number !== 'number' || isNaN(number)) return 'Số không hợp lệ';
   if (number === 0) return 'Không đồng chẵn';
 
