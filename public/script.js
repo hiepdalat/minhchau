@@ -124,6 +124,7 @@ function initCongNo() {
         const tien = sl * gia;
 
         const tr = document.createElement('tr');
+        if (hh.thanhtoan) tr.classList.add('row-paid');
         tr.innerHTML = `
           <td><input type="checkbox" data-id="${doc._id}" data-index="${index}"></td>
           <td>${ten}</td>
