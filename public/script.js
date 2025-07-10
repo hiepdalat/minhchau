@@ -451,11 +451,13 @@ function inDanhSach() {
       <title>Hóa đơn bán hàng</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 20px; color: #000; position: relative; }
-        .header { display: flex; align-items: center; }
+        
+        .header { display: flex; gap: 20px; align-items: flex-start; center; margin-bottom: 10px; }
         .header img { height: 280px; margin-right: 16px; }
         .company-info h1 { margin: 0; color: #d00; font-size: 22px; }
         .company-info { line-height: 1.3; }
-        h2 { text-align: center; margin: 20px 0 8px; color: #d00; }
+       
+        h2 { text-align: center; margin: 0; margin-bottom: 5px; color: red; }
         .info div { margin: 6px 0; }
         .dots-line {
           border-bottom: 1px dotted #000;
