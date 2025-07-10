@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===================== MODULE: CÔNG NỢ =====================
 let monTam = [];
+
 function initCongNo() {
   console.log('🔁 Trang công nợ');
 
@@ -83,6 +84,7 @@ function initCongNo() {
   const inputND = document.getElementById('nd');
   const inputSL = document.getElementById('sl');
   const inputDG = document.getElementById('dg');
+  const btnLuu = document.getElementById('btnLuu');
 
   let allData = [];
 
@@ -147,6 +149,27 @@ function initCongNo() {
     return [...arr].sort(() => 0.5 - Math.random()).slice(0, n);
   }
 
+  function loadDataAndRender() {
+    fetch('/api/congno')
+      .then(res => res.json())
+      .then(data => {
+        allData = data;
+        const keyword = boDau(inputTim.value.trim());
+        if (!keyword) {
+          renderTable(getRandomRows(allData, 10));
+        } else {
+          const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
+          renderTable(matched);
+        }
+      });
+  }
+
+  btnTim.onclick = loadDataAndRender;
+
+  document.getElementById('btnLuu')?.addEventListener('click', () => {
+    luuTatCa(() => loadDataAndRender());
+  });
+
   fetch('/api/congno')
     .then(res => res.json())
     .then(data => {
@@ -159,20 +182,9 @@ function initCongNo() {
       tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
     });
 
-  btnTim.onclick = () => {
-    const keyword = boDau(inputTim.value.trim());
-    if (!keyword) {
-      renderTable(getRandomRows(allData, 10));
-    } else {
-      const matched = allData.filter(row => boDau(row.ten || '').includes(keyword));
-      renderTable(matched);
-    }
-  };
-
   document.getElementById('checkAll')?.addEventListener('change', function () {
     chonTatCa(this);
   });
-  document.getElementById('btnLuu')?.addEventListener('click', luuTatCa);
   document.getElementById('btnXoa')?.addEventListener('click', xoaDaChon);
   document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
   document.getElementById('btnIn')?.addEventListener('click', inDanhSach);
