@@ -546,7 +546,8 @@ function capNhatTongCong() {
   checkboxes.forEach(chk => {
     const tr = chk.closest('tr');
     const cells = tr.querySelectorAll('td');
-    const thanhTien = parseFloat(cells[6]?.innerText?.replace(/,/g, '') || '0');
+    const thanhTien = parseFloat(cells[6]?.innerText?.replace(/\./g, '').replace(/,/g, '') || '0');
+    
     tong += thanhTien;
   });
 
