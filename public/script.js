@@ -83,7 +83,9 @@ function initCongNo() {
   const inputTim = document.getElementById('timten');
 
   let allData = [];
-
+   function boDau(str) {
+    return str.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  }
   function renderTable(data) {
   const tbody = document.querySelector('#ds');
   tbody.innerHTML = '';
@@ -124,15 +126,15 @@ function initCongNo() {
       tbody.innerHTML = '<tr><td colspan="7">Lỗi tải dữ liệu</td></tr>';
     });
 
-  btnTim.onclick = () => {
-  const keyword = inputTim.value.trim().toLowerCase();
-  if (!keyword) {
-    renderTable(getRandomRows(allData, 10));
-  } else {
-    const matched = allData.filter(row =>
-      (row.ten || '').toLowerCase().includes(keyword)
-    );
-    renderTable(matched);
+ btnTim.onclick = () => {
+    const keyword = boDau(inputTim.value.trim());
+    if (!keyword) {
+      renderTable(getRandomRows(allData, 10));
+    } else {
+      const matched = allData.filter(row =>
+        boDau(row.ten || '').includes(keyword)
+      );
+      renderTable(matched);
   }
 };
 
