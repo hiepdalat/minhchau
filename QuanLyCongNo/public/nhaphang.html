@@ -28,20 +28,6 @@
     </div>
   </header>
 
-  <!-- Vùng tìm kiếm -->
-  <div class="card">
-    <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
-    <div style="display: flex; gap: 10px; margin-top: 5px;">
-      <input id="searchSupplier" class="form-control" placeholder="Nhập tên đại lý">
-      <button id="btnSearchSupplier">Tìm</button>
-    </div>
-    <div id="suggestions" style="margin-top: 10px;"></div>
-    <br>
-    <button id="detailBtn">
-      <i class="fa fa-file-alt"></i> Chi tiết đơn hàng
-    </button>
-  </div>
-
   <!-- Thông tin chung -->
   <div class="card">
     <div class="grid-2">
@@ -64,10 +50,25 @@
       <div><label for="qty">Số lượng</label><input type="number" min="1" id="qty" value="1" /></div>
       <div><label for="price">Đơn giá</label><input type="number" min="0" id="price" value="0" /></div>
       <div><label for="discount">CK (%)</label><input type="number" min="0" id="discount" value="0" /></div>
-      <div class="align-end">
+      <div class="align-end" style="display: flex; gap: 10px;">
         <button id="addItem"><i class="fa fa-plus"></i> Thêm món</button>
+        <button id="saveBtn"><i class="fa fa-save"></i> Lưu phiếu nhập</button>
       </div>
     </div>
+  </div>
+
+  <!-- Tìm tên đại lý + chi tiết đơn hàng -->
+  <div class="card">
+    <label for="searchSupplier">🔍 Tìm theo tên đại lý:</label>
+    <div style="display: flex; gap: 10px; margin-top: 5px;">
+      <input id="searchSupplier" class="form-control" placeholder="Nhập tên đại lý">
+      <button id="btnSearchSupplier">Tìm</button>
+    </div>
+    <div id="suggestions" style="margin-top: 10px;"></div>
+    <br>
+    <button id="detailBtn">
+      <i class="fa fa-file-alt"></i> Chi tiết đơn hàng
+    </button>
   </div>
 
   <!-- Danh sách tạm -->
@@ -87,11 +88,6 @@
     </table>
   </div>
 
-  <!-- Hành động -->
-  <div class="card" style="text-align: right;">
-    <button id="saveBtn"><i class="fa fa-save"></i> Lưu phiếu nhập</button>
-  </div>
-
-  <script src="/script.js" defer></script>
+  <script src="/script-nhap.js" defer></script>
 </body>
 </html>
