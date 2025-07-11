@@ -317,9 +317,10 @@ app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
   if (!id) return res.status(400).json({ error: "Thiếu ID" });
 
   try {
+    const objectId = new mongoose.Types.ObjectId(id);
     const result = await StockReceipt.updateOne(
-      { "items._id": id },
-      { $pull: { items: { _id: id } } }
+      { "items._id": objectId },
+      { $pull: { items: { _id: objectId } } }
     );
 
     if (result.modifiedCount === 0) return res.status(404).json({ error: "Không tìm thấy dòng để xóa" });
