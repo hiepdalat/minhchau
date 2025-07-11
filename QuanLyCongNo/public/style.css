@@ -223,8 +223,16 @@ td:nth-child(3) {
 
 .table-wrapper table {
   width: 100%;
-  min-width: 800px;
   border-collapse: collapse;
+  background: #fff;
+  color: #000;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
 }
 .table-wrapper::-webkit-scrollbar {
   height: 6px;
