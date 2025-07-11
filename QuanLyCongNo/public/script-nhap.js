@@ -181,22 +181,21 @@ document.getElementById("btnDeleteSelected").addEventListener("click", async () 
     .filter(tr => tr.querySelector(".row-check")?.checked);
 
   if (rows.length === 0) {
-    Swal.fire("Chưa chọn", "Vui lòng chọn dòng cần xóa", "warning");
+    Swal.fire("Chưa chọn", "Vui lòng chọn ít nhất 1 dòng để xóa", "warning");
     return;
   }
 
-  if (rows.length > 1) {
-    Swal.fire("Chỉ chọn 1 dòng", "Chức năng xóa chỉ áp dụng cho 1 dòng mỗi lần", "info");
+  const tenHangList = rows.map(row => row.cells[2]?.textContent || "mặt hàng").join(", ");
+  const ids = rows.map(row => row.dataset.id).filter(Boolean);
+
+  if (!ids.length) {
+    Swal.fire("Lỗi", "Không lấy được ID dòng cần xóa", "error");
     return;
   }
-
-  const selectedRow = rows[0];
-  const id = selectedRow.dataset.id;
-  const tenhang = selectedRow.cells[2]?.textContent || "mặt hàng";
 
   const confirm = await Swal.fire({
-    title: "Xác nhận xóa?",
-    text: `Bạn có chắc muốn xóa "${tenhang}" khỏi danh sách nhập hàng?`,
+    title: `Xác nhận xóa ${ids.length} dòng?`,
+    html: `Bạn có chắc muốn xóa các mặt hàng sau?<br><b>${tenHangList}</b>`,
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "✅ Xóa",
@@ -206,25 +205,22 @@ document.getElementById("btnDeleteSelected").addEventListener("click", async () 
   if (!confirm.isConfirmed) return;
 
   try {
-    const res = await fetch(`/api/stock/delete-row?id=${encodeURIComponent(id)}`, {
-      method: "DELETE"
+    const res = await fetch(`/api/stock/delete-multiple-rows`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids })
     });
-
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text);
-    }
 
     const result = await res.json();
     if (result.success) {
-      Swal.fire("✅ Đã xóa", `"${tenhang}" đã được xóa khỏi hệ thống`, "success");
-      selectedRow.remove();
+      Swal.fire("✅ Đã xóa", `${result.deleted} dòng đã được xóa`, "success");
+      rows.forEach(row => row.remove());
     } else {
       Swal.fire("Lỗi", result.error || "Không thể xóa", "error");
     }
   } catch (err) {
     console.error("Lỗi khi xóa:", err);
-    Swal.fire("Lỗi", "Không thể kết nối server hoặc dữ liệu không đúng", "error");
+    Swal.fire("Lỗi", "Không thể kết nối server", "error");
   }
 });
   
