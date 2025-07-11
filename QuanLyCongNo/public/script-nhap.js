@@ -120,51 +120,48 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
-  searchBtn.addEventListener("click", async () => {
-    const ten = document.getElementById("searchSupplier").value.trim();
-    const thang = document.getElementById("searchMonth").value;
+ searchBtn.addEventListener("click", async () => {
+  const ten = document.getElementById("searchSupplier").value.trim();
+  const thang = document.getElementById("searchMonth").value;
 
-    if (!ten || !thang) return;
+  if (!ten || !thang) return;
 
-    try {
-      const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
-      const res = await fetch(url);
-      const data = await res.json();
+  try {
+    const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
+    const res = await fetch(url);
+    const data = await res.json();
 
-      const tbody = document.getElementById("bangKetQua");
-      if (!tbody) return;
+    const tbody = document.getElementById("bangKetQua");
+    if (!tbody) return;
 
-      tbody.innerHTML = "";
-      document.getElementById("khungKetQua").style.display = "block";
+    tbody.innerHTML = "";
+    document.getElementById("khungKetQua").style.display = "block";
 
-      if (!data.length) {
-        tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
-        return;
-      }
-
-      data.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.ngay}</td>
-          <td>${item.tenhang}</td>
-          <td>${item.dvt}</td>
-          <td>${item.soluong}</td>
-          <td>${Number(item.dongia).toLocaleString()}</td>
-          <td>${item.ck}%</td>
-          <td>${Number(item.gianhap).toLocaleString()}</td>
-          <td>${Number(item.thanhtien).toLocaleString()}</td>
-        `;
-        row.addEventListener("click", () => {
-          row.classList.toggle("selected-row");
-          row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
-        });
-        tbody.appendChild(row);
-      });
-    } catch (err) {
-      console.error("Lỗi tìm đại lý:", err);
-      alert("Không thể tìm đại lý hoặc mặt hàng");
+    if (!data.length) {
+      tbody.innerHTML = "<tr><td colspan='9'>Không có kết quả</td></tr>";
+      return;
     }
-  });
+
+    data.forEach(item => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="checkbox" class="row-check" /></td>
+        <td>${item.ngay}</td>
+        <td>${item.tenhang}</td>
+        <td>${item.dvt}</td>
+        <td>${item.soluong}</td>
+        <td>${Number(item.dongia).toLocaleString()}</td>
+        <td>${item.ck}%</td>
+        <td>${Number(item.gianhap).toLocaleString()}</td>
+        <td>${Number(item.thanhtien).toLocaleString()}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Lỗi tìm đại lý:", err);
+    alert("Không thể tìm đại lý hoặc mặt hàng");
+  }
+});
 
   async function taiKetQuaTheoTenDaily(daily) {
     try {
@@ -207,21 +204,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   detailBtn.addEventListener("click", () => {
-    const table = document.getElementById("bangKetQua");
-    if (!table) return;
+  const table = document.getElementById("bangKetQua");
+  if (!table) return;
 
-    const rows = table.querySelectorAll("tr[data-selected='true']");
-    if (rows.length === 0) {
-      alert("Vui lòng chọn một dòng hàng để xem chi tiết");
-      return;
-    }
+  const rows = table.querySelectorAll("tbody tr");
+  const checkedRow = Array.from(rows).find(row => row.querySelector(".row-check")?.checked);
 
-    const ngay = rows[0].cells[0].textContent.trim();
-    if (!ngay) return;
+  if (!checkedRow) {
+    alert("Vui lòng tick chọn 1 dòng để xem chi tiết");
+    return;
+  }
 
-    inChiTietPhieuNhap(ngay);
-  });
+  const ngay = checkedRow.cells[1].textContent.trim(); // cột số 1 là "Ngày", vì cột 0 là checkbox
+  if (!ngay) return;
 
+  inChiTietPhieuNhap(ngay); // gọi hàm đã có sẵn
+});
+  
   async function inChiTietPhieuNhap(ngay) {
     try {
       const res = await fetch(`/api/stock/receipt-by-date?ngay=${encodeURIComponent(ngay)}`);
