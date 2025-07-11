@@ -153,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${Number(item.thanhtien).toLocaleString()}</td>
       `;
       row.dataset.ngay = item.ngay;
+      row.dataset.id = item._id; //tôi đã đặt ở đây 
       row.dataset.daily = item.daily;
       tbody.appendChild(row);
     });
