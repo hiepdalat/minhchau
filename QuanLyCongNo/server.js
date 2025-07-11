@@ -186,27 +186,7 @@ app.post('/thanhtoan', requireLogin, async (req, res) => {
     res.status(500).send('Lỗi server');
   }
 });
-app.delete('/api/stock/delete', requireLogin, async (req, res) => {
-  try {
-    const { ngay, daily } = req.query;
-    if (!ngay || !daily) return res.status(400).json({ error: "Thiếu ngày hoặc đại lý" });
 
-    const start = new Date(ngay);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(ngay);
-    end.setHours(23, 59, 59, 999);
-
-    const result = await StockReceipt.deleteMany({
-      ngay: { $gte: start, $lte: end },
-      daily
-    });
-
-    res.json({ success: true, deletedCount: result.deletedCount });
-  } catch (err) {
-    console.error("Lỗi khi xóa phiếu nhập:", err);
-    res.status(500).json({ error: "Lỗi server khi xóa" });
-  }
-});
 // ======= API NHẬP HÀNG =======
 app.post('/api/stock/receive', requireLogin, async (req, res) => {
   try {
@@ -259,7 +239,7 @@ app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
     matched.forEach(r => {
       r.items.forEach(item => {
         result.push({
-           _id: item._id,
+          _id: item._id,
           ngay: r.ngay.toISOString().split('T')[0],
           daily: r.daily,
           tenhang: item.tenhang,
