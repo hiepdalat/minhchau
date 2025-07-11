@@ -35,7 +35,7 @@
 <label for="discount">Chiết khấu (%)</label>
 <input type="number" id="discount" value="0" min="0" max="100">
     <button id="addItem" class="btn btn-primary">➕ Thêm món</button>
-    <button id="saveBtn" class="btn btn-success">💾 Lưu phiếu nhập</button>
+    
   </div>
 
   <!-- Danh sách tạm -->
@@ -61,6 +61,9 @@
         <tr><td colspan="7" style="text-align:right">Tổng tiền:</td><td id="grandTotal">0</td><td></td></tr>
       </tfoot>
     </table>
+    <div style="text-align:right;">
+    <button id="saveBtn" class="btn btn-success">💾 Lưu phiếu nhập</button>
+  </div>
   </div>
 
   <!-- Vùng tìm kiếm -->
@@ -69,10 +72,12 @@
     <input id="searchSupplier" placeholder="Nhập tên đại lý">
     <input type="month" id="searchMonth" value="">
     <button id="btnSearchSupplier">🔍 Tìm</button>
-    <button id="detailBtn" class="btn btn-secondary">📋 Chi tiết đơn hàng</button>
+    <button id="btnDeleteSelected" class="btn btn-danger">🗑️ Xóa đã chọn</button>
+   
   </div>
 <div class="card table-wrapper" id="khungKetQua" style="display: none;">
   <h3>📦 Mặt hàng đã nhập từ đại lý</h3>
+   <button id="detailBtn" class="btn btn-secondary">📋 Chi tiết đơn hàng</button>
  
     <table>
       <thead>
