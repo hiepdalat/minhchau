@@ -23,16 +23,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTable() {
-  const khung = document.getElementById("khungDanhSachTam");
+    const khung = document.getElementById("khungDanhSachTam");
 
-  if (danhSachTam.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="9">Chưa có mặt hàng</td></tr>';
-    grandTotalEl.textContent = "0";
-    khung.style.display = "none";  // Ẩn nếu không có hàng
-    return;
-  }
+    if (danhSachTam.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="9">Chưa có mặt hàng</td></tr>';
+      grandTotalEl.textContent = "0";
+      khung.style.display = "none";
+      return;
+    }
 
-  khung.style.display = "block"; // Hiện nếu có ít nhất 1 hàng
+    khung.style.display = "block";
+    tableBody.innerHTML = "";
     let total = 0;
 
     danhSachTam.forEach((item, index) => {
@@ -99,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const payload = { supplier, date, items: danhSachTam };
 
-   fetch("/api/stock/receive", {
+    fetch("/api/stock/receive", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -111,8 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dateEl.value = "";
         danhSachTam.length = 0;
         renderTable();
-        // ✅ Gọi lại để hiển thị dữ liệu mới nhập
-      taiKetQuaTheoTenDaily(supplier);
+        taiKetQuaTheoTenDaily(supplier);
       })
       .catch(err => {
         console.error(err);
@@ -121,71 +121,51 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   searchBtn.addEventListener("click", async () => {
-    const keyword = document.getElementById("searchSupplier").value.trim();
-    
+    const ten = document.getElementById("searchSupplier").value.trim();
+    const thang = document.getElementById("searchMonth").value;
 
-const ten = document.getElementById("searchSupplier").value.trim();
-const thang = document.getElementById("searchMonth").value; // ví dụ: <input type="month" id="searchMonth">
+    if (!ten || !thang) return;
 
-if (!ten || !thang) return;
+    try {
+      const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
+      const res = await fetch(url);
+      const data = await res.json();
 
-const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
-const res = await fetch(url);
-    
-    const data = await res.json();
       const tbody = document.getElementById("bangKetQua");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-  document.getElementById("khungKetQua").style.display = "block";
+      if (!tbody) return;
 
-  if (!data.length) {
-    tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
-    return;
-  }searchBtn.addEventListener("click", async () => {
-  const ten = document.getElementById("searchSupplier").value.trim();
-  const thang = document.getElementById("searchMonth").value;
+      tbody.innerHTML = "";
+      document.getElementById("khungKetQua").style.display = "block";
 
-  if (!ten || !thang) return;
+      if (!data.length) {
+        tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
+        return;
+      }
 
-  try {
-    const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    const tbody = document.getElementById("bangKetQua");
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-    document.getElementById("khungKetQua").style.display = "block";
-
-    if (!data.length) {
-      tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
-      return;
-    }
-
-    data.forEach(item => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${item.ngay}</td>
-        <td>${item.tenhang}</td>
-        <td>${item.dvt}</td>
-        <td>${item.soluong}</td>
-        <td>${Number(item.dongia).toLocaleString()}</td>
-        <td>${item.ck}%</td>
-        <td>${Number(item.gianhap).toLocaleString()}</td>
-        <td>${Number(item.thanhtien).toLocaleString()}</td>
-      `;
-      row.addEventListener("click", () => {
-        row.classList.toggle("selected-row");
-        row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.ngay}</td>
+          <td>${item.tenhang}</td>
+          <td>${item.dvt}</td>
+          <td>${item.soluong}</td>
+          <td>${Number(item.dongia).toLocaleString()}</td>
+          <td>${item.ck}%</td>
+          <td>${Number(item.gianhap).toLocaleString()}</td>
+          <td>${Number(item.thanhtien).toLocaleString()}</td>
+        `;
+        row.addEventListener("click", () => {
+          row.classList.toggle("selected-row");
+          row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+        });
+        tbody.appendChild(row);
       });
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("Lỗi tìm đại lý:", err);
-    alert("Không thể tìm đại lý hoặc mặt hàng");
-  }
-});
+    } catch (err) {
+      console.error("Lỗi tìm đại lý:", err);
+      alert("Không thể tìm đại lý hoặc mặt hàng");
+    }
+  });
+
   async function taiKetQuaTheoTenDaily(daily) {
     try {
       const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(daily)}`);
@@ -222,7 +202,7 @@ const res = await fetch(url);
       });
     } catch (err) {
       console.error("Lỗi tải dữ liệu:", err);
-      Swal.fire("Lỗi", "Không thể tải dữ liệu", "error");
+      alert("Không thể tải dữ liệu");
     }
   }
 
@@ -232,76 +212,76 @@ const res = await fetch(url);
 
     const rows = table.querySelectorAll("tr[data-selected='true']");
     if (rows.length === 0) {
-      Swal.fire("Thông báo", "Vui lòng chọn một dòng hàng để xem chi tiết", "info");
+      alert("Vui lòng chọn một dòng hàng để xem chi tiết");
       return;
     }
 
     const ngay = rows[0].cells[0].textContent.trim();
     if (!ngay) return;
 
-    inChiTietPhieuNhap(ngay); // ✅ GỌI HÀM in
+    inChiTietPhieuNhap(ngay);
   });
-  
-async function inChiTietPhieuNhap(ngay) {
-  try {
-    const res = await fetch(`/api/stock/receipt-by-date?ngay=${encodeURIComponent(ngay)}`);
-    const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) {
-      Swal.fire("Không có phiếu nhập", `Không có dữ liệu cho ngày ${ngay}`, "info");
-      return;
-    }
 
-    const win = window.open('', '_blank');
-    let html = `<html><head><title>Phiếu nhập</title>
-      <style>
-        body { font-family: Arial; color: #000; max-width: 800px; margin: auto; }
-        h2 { text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
-        th { background: #f0f0f0; }
-      </style></head><body>`;
+  async function inChiTietPhieuNhap(ngay) {
+    try {
+      const res = await fetch(`/api/stock/receipt-by-date?ngay=${encodeURIComponent(ngay)}`);
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        alert(`Không có dữ liệu cho ngày ${ngay}`);
+        return;
+      }
 
-    html += `<h2>🧾 PHIẾU NHẬP HÀNG</h2><p><b>Ngày:</b> ${ngay}</p>`;
+      const win = window.open('', '_blank');
+      let html = `<html><head><title>Phiếu nhập</title>
+        <style>
+          body { font-family: Arial; color: #000; max-width: 800px; margin: auto; }
+          h2 { text-align: center; }
+          table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+          th { background: #f0f0f0; }
+        </style></head><body>`;
 
-    data.forEach((r, i) => {
-      html += `<p><b>Đại lý:</b> ${r.daily}</p>
-        <table>
-          <thead><tr>
-            <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
-            <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
-          </tr></thead><tbody>`;
+      html += `<h2>🧾 PHIẾU NHẬP HÀNG</h2><p><b>Ngày:</b> ${ngay}</p>`;
 
-      r.items.forEach((item, idx) => {
+      data.forEach((r) => {
+        html += `<p><b>Đại lý:</b> ${r.daily}</p>
+          <table>
+            <thead><tr>
+              <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
+              <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
+            </tr></thead><tbody>`;
+
+        r.items.forEach((item, idx) => {
+          html += `<tr>
+            <td>${idx + 1}</td>
+            <td>${item.tenhang}</td>
+            <td>${item.dvt}</td>
+            <td>${item.soluong}</td>
+            <td>${Number(item.dongia).toLocaleString()}</td>
+            <td>${item.ck}%</td>
+            <td>${Number(item.gianhap).toLocaleString()}</td>
+            <td>${Number(item.thanhtien).toLocaleString()}</td>
+          </tr>`;
+        });
+
         html += `<tr>
-          <td>${idx + 1}</td>
-          <td>${item.tenhang}</td>
-          <td>${item.dvt}</td>
-          <td>${item.soluong}</td>
-          <td>${Number(item.dongia).toLocaleString()}</td>
-          <td>${item.ck}%</td>
-          <td>${Number(item.gianhap).toLocaleString()}</td>
-          <td>${Number(item.thanhtien).toLocaleString()}</td>
-        </tr>`;
+          <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
+          <td><b>${Number(r.tongtien).toLocaleString()}</b></td>
+        </tr></tbody></table>`;
       });
 
-      html += `<tr>
-        <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
-        <td><b>${Number(r.tongtien).toLocaleString()}</b></td>
-      </tr></tbody></table>`;
-    });
+      html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></body></html>`;
 
-    html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></body></html>`;
-
-    win.document.write(html);
-    win.document.close();
-    win.print();
-  } catch (err) {
-    console.error("Lỗi khi in phiếu:", err);
-    Swal.fire("Lỗi", "Không thể in phiếu", "error");
+      win.document.write(html);
+      win.document.close();
+      win.print();
+    } catch (err) {
+      console.error("Lỗi khi in phiếu:", err);
+      alert("Không thể in phiếu");
+    }
   }
-}
-  
+
   document.getElementById("btnLogout").addEventListener("click", () => {
-  window.location.href = "/logout";
-});
+    window.location.href = "/logout";
+  });
 });
