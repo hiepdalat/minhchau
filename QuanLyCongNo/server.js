@@ -217,6 +217,7 @@ app.post('/api/stock/receive', requireLogin, async (req, res) => {
       const giaNhap = it.price * (1 - it.discount / 100);
       const thanhTien = giaNhap * it.qty;
       return {
+         _id: new mongoose.Types.ObjectId(),
         tenhang: it.product,
         dvt: it.unit,
         soluong: it.qty,
@@ -258,6 +259,7 @@ app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
     matched.forEach(r => {
       r.items.forEach(item => {
         result.push({
+           _id: item._id,
           ngay: r.ngay.toISOString().split('T')[0],
           daily: r.daily,
           tenhang: item.tenhang,
@@ -310,7 +312,24 @@ app.get('/api/stock/receipt-by-date', requireLogin, async (req, res) => {
     res.status(500).json({ error: 'Lỗi server' });
   }
 });
+app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).json({ error: "Thiếu ID" });
 
+  try {
+    const result = await StockReceipt.updateOne(
+      { "items._id": id },
+      { $pull: { items: { _id: id } } }
+    );
+
+    if (result.modifiedCount === 0) return res.status(404).json({ error: "Không tìm thấy dòng để xóa" });
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Lỗi khi xóa dòng:", err);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+});
 // ======= API SẢN PHẨM (cho bán hàng) =======
 app.get('/api/products/stock', requireLogin, async (req, res) => {
   try {
