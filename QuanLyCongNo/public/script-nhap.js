@@ -122,36 +122,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchBtn.addEventListener("click", async () => {
     const keyword = document.getElementById("searchSupplier").value.trim();
-    if (!keyword) return;
+    const monthStr = document.getElementById("searchMonth").value; 
+    
+    if (!keyword || !monthStr) return;
+    const [year, month] = monthStr.split("-");
+    const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(keyword)}&month=${month}&year=${year}`);
+    const data = await res.json();
+      const tbody = document.getElementById("bangKetQua");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  document.getElementById("khungKetQua").style.display = "block";
 
-    try {
-      const res = await fetch(`/api/stock/search-supplier?ten=${encodeURIComponent(keyword)}`);
-      const data = await res.json();
+  if (!data.length) {
+    tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
+    return;
+  }
 
-      suggestionsWrap.innerHTML = "";
-
-      if (!data.length) {
-        suggestionsWrap.innerHTML = "<div class='suggest-item'>Không tìm thấy đại lý</div>";
-        return;
-      }
-
-      data.forEach(entry => {
-        const div = document.createElement("div");
-        div.className = "suggest-item";
-        div.textContent = entry.ten;
-        div.onclick = () => {
-          document.getElementById("supplier").value = entry.ten;
-          suggestionsWrap.innerHTML = "";
-          taiKetQuaTheoTenDaily(entry.ten);
-        };
-        suggestionsWrap.appendChild(div);
-      });
-    } catch (err) {
-      console.error("Lỗi tìm đại lý:", err);
-      Swal.fire("Lỗi", "Không thể tìm đại lý", "error");
-    }
+  data.forEach(item => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.ngay}</td>
+      <td>${item.tenhang}</td>
+      <td>${item.dvt}</td>
+      <td>${item.soluong}</td>
+      <td>${item.dongia.toLocaleString()}</td>
+      <td>${item.ck}%</td>
+      <td>${item.gianhap.toLocaleString()}</td>
+      <td>${item.thanhtien.toLocaleString()}</td>
+    `;
+    row.addEventListener("click", () => {
+      row.classList.toggle("selected-row");
+      row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+    });
+    tbody.appendChild(row);
   });
-
+});
   async function taiKetQuaTheoTenDaily(daily) {
     try {
       const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(daily)}`);
