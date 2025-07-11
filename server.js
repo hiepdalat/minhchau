@@ -217,16 +217,22 @@ app.post('/api/stock/receive', requireLogin, async (req, res) => {
 app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
   try {
     const kw = removeDiacritics(req.query.ten || '');
-    const thang = req.query.thang || ''; // dạng yyyy-mm
+    const thang = req.query.thang; // "2025-07"
 
-    const all = await StockReceipt.find();
+    if (!kw || !thang) {
+      return res.status(400).json({ error: "Thiếu tên hoặc tháng" });
+    }
 
-    const matched = all.filter(r => {
-      const matchTen = removeDiacritics(r.daily).includes(kw);
-      if (!thang) return matchTen;
-      const rMonth = r.ngay.toISOString().slice(0, 7); // yyyy-mm
-      return matchTen && rMonth === thang;
+    const startDate = new Date(thang + "-01");
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(0); // ngày cuối tháng
+
+    const all = await StockReceipt.find({
+      ngay: { $gte: startDate, $lte: endDate }
     });
+
+    const matched = all.filter(r => removeDiacritics(r.daily).includes(kw));
 
     let result = [];
     matched.forEach(r => {
@@ -248,7 +254,7 @@ app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error(err);
-    res.status(500).json([]);
+    res.status(500).json({ error: 'Lỗi server' });
   }
 });
 app.get('/api/stock/search-supplier', requireLogin, async (req, res) => {
