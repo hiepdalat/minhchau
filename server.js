@@ -188,37 +188,7 @@ app.post('/thanhtoan', requireLogin, async (req, res) => {
 });
 
 // ======= API NHẬP HÀNG =======
-app.post('/api/stock/fix-id-items', requireLogin, async (req, res) => {
-  try {
-    const receipts = await StockReceipt.find();
-    let countUpdated = 0;
 
-    for (const r of receipts) {
-      let changed = false;
-
-      r.items.forEach(item => {
-        if (!item._id) {
-          item._id = new mongoose.Types.ObjectId();
-          changed = true;
-        }
-      });
-
-      if (changed) {
-        await StockReceipt.updateOne(
-          { _id: r._id },
-          { $set: { items: r.items } }
-        );
-        countUpdated++;
-      }
-    }
-
-    res.json({ success: true, message: `✅ Đã cập nhật ${countUpdated} phiếu nhập có item thiếu _id.` });
-  } catch (err) {
-    console.error("Lỗi khi cập nhật _id cho items:", err);
-    res.status(500).json({ success: false, error: "Lỗi server khi sửa _id." });
-  }
-});
-// sửa lỗi id
 app.post('/api/stock/receive', requireLogin, async (req, res) => {
   try {
     const { supplier, date, items } = req.body;
