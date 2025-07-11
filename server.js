@@ -290,25 +290,23 @@ app.get('/api/stock/receipt-by-date', requireLogin, async (req, res) => {
     res.status(500).json({ error: 'Lỗi server' });
   }
 });
-app.delete('/api/stock/delete', requireLogin, async (req, res) => {
+app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).json({ error: "Thiếu ID" });
+
   try {
-    const { ngay, daily } = req.query;
-    if (!ngay || !daily) return res.status(400).json({ error: "Thiếu ngày hoặc đại lý" });
+    const objectId = new mongoose.Types.ObjectId(id);
+    const result = await StockReceipt.updateOne(
+      { "items._id": objectId },
+      { $pull: { items: { _id: objectId } } }
+    );
 
-    const start = new Date(ngay);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(ngay);
-    end.setHours(23, 59, 59, 999);
+    if (result.modifiedCount === 0) return res.status(404).json({ error: "Không tìm thấy dòng để xóa" });
 
-    const result = await StockReceipt.deleteMany({
-      ngay: { $gte: start, $lte: end },
-      daily
-    });
-
-    res.json({ success: true, deletedCount: result.deletedCount });
+    res.json({ success: true });
   } catch (err) {
-    console.error("Lỗi khi xóa phiếu nhập:", err);
-    res.status(500).json({ error: "Lỗi server khi xóa" });
+    console.error("Lỗi khi xóa dòng:", err);
+    res.status(500).json({ error: "Lỗi server" });
   }
 });
 // ======= API SẢN PHẨM (cho bán hàng) =======
