@@ -216,6 +216,16 @@ td:nth-child(3) {
   max-width: 240px;
   word-break: break-word;
 }
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrapper table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+}
 .table-wrapper::-webkit-scrollbar {
   height: 6px;
 }
