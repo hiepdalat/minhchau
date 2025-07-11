@@ -23,14 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTable() {
-    tableBody.innerHTML = "";
+  const khung = document.getElementById("khungDanhSachTam");
 
-    if (danhSachTam.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="9">Chưa có mặt hàng</td></tr>';
-      grandTotalEl.textContent = "0";
-      return;
-    }
+  if (danhSachTam.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="9">Chưa có mặt hàng</td></tr>';
+    grandTotalEl.textContent = "0";
+    khung.style.display = "none";  // Ẩn nếu không có hàng
+    return;
+  }
 
+  khung.style.display = "block"; // Hiện nếu có ít nhất 1 hàng
     let total = 0;
 
     danhSachTam.forEach((item, index) => {
