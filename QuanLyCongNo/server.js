@@ -244,6 +244,22 @@ app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
     res.status(500).json([]);
   }
 });
+app.get('/api/stock/search-supplier', requireLogin, async (req, res) => {
+  try {
+    const kw = removeDiacritics(req.query.ten || '');
+    const receipts = await StockReceipt.find();
+    const uniqueSuppliers = Array.from(new Set(
+      receipts
+        .map(r => ({ ten: r.daily, ten_khongdau: removeDiacritics(r.daily) }))
+        .filter(s => s.ten_khongdau.includes(kw))
+        .map(s => s.ten)
+    ));
+    res.json(uniqueSuppliers.map(ten => ({ ten })));
+  } catch (err) {
+    console.error("Lỗi tìm đại lý nhập hàng:", err);
+    res.status(500).json([]);
+  }
+});
 app.get('/api/stock/receipt-by-date', requireLogin, async (req, res) => {
   try {
     const { ngay } = req.query;
