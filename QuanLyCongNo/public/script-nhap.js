@@ -203,9 +203,68 @@ document.addEventListener("DOMContentLoaded", () => {
     const ngay = rows[0].cells[0].textContent.trim();
     if (!ngay) return;
 
-    const link = `/chi-tiet-phieu-nhap?ngay=${encodeURIComponent(ngay)}`;
-    window.open(link, "_blank");
+    inChiTietPhieuNhap(ngay); // ✅ GỌI HÀM in
   });
+  
+async function inChiTietPhieuNhap(ngay) {
+  try {
+    const res = await fetch(`/api/stock/receipt-by-date?ngay=${encodeURIComponent(ngay)}`);
+    const data = await res.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      Swal.fire("Không có phiếu nhập", `Không có dữ liệu cho ngày ${ngay}`, "info");
+      return;
+    }
+
+    const win = window.open('', '_blank');
+    let html = `<html><head><title>Phiếu nhập</title>
+      <style>
+        body { font-family: Arial; color: #000; max-width: 800px; margin: auto; }
+        h2 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+        th { background: #f0f0f0; }
+      </style></head><body>`;
+
+    html += `<h2>🧾 PHIẾU NHẬP HÀNG</h2><p><b>Ngày:</b> ${ngay}</p>`;
+
+    data.forEach((r, i) => {
+      html += `<p><b>Đại lý:</b> ${r.daily}</p>
+        <table>
+          <thead><tr>
+            <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
+            <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
+          </tr></thead><tbody>`;
+
+      r.items.forEach((item, idx) => {
+        html += `<tr>
+          <td>${idx + 1}</td>
+          <td>${item.tenhang}</td>
+          <td>${item.dvt}</td>
+          <td>${item.soluong}</td>
+          <td>${Number(item.dongia).toLocaleString()}</td>
+          <td>${item.ck}%</td>
+          <td>${Number(item.gianhap).toLocaleString()}</td>
+          <td>${Number(item.thanhtien).toLocaleString()}</td>
+        </tr>`;
+      });
+
+      html += `<tr>
+        <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
+        <td><b>${Number(r.tongtien).toLocaleString()}</b></td>
+      </tr></tbody></table>`;
+    });
+
+    html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></body></html>`;
+
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  } catch (err) {
+    console.error("Lỗi khi in phiếu:", err);
+    Swal.fire("Lỗi", "Không thể in phiếu", "error");
+  }
+}
+  
   document.getElementById("btnLogout").addEventListener("click", () => {
   window.location.href = "/logout";
 });
