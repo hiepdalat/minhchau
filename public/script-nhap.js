@@ -185,34 +185,46 @@ document.getElementById("btnDeleteSelected").addEventListener("click", async () 
     return;
   }
 
-  const ngay = rows[0].dataset.ngay;
-  const daily = rows[0].dataset.daily;
+  if (rows.length > 1) {
+    Swal.fire("Chỉ chọn 1 dòng", "Chức năng xóa chỉ áp dụng cho 1 dòng mỗi lần", "info");
+    return;
+  }
+
+  const selectedRow = rows[0];
+  const id = selectedRow.dataset.id;
+  const tenhang = selectedRow.cells[2]?.textContent || "mặt hàng";
 
   const confirm = await Swal.fire({
-    title: "Bạn có chắc?",
-    text: `Xóa toàn bộ mặt hàng đã nhập của "${daily}" vào ngày ${ngay}?`,
+    title: "Xác nhận xóa?",
+    text: `Bạn có chắc muốn xóa "${tenhang}" khỏi danh sách nhập hàng?`,
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "✅ Xóa",
     cancelButtonText: "❌ Hủy"
   });
 
-  if (confirm.isConfirmed) {
-    try {
-      const res = await fetch(`/api/stock/delete?ngay=${encodeURIComponent(ngay)}&daily=${encodeURIComponent(daily)}`, {
-        method: "DELETE"
-      });
-      const result = await res.json();
-      if (result.success) {
-        Swal.fire("Đã xóa", "Dữ liệu đã được xóa", "success");
-        searchBtn.click(); // load lại
-      } else {
-        Swal.fire("Lỗi", result.error || "Không thể xóa", "error");
-      }
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Lỗi", "Xóa thất bại", "error");
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const res = await fetch(`/api/stock/delete-row?id=${encodeURIComponent(id)}`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text);
     }
+
+    const result = await res.json();
+    if (result.success) {
+      Swal.fire("✅ Đã xóa", `"${tenhang}" đã được xóa khỏi hệ thống`, "success");
+      selectedRow.remove();
+    } else {
+      Swal.fire("Lỗi", result.error || "Không thể xóa", "error");
+    }
+  } catch (err) {
+    console.error("Lỗi khi xóa:", err);
+    Swal.fire("Lỗi", "Không thể kết nối server hoặc dữ liệu không đúng", "error");
   }
 });
   
