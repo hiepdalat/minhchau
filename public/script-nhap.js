@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!keyword) return;
 
     try {
-      const res = await fetch(`/timkiem?ten=${encodeURIComponent(keyword)}`);
+      const res = await fetch(`/api/stock/search-supplier?ten=${encodeURIComponent(keyword)}`);
       const data = await res.json();
 
       suggestionsWrap.innerHTML = "";
