@@ -217,22 +217,24 @@ app.post('/api/stock/receive', requireLogin, async (req, res) => {
 app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
   try {
     const kw = removeDiacritics(req.query.ten || '');
-    const year = parseInt(req.query.year);
-    const month = parseInt(req.query.month);
+    const thang = req.query.thang; // dạng: "2025-07"
+    if (!kw || !thang) return res.status(400).json([]);
 
-    if (!year || !month) return res.status(400).json([]);
+    const start = new Date(thang + "-01T00:00:00");
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
 
-    const start = new Date(year, month - 1, 1);
-    const end = new Date(year, month, 0, 23, 59, 59, 999);
+    const all = await StockReceipt.find({
+      ngay: { $gte: start, $lt: end }
+    });
 
-    const all = await StockReceipt.find({ ngay: { $gte: start, $lte: end } });
     const matched = all.filter(r => removeDiacritics(r.daily).includes(kw));
 
-    let result = [];
+    const result = [];
     matched.forEach(r => {
       r.items.forEach(item => {
         result.push({
-          ngay: r.ngay.toISOString().split('T')[0],
+          ngay: r.ngay.toISOString().split("T")[0],
           daily: r.daily,
           tenhang: item.tenhang,
           dvt: item.dvt,
@@ -247,10 +249,11 @@ app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
 
     res.json(result);
   } catch (err) {
-    console.error(err);
+    console.error("Lỗi tìm mặt hàng:", err);
     res.status(500).json([]);
   }
-});app.get('/api/stock/search-supplier', requireLogin, async (req, res) => {
+});
+app.get('/api/stock/search-supplier', requireLogin, async (req, res) => {
   try {
     const kw = removeDiacritics(req.query.ten || '');
     const receipts = await StockReceipt.find();
