@@ -111,6 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
         dateEl.value = "";
         danhSachTam.length = 0;
         renderTable();
+         // ✅ Gọi lại để hiển thị dữ liệu mới nhập
+      taiKetQuaTheoTenDaily(supplier);
       })
       .catch(err => {
         console.error(err);
