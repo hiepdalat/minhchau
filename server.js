@@ -244,10 +244,10 @@ app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
     res.status(500).json([]);
   }
 });
-app.get('/chi-tiet-phieu-nhap', requireLogin, async (req, res) => {
+app.get('/api/stock/receipt-by-date', requireLogin, async (req, res) => {
   try {
     const { ngay } = req.query;
-    if (!ngay) return res.status(400).send('Thiếu tham số ngày');
+    if (!ngay) return res.status(400).json({ error: 'Thiếu tham số ngày' });
 
     const start = new Date(ngay);
     start.setHours(0, 0, 0, 0);
@@ -255,55 +255,10 @@ app.get('/chi-tiet-phieu-nhap', requireLogin, async (req, res) => {
     end.setHours(23, 59, 59, 999);
 
     const receipts = await StockReceipt.find({ ngay: { $gte: start, $lte: end } });
-    if (!receipts.length) return res.send(`<h3>Không có phiếu nhập ngày ${ngay}</h3>`);
-
-    let html = `<div style="max-width:800px; margin:auto; font-family:Arial; color:#000">
-      <h2 style="text-align:center">🧾 PHIẾU NHẬP HÀNG</h2>
-      <p><b>Ngày:</b> ${ngay}</p>`;
-
-    receipts.forEach((r, i) => {
-      html += `
-        <p><b>Đại lý:</b> ${r.daily}</p>
-        <table border="1" cellspacing="0" cellpadding="6" width="100%" style="border-collapse:collapse; margin-bottom:20px;">
-          <thead>
-            <tr style="background:#f0f0f0">
-              <th>STT</th>
-              <th>Tên hàng</th>
-              <th>ĐVT</th>
-              <th>SL</th>
-              <th>Đơn giá</th>
-              <th>CK</th>
-              <th>Giá nhập</th>
-              <th>Thành tiền</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      r.items.forEach((item, idx) => {
-        html += `<tr>
-          <td>${idx + 1}</td>
-          <td>${item.tenhang}</td>
-          <td>${item.dvt}</td>
-          <td>${item.soluong}</td>
-          <td>${item.dongia.toLocaleString()}</td>
-          <td>${item.ck}%</td>
-          <td>${item.gianhap.toLocaleString()}</td>
-          <td>${item.thanhtien.toLocaleString()}</td>
-        </tr>`;
-      });
-      html += `
-        <tr>
-          <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
-          <td><b>${r.tongtien.toLocaleString()}</b></td>
-        </tr>
-        </tbody>
-        </table>`;
-    });
-
-    html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></div>`;
-    res.send(html);
+    res.json(receipts);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Lỗi server');
+    res.status(500).json({ error: 'Lỗi server' });
   }
 });
 
