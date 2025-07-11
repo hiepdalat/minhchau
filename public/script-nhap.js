@@ -123,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
  searchBtn.addEventListener("click", async () => {
   const ten = document.getElementById("searchSupplier").value.trim();
   const thang = document.getElementById("searchMonth").value;
-
   if (!ten || !thang) return;
 
   try {
@@ -132,8 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const data = await res.json();
 
     const tbody = document.getElementById("bangKetQua");
-    if (!tbody) return;
-
     tbody.innerHTML = "";
     document.getElementById("khungKetQua").style.display = "block";
 
@@ -145,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     data.forEach(item => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td><input type="checkbox" class="row-check" /></td>
+        <td><input type="checkbox" class="row-check"></td>
         <td>${item.ngay}</td>
         <td>${item.tenhang}</td>
         <td>${item.dvt}</td>
@@ -155,6 +152,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${Number(item.gianhap).toLocaleString()}</td>
         <td>${Number(item.thanhtien).toLocaleString()}</td>
       `;
+      row.dataset.ngay = item.ngay;
+      row.dataset.daily = item.daily;
       tbody.appendChild(row);
     });
   } catch (err) {
@@ -163,62 +162,57 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-  async function taiKetQuaTheoTenDaily(daily) {
-    try {
-      const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(daily)}`);
-      const data = await res.json();
+detailBtn.addEventListener("click", () => {
+  const rows = [...document.querySelectorAll("#bangKetQua tr")]
+    .filter(tr => tr.querySelector(".row-check")?.checked);
 
-      const tbody = document.getElementById("bangKetQua");
-      if (!tbody) return;
-
-      tbody.innerHTML = "";
-      document.getElementById("khungKetQua").style.display = "block";
-
-      if (!data.length) {
-        tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
-        return;
-      }
-
-      data.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.ngay}</td>
-          <td>${item.tenhang}</td>
-          <td>${item.dvt}</td>
-          <td>${item.soluong}</td>
-          <td>${item.dongia.toLocaleString()}</td>
-          <td>${item.ck}%</td>
-          <td>${item.gianhap.toLocaleString()}</td>
-          <td>${item.thanhtien.toLocaleString()}</td>
-        `;
-        row.addEventListener("click", () => {
-          row.classList.toggle("selected-row");
-          row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
-        });
-        tbody.appendChild(row);
-      });
-    } catch (err) {
-      console.error("Lỗi tải dữ liệu:", err);
-      alert("Không thể tải dữ liệu");
-    }
-  }
-
-  detailBtn.addEventListener("click", () => {
-  const table = document.getElementById("bangKetQua");
-  if (!table) return;
-
-  const rows = table.querySelectorAll("tbody tr");
-  const checkedRow = Array.from(rows).find(row => row.querySelector(".row-check")?.checked);
-
-  if (!checkedRow) {
-    alert("Vui lòng tick chọn 1 dòng để xem chi tiết");
+  if (rows.length === 0) {
+    Swal.fire("Thông báo", "Vui lòng chọn 1 dòng để xem chi tiết", "info");
     return;
   }
 
-  const ngay = checkedRow.cells[1].textContent.trim(); // cột số 1 là "Ngày", vì cột 0 là checkbox
-  if (!ngay) return;
+  const ngay = rows[0].dataset.ngay;
+  inChiTietPhieuNhap(ngay);
+});
 
-  inChiTietPhieuNhap(ngay); // gọi hàm đã có sẵn
+document.getElementById("btnDeleteSelected").addEventListener("click", async () => {
+  const rows = [...document.querySelectorAll("#bangKetQua tr")]
+    .filter(tr => tr.querySelector(".row-check")?.checked);
+
+  if (rows.length === 0) {
+    Swal.fire("Chưa chọn", "Vui lòng chọn dòng cần xóa", "warning");
+    return;
+  }
+
+  const ngay = rows[0].dataset.ngay;
+  const daily = rows[0].dataset.daily;
+
+  const confirm = await Swal.fire({
+    title: "Bạn có chắc?",
+    text: `Xóa toàn bộ mặt hàng đã nhập của "${daily}" vào ngày ${ngay}?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "✅ Xóa",
+    cancelButtonText: "❌ Hủy"
+  });
+
+  if (confirm.isConfirmed) {
+    try {
+      const res = await fetch(`/api/stock/delete?ngay=${encodeURIComponent(ngay)}&daily=${encodeURIComponent(daily)}`, {
+        method: "DELETE"
+      });
+      const result = await res.json();
+      if (result.success) {
+        Swal.fire("Đã xóa", "Dữ liệu đã được xóa", "success");
+        searchBtn.click(); // load lại
+      } else {
+        Swal.fire("Lỗi", result.error || "Không thể xóa", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Lỗi", "Xóa thất bại", "error");
+    }
+  }
 });
   
   async function inChiTietPhieuNhap(ngay) {
