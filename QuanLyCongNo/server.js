@@ -197,7 +197,7 @@ app.post('/api/stock/receive', requireLogin, async (req, res) => {
       const giaNhap = it.price * (1 - it.discount / 100);
       const thanhTien = giaNhap * it.qty;
       return {
-        tenhang: it.name,
+        tenhang: it.product,
         dvt: it.unit,
         soluong: it.qty,
         dongia: it.price,
