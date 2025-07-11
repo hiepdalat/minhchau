@@ -217,10 +217,17 @@ app.post('/api/stock/receive', requireLogin, async (req, res) => {
 app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
   try {
     const kw = removeDiacritics(req.query.ten || '');
-    const all = await StockReceipt.find();
+    const year = parseInt(req.query.year);
+    const month = parseInt(req.query.month);
+
+    if (!year || !month) return res.status(400).json([]);
+
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0, 23, 59, 59, 999);
+
+    const all = await StockReceipt.find({ ngay: { $gte: start, $lte: end } });
     const matched = all.filter(r => removeDiacritics(r.daily).includes(kw));
 
-    // Gộp tất cả mặt hàng
     let result = [];
     matched.forEach(r => {
       r.items.forEach(item => {
