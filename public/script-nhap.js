@@ -121,41 +121,49 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   searchBtn.addEventListener("click", async () => {
-    const keyword = document.getElementById("searchSupplier").value.trim();
-    const monthStr = document.getElementById("searchMonth").value; 
-    
-    if (!keyword || !monthStr) return;
-    const [year, month] = monthStr.split("-");
-    const res = await fetch(`/api/stock/search-daily?ten=${encodeURIComponent(keyword)}&month=${month}&year=${year}`);
+  const ten = document.getElementById("searchSupplier").value.trim();
+  const thang = document.getElementById("searchMonth").value;
+
+  if (!ten || !thang) return;
+
+  try {
+    const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
+    const res = await fetch(url);
     const data = await res.json();
-      const tbody = document.getElementById("bangKetQua");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-  document.getElementById("khungKetQua").style.display = "block";
 
-  if (!data.length) {
-    tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
-    return;
-  }
+    const tbody = document.getElementById("bangKetQua");
+    if (!tbody) return;
 
-  data.forEach(item => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${item.ngay}</td>
-      <td>${item.tenhang}</td>
-      <td>${item.dvt}</td>
-      <td>${item.soluong}</td>
-      <td>${item.dongia.toLocaleString()}</td>
-      <td>${item.ck}%</td>
-      <td>${item.gianhap.toLocaleString()}</td>
-      <td>${item.thanhtien.toLocaleString()}</td>
-    `;
-    row.addEventListener("click", () => {
-      row.classList.toggle("selected-row");
-      row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+    tbody.innerHTML = "";
+    document.getElementById("khungKetQua").style.display = "block";
+
+    if (!data.length) {
+      tbody.innerHTML = "<tr><td colspan='8'>Không có kết quả</td></tr>";
+      return;
+    }
+
+    data.forEach(item => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${item.ngay}</td>
+        <td>${item.tenhang}</td>
+        <td>${item.dvt}</td>
+        <td>${item.soluong}</td>
+        <td>${Number(item.dongia).toLocaleString()}</td>
+        <td>${item.ck}%</td>
+        <td>${Number(item.gianhap).toLocaleString()}</td>
+        <td>${Number(item.thanhtien).toLocaleString()}</td>
+      `;
+      row.addEventListener("click", () => {
+        row.classList.toggle("selected-row");
+        row.dataset.selected = row.dataset.selected === "true" ? "false" : "true";
+      });
+      tbody.appendChild(row);
     });
-    tbody.appendChild(row);
-  });
+  } catch (err) {
+    console.error("Lỗi tìm đại lý:", err);
+    alert("Không thể tìm đại lý hoặc mặt hàng");
+  }
 });
   async function taiKetQuaTheoTenDaily(daily) {
     try {
