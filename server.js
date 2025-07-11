@@ -312,6 +312,30 @@ app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 });
+app.post('/api/stock/delete-multiple-rows', requireLogin, async (req, res) => {
+  try {
+    const ids = req.body.ids;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "Thiếu danh sách ID" });
+    }
+
+    const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
+    let totalDeleted = 0;
+
+    for (const oid of objectIds) {
+      const result = await StockReceipt.updateOne(
+        { "items._id": oid },
+        { $pull: { items: { _id: oid } } }
+      );
+      if (result.modifiedCount > 0) totalDeleted++;
+    }
+
+    res.json({ success: true, deleted: totalDeleted });
+  } catch (err) {
+    console.error("Lỗi khi xóa nhiều dòng:", err);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+});
 // ======= API SẢN PHẨM (cho bán hàng) =======
 app.get('/api/products/stock', requireLogin, async (req, res) => {
   try {
