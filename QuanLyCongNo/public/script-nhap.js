@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const payload = { supplier, date, items: danhSachTam };
 
-    fetch("/api/nhap", {
+   fetch("/api/stock/receive", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
