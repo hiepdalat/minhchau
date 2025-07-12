@@ -1,8 +1,6 @@
-// ========================= script-nhap.js =========================
 document.addEventListener("DOMContentLoaded", () => {
   const danhSachTam = [];
 
-  // DOM Elements
   const supplierEl = document.getElementById("supplier");
   const dateEl = document.getElementById("date");
   const productEl = document.getElementById("product");
@@ -112,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
         dateEl.value = "";
         danhSachTam.length = 0;
         renderTable();
-        taiKetQuaTheoTenDaily(supplier);
+        // Đã xoá taiKetQuaTheoTenDaily vì không tồn tại
       })
       .catch(err => {
         console.error(err);
@@ -120,110 +118,110 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   });
 
- searchBtn.addEventListener("click", async () => {
-  const ten = document.getElementById("searchSupplier").value.trim();
-  const thang = document.getElementById("searchMonth").value;
-  if (!ten || !thang) return;
+  searchBtn.addEventListener("click", async () => {
+    const ten = document.getElementById("searchSupplier").value.trim();
+    const thang = document.getElementById("searchMonth").value;
+    if (!ten || !thang) return;
 
-  try {
-    const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    try {
+      const url = `/api/stock/search-daily?ten=${encodeURIComponent(ten)}&thang=${encodeURIComponent(thang)}`;
+      const res = await fetch(url);
+      const data = await res.json();
 
-    const tbody = document.getElementById("bangKetQua");
-    tbody.innerHTML = "";
-    document.getElementById("khungKetQua").style.display = "block";
+      const tbody = document.getElementById("bangKetQua");
+      tbody.innerHTML = "";
+      document.getElementById("khungKetQua").style.display = "block";
 
-    if (!data.length) {
-      tbody.innerHTML = "<tr><td colspan='9'>Không có kết quả</td></tr>";
+      if (!data.length) {
+        tbody.innerHTML = "<tr><td colspan='9'>Không có kết quả</td></tr>";
+        return;
+      }
+
+      data.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><input type="checkbox" class="row-check"></td>
+          <td>${item.ngay}</td>
+          <td>${item.tenhang}</td>
+          <td>${item.dvt}</td>
+          <td>${item.soluong}</td>
+          <td>${Number(item.dongia).toLocaleString()}</td>
+          <td>${item.ck}%</td>
+          <td>${Number(item.gianhap).toLocaleString()}</td>
+          <td>${Number(item.thanhtien).toLocaleString()}</td>
+        `;
+        row.dataset.id = item._id;
+        row.dataset.ngay = item.ngay;
+        row.dataset.daily = item.daily;
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Lỗi tìm đại lý:", err);
+      alert("Không thể tìm đại lý hoặc mặt hàng");
+    }
+  });
+
+  detailBtn.addEventListener("click", () => {
+    const rows = [...document.querySelectorAll("#bangKetQua tr")]
+      .filter(tr => tr.querySelector(".row-check")?.checked);
+
+    if (rows.length === 0) {
+      Swal.fire("Thông báo", "Vui lòng chọn 1 dòng để xem chi tiết", "info");
       return;
     }
 
-    data.forEach(item => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td> <input type="checkbox" data-id="{{_id}}" class="row-check"></td>
-        <td>${item.ngay}</td>
-        <td>${item.tenhang}</td>
-        <td>${item.dvt}</td>
-        <td>${item.soluong}</td>
-        <td>${Number(item.dongia).toLocaleString()}</td>
-        <td>${item.ck}%</td>
-        <td>${Number(item.gianhap).toLocaleString()}</td>
-        <td>${Number(item.thanhtien).toLocaleString()}</td>
-      `;
-      row.dataset.ngay = item.ngay;
-      row.dataset.id = item._id; //tôi đã đặt ở đây 
-      row.dataset.daily = item.daily;
-      tbody.appendChild(row);
-    });
-  } catch (err) {
-    console.error("Lỗi tìm đại lý:", err);
-    alert("Không thể tìm đại lý hoặc mặt hàng");
-  }
-});
-
-detailBtn.addEventListener("click", () => {
-  const rows = [...document.querySelectorAll("#bangKetQua tr")]
-    .filter(tr => tr.querySelector(".row-check")?.checked);
-
-  if (rows.length === 0) {
-    Swal.fire("Thông báo", "Vui lòng chọn 1 dòng để xem chi tiết", "info");
-    return;
-  }
-
-  const ngay = rows[0].dataset.ngay;
-  inChiTietPhieuNhap(ngay);
-});
-
-document.getElementById("btnDeleteSelected").addEventListener("click", async () => {
-  const rows = [...document.querySelectorAll("#bangKetQua tr")]
-    .filter(tr => tr.querySelector(".row-check")?.checked);
-
-  if (rows.length === 0) {
-    Swal.fire("Chưa chọn", "Vui lòng chọn ít nhất 1 dòng để xóa", "warning");
-    return;
-  }
-
-  const tenHangList = rows.map(row => row.cells[2]?.textContent || "mặt hàng").join(", ");
-  const ids = rows.map(row => row.dataset.id).filter(Boolean);
-
-  if (!ids.length) {
-    Swal.fire("Lỗi", "Không lấy được ID dòng cần xóa", "error");
-    return;
-  }
-
-  const confirm = await Swal.fire({
-    title: `Xác nhận xóa ${ids.length} dòng?`,
-    html: `Bạn có chắc muốn xóa các mặt hàng sau?<br><b>${tenHangList}</b>`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "✅ Xóa",
-    cancelButtonText: "❌ Hủy"
+    const ngay = rows[0].dataset.ngay;
+    inChiTietPhieuNhap(ngay);
   });
 
-  if (!confirm.isConfirmed) return;
+  document.getElementById("btnDeleteSelected").addEventListener("click", async () => {
+    const rows = [...document.querySelectorAll("#bangKetQua tr")]
+      .filter(tr => tr.querySelector(".row-check")?.checked);
 
-  try {
-    const res = await fetch(`/api/stock/delete-multiple-rows`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ids })
+    if (rows.length === 0) {
+      Swal.fire("Chưa chọn", "Vui lòng chọn ít nhất 1 dòng để xóa", "warning");
+      return;
+    }
+
+    const tenHangList = rows.map(row => row.cells[2]?.textContent || "mặt hàng").join(", ");
+    const ids = rows.map(row => row.dataset.id).filter(Boolean);
+
+    if (!ids.length) {
+      Swal.fire("Lỗi", "Không lấy được ID dòng cần xóa", "error");
+      return;
+    }
+
+    const confirm = await Swal.fire({
+      title: `Xác nhận xóa ${ids.length} dòng?`,
+      html: `Bạn có chắc muốn xóa các mặt hàng sau?<br><b>${tenHangList}</b>`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "✅ Xóa",
+      cancelButtonText: "❌ Hủy"
     });
 
-    const result = await res.json();
-    if (result.success) {
-      Swal.fire("✅ Đã xóa", `${result.deleted} dòng đã được xóa`, "success");
-      rows.forEach(row => row.remove());
-    } else {
-      Swal.fire("Lỗi", result.error || "Không thể xóa", "error");
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await fetch(`/api/stock/delete-multiple-rows`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids })
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        Swal.fire("✅ Đã xóa", `${result.deleted} dòng đã được xóa`, "success");
+        rows.forEach(row => row.remove());
+      } else {
+        Swal.fire("Lỗi", result.error || "Không thể xóa", "error");
+      }
+    } catch (err) {
+      console.error("Lỗi khi xóa:", err);
+      Swal.fire("Lỗi", "Không thể kết nối server", "error");
     }
-  } catch (err) {
-    console.error("Lỗi khi xóa:", err);
-    Swal.fire("Lỗi", "Không thể kết nối server", "error");
-  }
-});
-  
+  });
+
   async function inChiTietPhieuNhap(ngay) {
     try {
       const res = await fetch(`/api/stock/receipt-by-date?ngay=${encodeURIComponent(ngay)}`);
@@ -245,45 +243,43 @@ document.getElementById("btnDeleteSelected").addEventListener("click", async () 
 
       html += `<h2>🧾 PHIẾU NHẬP HÀNG</h2><p><b>Ngày:</b> ${ngay}</p>`;
 
-      // Gom các phiếu theo đại lý
-const grouped = {};
-data.forEach(r => {
-  if (!grouped[r.daily]) {
-    grouped[r.daily] = { items: [], tongtien: 0 };
-  }
-  grouped[r.daily].items.push(...r.items);
-  grouped[r.daily].tongtien += r.tongtien;
-});
+      const grouped = {};
+      data.forEach(r => {
+        if (!grouped[r.daily]) {
+          grouped[r.daily] = { items: [], tongtien: 0 };
+        }
+        grouped[r.daily].items.push(...r.items);
+        grouped[r.daily].tongtien += r.tongtien;
+      });
 
-Object.entries(grouped).forEach(([daily, { items, tongtien }]) => {
-  html += `<p><b>Đại lý:</b> ${daily}</p>
-    <table>
-      <thead><tr>
-        <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
-        <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
-      </tr></thead><tbody>`;
+      Object.entries(grouped).forEach(([daily, { items, tongtien }]) => {
+        html += `<p><b>Đại lý:</b> ${daily}</p>
+          <table>
+            <thead><tr>
+              <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
+              <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
+            </tr></thead><tbody>`;
 
-  items.forEach((item, idx) => {
-    html += `<tr>
-      <td>${idx + 1}</td>
-      <td>${item.tenhang}</td>
-      <td>${item.dvt}</td>
-      <td>${item.soluong}</td>
-      <td>${Number(item.dongia).toLocaleString()}</td>
-      <td>${item.ck}%</td>
-      <td>${Number(item.gianhap).toLocaleString()}</td>
-      <td>${Number(item.thanhtien).toLocaleString()}</td>
-    </tr>`;
-  });
+        items.forEach((item, idx) => {
+          html += `<tr>
+            <td>${idx + 1}</td>
+            <td>${item.tenhang}</td>
+            <td>${item.dvt}</td>
+            <td>${item.soluong}</td>
+            <td>${Number(item.dongia).toLocaleString()}</td>
+            <td>${item.ck}%</td>
+            <td>${Number(item.gianhap).toLocaleString()}</td>
+            <td>${Number(item.thanhtien).toLocaleString()}</td>
+          </tr>`;
+        });
 
-  html += `<tr>
-    <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
-    <td><b>${Number(tongtien).toLocaleString()}</b></td>
-  </tr></tbody></table>`;
-});
+        html += `<tr>
+          <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
+          <td><b>${Number(tongtien).toLocaleString()}</b></td>
+        </tr></tbody></table>`;
+      });
 
       html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></body></html>`;
-
       win.document.write(html);
       win.document.close();
       win.print();
