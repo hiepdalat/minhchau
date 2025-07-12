@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       total += thanhTien;
 
       const row = document.createElement("tr");
+      row.dataset.id = item._id; // <-- Gắn ID vào thẻ <tr>
       row.innerHTML = `
         <td>${index + 1}</td>
         <td>${item.product}</td>
@@ -185,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
    const ids = rows.map(row => row.querySelector(".row-check")?.dataset.id).filter(Boolean);
 const tenHangList = rows.map(row => row.cells[2]?.textContent || "mặt hàng").join(", ");
-
+console.log("Gửi ids:", ids); 
     if (!ids.length) {
       Swal.fire("Lỗi", "Không lấy được ID dòng cần xóa", "error");
       return;
