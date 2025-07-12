@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageText = document.getElementById('messageText');
     const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
-    const receiptDetailsModal = document.getElementById('receiptDetailsModal');
+    const receiptDetailsModal = document.getElementById('receiptDetailsModal'); // Modal cũ, không dùng cho in ấn nữa
     const detailDailyNameSpan = document.getElementById('detailDailyName');
     const detailReceiptDateSpan = document.getElementById('detailReceiptDate');
     const detailTotalAmountSpan = document.getElementById('detailTotalAmount');
@@ -339,23 +339,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to update the state of the "View Details" button
     function updateViewDetailsButtonState() {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
-        console.log(`[updateViewDetailsButtonState] Số lượng checkbox được chọn: ${checkedCheckboxes.length}`);
-        // Nút "Xem chi tiết" chỉ được kích hoạt khi CHỈ MỘT checkbox được chọn
         if (checkedCheckboxes.length === 1) {
             viewDetailsBtn.disabled = false;
             viewDetailsBtn.dataset.receiptId = checkedCheckboxes[0].dataset.receiptId;
-            console.log(`[updateViewDetailsButtonState] Nút Xem chi tiết: BẬT, receiptId: ${viewDetailsBtn.dataset.receiptId}`);
         } else {
             viewDetailsBtn.disabled = true;
             delete viewDetailsBtn.dataset.receiptId;
-            console.log('[updateViewDetailsButtonState] Nút Xem chi tiết: TẮT');
         }
     }
 
     // Event listener for any item checkbox change
     receiptsBody.addEventListener('change', (event) => {
         if (event.target.classList.contains('item-checkbox')) {
-            console.log(`[receiptsBody change] Checkbox thay đổi trạng thái: ${event.target.checked}`);
             updateViewDetailsButtonState(); // Update button state after any checkbox changes
             // If any item checkbox is unchecked, uncheck the "Select All" checkbox
             if (!event.target.checked) {
@@ -372,7 +367,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listener for select all checkbox
     selectAllReceiptsCheckbox.addEventListener('change', (event) => {
-        console.log(`[selectAllReceiptsCheckbox change] Select All: ${event.target.checked}`);
         document.querySelectorAll('.item-checkbox').forEach(checkbox => {
             checkbox.checked = event.target.checked;
         });
@@ -437,69 +431,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         await fetchAndRenderReceipts();
     });
 
-    // --- View Details Button Logic ---
-    viewDetailsBtn.addEventListener('click', async () => {
+    // --- View Details Button Logic (MODIFIED TO OPEN NEW TAB FOR PRINTING) ---
+    viewDetailsBtn.addEventListener('click', () => {
         const receiptId = viewDetailsBtn.dataset.receiptId;
-        console.log(`[viewDetailsBtn click] Đang cố gắng xem chi tiết phiếu nhập với ID: ${receiptId}`);
         if (!receiptId) {
             showMessageBox('Vui lòng chọn một phiếu nhập để xem chi tiết.');
             return;
         }
-
-        try {
-            const response = await fetch(`/api/nhaphang/${receiptId}`);
-            if (response.ok) {
-                const receipt = await response.json();
-                console.log('[viewDetailsBtn click] Đã nhận dữ liệu phiếu nhập:', receipt);
-                
-                // Populate modal details
-                detailDailyNameSpan.textContent = receipt.daily;
-                const receiptDate = new Date(receipt.ngay);
-                detailReceiptDateSpan.textContent = receiptDate.toLocaleDateString('vi-VN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                detailTotalAmountSpan.textContent = formatCurrency(receipt.tongtien);
-
-                // Populate items table in modal
-                detailItemsBody.innerHTML = '';
-                if (receipt.items.length === 0) {
-                    detailItemsBody.innerHTML = '<tr><td colspan="7" class="text-center py-2">Phiếu nhập này không có mặt hàng nào.</td></tr>';
-                } else {
-                    receipt.items.forEach(item => {
-                        const row = detailItemsBody.insertRow();
-                        row.innerHTML = `
-                            <td class="py-2 px-4 border-b border-gray-600">${item.tenhang}</td>
-                            <td class="py-2 px-4 border-b border-gray-600">${item.dvt}</td>
-                            <td class="py-2 px-4 border-b border-gray-600">${item.soluong}</td>
-                            <td class="py-2 px-4 border-b border-gray-600">${formatCurrency(item.dongia)}</td>
-                            <td class="py-2 px-4 border-b border-gray-600">${item.ck}%</td>
-                            <td class="py-2 px-4 border-b border-gray-600">${formatCurrency(item.gianhap)}</td>
-                            <td class="py-2 px-4 border-b border-gray-600">${formatCurrency(item.thanhtien)}</td>
-                        `;
-                    });
-                }
-
-                receiptDetailsModal.classList.remove('hidden'); // Show the modal
-            } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-                setTimeout(() => window.location.href = '/index.html', 2000);
-            } else {
-                const errorData = await response.json();
-                console.error('[viewDetailsBtn click] Lỗi phản hồi API:', errorData);
-                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập: ${errorData.error || response.statusText}`);
-            }
-        } catch (error) {
-            console.error('[viewDetailsBtn click] Lỗi mạng hoặc server:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
-        }
+        // Open the new print-receipt.html page in a new tab, passing the receiptId
+        window.open(`/print-receipt?receiptId=${receiptId}`, '_blank');
     });
 
-    // Close details modal
-    closeDetailsModalBtn.addEventListener('click', () => {
-        receiptDetailsModal.classList.add('hidden');
-    });
+    // Removed the old modal close listener as the modal is no longer used for details display
+    // closeDetailsModalBtn.addEventListener('click', () => {
+    //     receiptDetailsModal.classList.add('hidden');
+    // });
 
 
     // --- Date Ticker Logic (from existing style.css) ---
