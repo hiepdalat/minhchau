@@ -315,19 +315,21 @@ app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
 app.post("/api/stock/delete-multiple-rows", requireLogin, async (req, res) => {
   try {
     const { ids } = req.body;
+
     if (!Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ error: "Thiếu danh sách ID" });
     }
 
-    // Lọc các ID hợp lệ
-    const validIds = ids.filter(id => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id))
-                        .map(id => new ObjectId(id));
+    // Chỉ nhận ID hợp lệ (24 ký tự hex)
+    const validIds = ids
+      .filter(id => typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id))
+      .map(id => new mongoose.Types.ObjectId(id));
 
     if (validIds.length === 0) {
       return res.status(400).json({ error: "Không có ID nào hợp lệ để xóa" });
     }
 
-    const result = await db.collection("phieunhap").updateMany(
+    const result = await StockReceipt.updateMany(
       { "items._id": { $in: validIds } },
       { $pull: { items: { _id: { $in: validIds } } } }
     );
