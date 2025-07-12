@@ -42,9 +42,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showMessageBox(message) {
         messageText.textContent = message;
         messageBox.classList.remove('hidden');
+        // Ensure only the "Đóng" button is visible for simple messages
+        const confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
+        if (confirmBtn) confirmBtn.classList.add('hidden');
+        messageBoxCloseBtn.classList.remove('hidden');
     }
 
-    // Event listener for message box close button
+    /**
+     * Shows a custom confirmation dialog.
+     * @param {string} message - The confirmation message.
+     * @returns {Promise<boolean>} - Resolves to true if confirmed, false otherwise.
+     */
+    function showConfirmationBox(message) {
+        return new Promise(resolve => {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+
+            // Add confirm button if it doesn't exist, or show it
+            let confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
+            if (!confirmBtn) {
+                confirmBtn = document.createElement('button');
+                confirmBtn.id = 'messageBoxConfirmBtn';
+                confirmBtn.textContent = 'Xác nhận';
+                confirmBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2';
+                messageBox.querySelector('.bg-gray-800').appendChild(confirmBtn);
+            } else {
+                confirmBtn.classList.remove('hidden');
+            }
+            messageBoxCloseBtn.textContent = 'Hủy'; // Change close button text to "Hủy"
+            messageBoxCloseBtn.classList.remove('hidden'); // Ensure it's visible
+
+            const handleConfirm = () => {
+                messageBox.classList.add('hidden');
+                confirmBtn.removeEventListener('click', handleConfirm);
+                messageBoxCloseBtn.removeEventListener('click', handleCancel);
+                messageBoxCloseBtn.textContent = 'Đóng'; // Reset text
+                resolve(true);
+            };
+
+            const handleCancel = () => {
+                messageBox.classList.add('hidden');
+                confirmBtn.removeEventListener('click', handleConfirm);
+                messageBoxCloseBtn.removeEventListener('click', handleCancel);
+                messageBoxCloseBtn.textContent = 'Đóng'; // Reset text
+                resolve(false);
+            };
+
+            confirmBtn.addEventListener('click', handleConfirm);
+            messageBoxCloseBtn.addEventListener('click', handleCancel);
+        });
+    }
+
+    // Event listener for message box close button (for simple messages)
     messageBoxCloseBtn.addEventListener('click', () => {
         messageBox.classList.add('hidden');
     });
@@ -290,19 +339,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to update the state of the "View Details" button
     function updateViewDetailsButtonState() {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+        console.log(`[updateViewDetailsButtonState] Số lượng checkbox được chọn: ${checkedCheckboxes.length}`);
+        // Nút "Xem chi tiết" chỉ được kích hoạt khi CHỈ MỘT checkbox được chọn
         if (checkedCheckboxes.length === 1) {
             viewDetailsBtn.disabled = false;
             viewDetailsBtn.dataset.receiptId = checkedCheckboxes[0].dataset.receiptId;
+            console.log(`[updateViewDetailsButtonState] Nút Xem chi tiết: BẬT, receiptId: ${viewDetailsBtn.dataset.receiptId}`);
         } else {
             viewDetailsBtn.disabled = true;
             delete viewDetailsBtn.dataset.receiptId;
+            console.log('[updateViewDetailsButtonState] Nút Xem chi tiết: TẮT');
         }
     }
 
     // Event listener for any item checkbox change
     receiptsBody.addEventListener('change', (event) => {
         if (event.target.classList.contains('item-checkbox')) {
-            updateViewDetailsButtonState();
+            console.log(`[receiptsBody change] Checkbox thay đổi trạng thái: ${event.target.checked}`);
+            updateViewDetailsButtonState(); // Update button state after any checkbox changes
             // If any item checkbox is unchecked, uncheck the "Select All" checkbox
             if (!event.target.checked) {
                 selectAllReceiptsCheckbox.checked = false;
@@ -318,6 +372,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listener for select all checkbox
     selectAllReceiptsCheckbox.addEventListener('change', (event) => {
+        console.log(`[selectAllReceiptsCheckbox change] Select All: ${event.target.checked}`);
         document.querySelectorAll('.item-checkbox').forEach(checkbox => {
             checkbox.checked = event.target.checked;
         });
@@ -342,7 +397,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (!confirm('Bạn có chắc chắn muốn xóa các món hàng đã chọn?')) {
+        const confirmed = await showConfirmationBox('Bạn có chắc chắn muốn xóa các món hàng đã chọn?');
+        if (!confirmed) {
             return;
         }
 
@@ -384,6 +440,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- View Details Button Logic ---
     viewDetailsBtn.addEventListener('click', async () => {
         const receiptId = viewDetailsBtn.dataset.receiptId;
+        console.log(`[viewDetailsBtn click] Đang cố gắng xem chi tiết phiếu nhập với ID: ${receiptId}`);
         if (!receiptId) {
             showMessageBox('Vui lòng chọn một phiếu nhập để xem chi tiết.');
             return;
@@ -393,6 +450,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(`/api/nhaphang/${receiptId}`);
             if (response.ok) {
                 const receipt = await response.json();
+                console.log('[viewDetailsBtn click] Đã nhận dữ liệu phiếu nhập:', receipt);
                 
                 // Populate modal details
                 detailDailyNameSpan.textContent = receipt.daily;
@@ -429,10 +487,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
+                console.error('[viewDetailsBtn click] Lỗi phản hồi API:', errorData);
                 showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập: ${errorData.error || response.statusText}`);
             }
         } catch (error) {
-            console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập:', error);
+            console.error('[viewDetailsBtn click] Lỗi mạng hoặc server:', error);
             showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
         }
     });
