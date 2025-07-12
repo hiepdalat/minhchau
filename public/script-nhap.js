@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchMonthInput = document.getElementById('searchMonth');
     const searchBtn = document.getElementById('searchBtn');
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const viewDetailsBtn = document.getElementById('viewDetailsBtn'); // Nút xem chi tiết mới
     const receiptsBody = document.getElementById('receiptsBody'); // Body của bảng "Mặt hàng đã nhập từ đại lý"
     const selectAllReceiptsCheckbox = document.getElementById('selectAllReceipts');
     const grandTotalAllItemsSpan = document.getElementById('grandTotalAllItems'); // Tổng tiền tất cả mặt hàng hiển thị
@@ -22,6 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageBox = document.getElementById('messageBox');
     const messageText = document.getElementById('messageText');
     const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+
+    const receiptDetailsModal = document.getElementById('receiptDetailsModal');
+    const detailDailyNameSpan = document.getElementById('detailDailyName');
+    const detailReceiptDateSpan = document.getElementById('detailReceiptDate');
+    const detailTotalAmountSpan = document.getElementById('detailTotalAmount');
+    const detailItemsBody = document.getElementById('detailItemsBody');
+    const closeDetailsModalBtn = document.getElementById('closeDetailsModalBtn');
 
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
 
@@ -200,7 +208,6 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Fetches and renders saved receipts as a flattened list of items.
      */
     async function fetchAndRenderReceipts() {
-        // Cập nhật colspan cho thông báo tải
         receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
         const dailySearch = searchDailyNameInput.value.trim();
         const monthSearch = searchMonthInput.value; // YYYY-MM format
@@ -222,7 +229,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let grandTotal = 0;
 
                 if (receipts.length === 0) {
-                    // Cập nhật colspan cho thông báo không tìm thấy
                     receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
                     grandTotalAllItemsSpan.textContent = formatCurrency(0);
                     return;
@@ -262,18 +268,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
                 grandTotalAllItemsSpan.textContent = formatCurrency(grandTotal);
 
+                updateViewDetailsButtonState(); // Cập nhật trạng thái nút sau khi render
             } else if (response.status === 401) {
                 showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                // Cập nhật colspan cho thông báo lỗi
                 receiptsBody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-red-400">Lỗi: ${errorData.error || response.statusText}</td></tr>`;
                 grandTotalAllItemsSpan.textContent = formatCurrency(0);
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            // Cập nhật colspan cho thông báo lỗi kết nối
             receiptsBody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-red-400">Lỗi kết nối đến server.</td></tr>`;
             grandTotalAllItemsSpan.textContent = formatCurrency(0);
         }
@@ -282,12 +287,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener for search button
     searchBtn.addEventListener('click', fetchAndRenderReceipts);
 
+    // Function to update the state of the "View Details" button
+    function updateViewDetailsButtonState() {
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+        if (checkedCheckboxes.length === 1) {
+            viewDetailsBtn.disabled = false;
+            viewDetailsBtn.dataset.receiptId = checkedCheckboxes[0].dataset.receiptId;
+        } else {
+            viewDetailsBtn.disabled = true;
+            delete viewDetailsBtn.dataset.receiptId;
+        }
+    }
+
+    // Event listener for any item checkbox change
+    receiptsBody.addEventListener('change', (event) => {
+        if (event.target.classList.contains('item-checkbox')) {
+            updateViewDetailsButtonState();
+            // If any item checkbox is unchecked, uncheck the "Select All" checkbox
+            if (!event.target.checked) {
+                selectAllReceiptsCheckbox.checked = false;
+            } else {
+                // If all item checkboxes are checked, check "Select All"
+                const allItemCheckboxes = document.querySelectorAll('.item-checkbox');
+                const allChecked = Array.from(allItemCheckboxes).every(cb => cb.checked);
+                selectAllReceiptsCheckbox.checked = allChecked;
+            }
+        }
+    });
+
+
     // Event listener for select all checkbox
     selectAllReceiptsCheckbox.addEventListener('change', (event) => {
-        // Select all individual item checkboxes
         document.querySelectorAll('.item-checkbox').forEach(checkbox => {
             checkbox.checked = event.target.checked;
         });
+        updateViewDetailsButtonState(); // Update button state after select all
     });
 
 
@@ -315,7 +349,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let successCount = 0;
         let failCount = 0;
 
-        // Process deletions sequentially to avoid overwhelming the server and handle errors per item
         for (const itemInfo of selectedItemsToDelete) {
             try {
                 const response = await fetch('/api/nhaphang/item', {
@@ -331,7 +364,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else if (response.status === 401) {
                     showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
                     setTimeout(() => window.location.href = '/index.html', 2000);
-                    return; // Stop further processing
+                    return;
                 } else {
                     failCount++;
                     const errorData = await response.json();
@@ -344,9 +377,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`);
-        selectAllReceiptsCheckbox.checked = false; // Uncheck select all
-        await fetchAndRenderReceipts(); // Refresh the list
+        selectAllReceiptsCheckbox.checked = false;
+        await fetchAndRenderReceipts();
     });
+
+    // --- View Details Button Logic ---
+    viewDetailsBtn.addEventListener('click', async () => {
+        const receiptId = viewDetailsBtn.dataset.receiptId;
+        if (!receiptId) {
+            showMessageBox('Vui lòng chọn một phiếu nhập để xem chi tiết.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/nhaphang/${receiptId}`);
+            if (response.ok) {
+                const receipt = await response.json();
+                
+                // Populate modal details
+                detailDailyNameSpan.textContent = receipt.daily;
+                const receiptDate = new Date(receipt.ngay);
+                detailReceiptDateSpan.textContent = receiptDate.toLocaleDateString('vi-VN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                detailTotalAmountSpan.textContent = formatCurrency(receipt.tongtien);
+
+                // Populate items table in modal
+                detailItemsBody.innerHTML = '';
+                if (receipt.items.length === 0) {
+                    detailItemsBody.innerHTML = '<tr><td colspan="7" class="text-center py-2">Phiếu nhập này không có mặt hàng nào.</td></tr>';
+                } else {
+                    receipt.items.forEach(item => {
+                        const row = detailItemsBody.insertRow();
+                        row.innerHTML = `
+                            <td class="py-2 px-4 border-b border-gray-600">${item.tenhang}</td>
+                            <td class="py-2 px-4 border-b border-gray-600">${item.dvt}</td>
+                            <td class="py-2 px-4 border-b border-gray-600">${item.soluong}</td>
+                            <td class="py-2 px-4 border-b border-gray-600">${formatCurrency(item.dongia)}</td>
+                            <td class="py-2 px-4 border-b border-gray-600">${item.ck}%</td>
+                            <td class="py-2 px-4 border-b border-gray-600">${formatCurrency(item.gianhap)}</td>
+                            <td class="py-2 px-4 border-b border-gray-600">${formatCurrency(item.thanhtien)}</td>
+                        `;
+                    });
+                }
+
+                receiptDetailsModal.classList.remove('hidden'); // Show the modal
+            } else if (response.status === 401) {
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                setTimeout(() => window.location.href = '/index.html', 2000);
+            } else {
+                const errorData = await response.json();
+                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập: ${errorData.error || response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập:', error);
+            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
+        }
+    });
+
+    // Close details modal
+    closeDetailsModalBtn.addEventListener('click', () => {
+        receiptDetailsModal.classList.add('hidden');
+    });
+
 
     // --- Date Ticker Logic (from existing style.css) ---
     const dateTicker = document.getElementById('dateTicker');
