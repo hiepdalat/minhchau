@@ -66,42 +66,32 @@ app.get('/api/congno', requireLogin, async (req, res) => {
     res.status(500).json([]);
   }
 });
-/*function requireLogin(req, res, next) {
-  if (req.session && req.session.user) {
-    res.set('Cache-Control', 'no-store');
-    return next();
-  }
 
-  // Nếu client yêu cầu JSON (AJAX)
-  if (req.headers.accept?.includes('application/json')) {
-    return res.status(401).json({ error: 'Hết phiên đăng nhập. Vui lòng đăng nhập lại.' });
-  }
-
-  // Nếu truy cập qua trình duyệt bình thường
-  res.redirect('/index.html');
-}*/
 // ======= SCHEMA NHẬP HÀNG =======
+// Đã xóa '_id: false' để Mongoose tự động tạo _id cho từng subdocument (món hàng)
 const itemSchema = new mongoose.Schema({
-  tenhang:   { type: String, required: true },
-  dvt:       { type: String, required: true },
-  soluong:   { type: Number, required: true },
-  dongia:    { type: Number, required: true },
-  ck:        { type: Number, default: 0 },
-  gianhap:   { type: Number, required: true },
-  thanhtien: { type: Number, required: true }
-}, { _id: false });
+    tenhang: { type: String, required: true },
+    dvt: { type: String, required: true },
+    soluong: { type: Number, required: true },
+    dongia: { type: Number, required: true },
+    ck: { type: Number, default: 0 },
+    gianhap: { type: Number, required: true },
+    thanhtien: { type: Number, required: true }
+}); // Không có { _id: false } nữa
 
 const receiptSchema = new mongoose.Schema({
-  ngay:     { type: Date, required: true },
-  daily:    { type: String, required: true },
-  items:    [itemSchema],
-  tongtien: { type: Number, required: true }
+    ngay: { type: Date, required: true },
+    daily: { type: String, required: true },
+    items: [itemSchema],
+    tongtien: { type: Number, required: true }
 }, { timestamps: true });
 
+// === MODEL GỐC CHO COLLECTION 'stockreceipts' (GIỮ NGUYÊN) ===
 const StockReceipt = mongoose.model('StockReceipt', receiptSchema);
+
 // === MODEL MỚI CHO COLLECTION 'PhieuNhapKho' ===
-// Model này sẽ được sử dụng cho trang nhaphang.html
 const PhieuNhapKhoEntry = mongoose.model('PhieuNhapKhoEntry', receiptSchema, 'PhieuNhapKho');
+
 
 
 // ======= SCHEMA KHO HÀNG =======
@@ -210,7 +200,6 @@ app.post('/thanhtoan', requireLogin, async (req, res) => {
 app.post('/api/nhaphang', requireLogin, async (req, res) => {
     try {
         const { ngay, daily, items, tongtien } = req.body;
-        // Sử dụng PhieuNhapKhoEntry model để lưu vào collection 'PhieuNhapKho'
         const newReceipt = new PhieuNhapKhoEntry({
             ngay: new Date(ngay),
             daily,
@@ -244,7 +233,6 @@ app.get('/api/nhaphang', requireLogin, async (req, res) => {
                 $lte: endDate
             };
         }
-        // Sử dụng PhieuNhapKhoEntry model để lấy dữ liệu từ collection 'PhieuNhapKho'
         const receipts = await PhieuNhapKhoEntry.find(query).sort({ ngay: -1 });
         res.json(receipts);
     } catch (err) {
@@ -253,18 +241,57 @@ app.get('/api/nhaphang', requireLogin, async (req, res) => {
     }
 });
 
+// API để xóa TOÀN BỘ phiếu nhập (dựa trên _id của phiếu)
 app.delete('/api/nhaphang', requireLogin, async (req, res) => {
     try {
-        const { ids } = req.body;
+        const { ids } = req.body; // Expect an array of receipt IDs to delete
         if (!Array.isArray(ids) || ids.length === 0) {
-            return res.status(400).json({ error: 'Vui lòng cung cấp ít nhất một ID để xóa.' });
+            return res.status(400).json({ error: 'Vui lòng cung cấp ít nhất một ID phiếu nhập để xóa.' });
         }
-        // Sử dụng PhieuNhapKhoEntry model để xóa dữ liệu từ collection 'PhieuNhapKho'
         const result = await PhieuNhapKhoEntry.deleteMany({ _id: { $in: ids } });
         res.status(200).json({ message: `Đã xóa ${result.deletedCount} phiếu nhập hàng từ PhieuNhapKho.`, deletedCount: result.deletedCount });
     } catch (err) {
-        console.error('Lỗi khi xóa phiếu nhập hàng từ PhieuNhapKho:', err);
-        res.status(500).json({ error: 'Không thể xóa phiếu nhập hàng từ PhieuNhapKho.' });
+        console.error('Lỗi khi xóa phiếu nhập hàng:', err);
+        res.status(500).json({ error: 'Không thể xóa phiếu nhập hàng.' });
+    }
+});
+
+// API MỚI: Xóa một món hàng cụ thể khỏi một phiếu nhập
+app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
+    try {
+        const { receiptId, itemId } = req.body;
+
+        if (!receiptId || !itemId) {
+            return res.status(400).json({ error: 'Vui lòng cung cấp ID phiếu nhập và ID món hàng để xóa.' });
+        }
+
+        const receipt = await PhieuNhapKhoEntry.findById(receiptId);
+
+        if (!receipt) {
+            return res.status(404).json({ error: 'Không tìm thấy phiếu nhập.' });
+        }
+
+        // Tìm món hàng cần xóa và tính toán lại tổng tiền
+        let itemRemovedAmount = 0;
+        const initialItemCount = receipt.items.length;
+
+        // Sử dụng $pull để xóa subdocument theo _id của nó
+        receipt.items.pull(itemId);
+
+        if (receipt.items.length === initialItemCount) {
+             // If item count didn't change, it means the item was not found.
+             return res.status(404).json({ error: 'Không tìm thấy món hàng trong phiếu nhập này.' });
+        }
+
+        // Cập nhật lại tổng tiền của phiếu nhập
+        receipt.tongtien = receipt.items.reduce((sum, item) => sum + item.thanhtien, 0);
+
+        await receipt.save();
+
+        res.status(200).json({ message: 'Đã xóa món hàng thành công và cập nhật phiếu nhập.', receipt });
+    } catch (err) {
+        console.error('Lỗi khi xóa món hàng khỏi phiếu nhập:', err);
+        res.status(500).json({ error: 'Không thể xóa món hàng khỏi phiếu nhập.' });
     }
 });
 
