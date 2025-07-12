@@ -52,7 +52,7 @@ function removeDiacritics(str) {
   return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
 }
 
-/*function requireLogin(req, res, next) {
+function requireLogin(req, res, next) {
   if (!req.session.user) return res.redirect('/index.html');
   res.set('Cache-Control', 'no-store');
   next();
@@ -65,8 +65,8 @@ app.get('/api/congno', requireLogin, async (req, res) => {
     console.error(err);
     res.status(500).json([]);
   }
-});*/
-function requireLogin(req, res, next) {
+});
+/*function requireLogin(req, res, next) {
   if (req.session && req.session.user) {
     res.set('Cache-Control', 'no-store');
     return next();
@@ -79,7 +79,8 @@ function requireLogin(req, res, next) {
 
   // Nếu truy cập qua trình duyệt bình thường
   res.redirect('/index.html');
-}// ======= SCHEMA NHẬP HÀNG =======
+}*/
+// ======= SCHEMA NHẬP HÀNG =======
 const itemSchema = new mongoose.Schema({
   tenhang:   { type: String, required: true },
   dvt:       { type: String, required: true },
