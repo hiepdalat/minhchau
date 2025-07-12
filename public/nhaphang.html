@@ -112,6 +112,9 @@
                     <button id="searchBtn" class="w-full py-2 px-4 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
                         <i class="fas fa-search mr-2"></i>Tìm
                     </button>
+                    <button id="viewDetailsBtn" class="w-full py-2 px-4 rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200" disabled>
+                        <i class="fas fa-eye mr-2"></i>Xem chi tiết phiếu nhập
+                    </button>
                     <button id="deleteSelectedBtn" class="w-full py-2 px-4 rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200">
                         <i class="fas fa-trash-alt mr-2"></i>Xóa đã chọn
                     </button>
@@ -154,6 +157,37 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center">
             <p id="messageText" class="mb-4 text-lg"></p>
             <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
+        </div>
+    </div>
+
+    <!-- Receipt Details Modal -->
+    <div id="receiptDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-4xl w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Chi tiết phiếu nhập</h3>
+            <div class="mb-4">
+                <p><strong>Đại lý:</strong> <span id="detailDailyName"></span></p>
+                <p><strong>Ngày nhập:</strong> <span id="detailReceiptDate"></span></p>
+                <p><strong>Tổng tiền phiếu:</strong> <span id="detailTotalAmount"></span></p>
+            </div>
+            <div class="table-wrapper mb-4">
+                <table class="min-w-full bg-gray-700 rounded-lg overflow-hidden">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tên hàng</th>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">ĐVT</th>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">SL</th>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đơn giá</th>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">CK(%)</th>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">G-Nhập</th>
+                            <th class="py-2 px-4 bg-gray-600 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailItemsBody" class="divide-y divide-gray-600">
+                        <!-- Detailed items will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <button id="closeDetailsModalBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
         </div>
     </div>
 
