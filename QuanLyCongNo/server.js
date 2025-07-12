@@ -241,6 +241,22 @@ app.get('/api/nhaphang', requireLogin, async (req, res) => {
     }
 });
 
+// API MỚI: Lấy một phiếu nhập cụ thể theo ID
+app.get('/api/nhaphang/:id', requireLogin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const receipt = await PhieuNhapKhoEntry.findById(id);
+        if (!receipt) {
+            return res.status(404).json({ error: 'Không tìm thấy phiếu nhập.' });
+        }
+        res.json(receipt);
+    } catch (err) {
+        console.error('Lỗi khi lấy chi tiết phiếu nhập:', err);
+        res.status(500).json({ error: 'Không thể lấy chi tiết phiếu nhập.' });
+    }
+});
+
+
 // API để xóa TOÀN BỘ phiếu nhập (dựa trên _id của phiếu)
 app.delete('/api/nhaphang', requireLogin, async (req, res) => {
     try {
@@ -256,7 +272,7 @@ app.delete('/api/nhaphang', requireLogin, async (req, res) => {
     }
 });
 
-// API MỚI: Xóa một món hàng cụ thể khỏi một phiếu nhập
+// API để xóa một món hàng cụ thể khỏi một phiếu nhập
 app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
     try {
         const { receiptId, itemId } = req.body;
@@ -271,8 +287,6 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
             return res.status(404).json({ error: 'Không tìm thấy phiếu nhập.' });
         }
 
-        // Tìm món hàng cần xóa và tính toán lại tổng tiền
-        let itemRemovedAmount = 0;
         const initialItemCount = receipt.items.length;
 
         // Sử dụng $pull để xóa subdocument theo _id của nó
@@ -294,6 +308,7 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
         res.status(500).json({ error: 'Không thể xóa món hàng khỏi phiếu nhập.' });
     }
 });
+
 
 
 // ======= API SẢN PHẨM (cho bán hàng) =======
