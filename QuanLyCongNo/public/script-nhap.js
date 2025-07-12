@@ -245,32 +245,42 @@ document.getElementById("btnDeleteSelected").addEventListener("click", async () 
 
       html += `<h2>🧾 PHIẾU NHẬP HÀNG</h2><p><b>Ngày:</b> ${ngay}</p>`;
 
-      data.forEach((r) => {
-        html += `<p><b>Đại lý:</b> ${r.daily}</p>
-          <table>
-            <thead><tr>
-              <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
-              <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
-            </tr></thead><tbody>`;
+      // Gom các phiếu theo đại lý
+const grouped = {};
+data.forEach(r => {
+  if (!grouped[r.daily]) {
+    grouped[r.daily] = { items: [], tongtien: 0 };
+  }
+  grouped[r.daily].items.push(...r.items);
+  grouped[r.daily].tongtien += r.tongtien;
+});
 
-        r.items.forEach((item, idx) => {
-          html += `<tr>
-            <td>${idx + 1}</td>
-            <td>${item.tenhang}</td>
-            <td>${item.dvt}</td>
-            <td>${item.soluong}</td>
-            <td>${Number(item.dongia).toLocaleString()}</td>
-            <td>${item.ck}%</td>
-            <td>${Number(item.gianhap).toLocaleString()}</td>
-            <td>${Number(item.thanhtien).toLocaleString()}</td>
-          </tr>`;
-        });
+Object.entries(grouped).forEach(([daily, { items, tongtien }]) => {
+  html += `<p><b>Đại lý:</b> ${daily}</p>
+    <table>
+      <thead><tr>
+        <th>STT</th><th>Tên hàng</th><th>ĐVT</th><th>SL</th><th>Đơn giá</th>
+        <th>CK</th><th>Giá nhập</th><th>Thành tiền</th>
+      </tr></thead><tbody>`;
 
-        html += `<tr>
-          <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
-          <td><b>${Number(r.tongtien).toLocaleString()}</b></td>
-        </tr></tbody></table>`;
-      });
+  items.forEach((item, idx) => {
+    html += `<tr>
+      <td>${idx + 1}</td>
+      <td>${item.tenhang}</td>
+      <td>${item.dvt}</td>
+      <td>${item.soluong}</td>
+      <td>${Number(item.dongia).toLocaleString()}</td>
+      <td>${item.ck}%</td>
+      <td>${Number(item.gianhap).toLocaleString()}</td>
+      <td>${Number(item.thanhtien).toLocaleString()}</td>
+    </tr>`;
+  });
+
+  html += `<tr>
+    <td colspan="7" style="text-align:right;"><b>Tổng cộng:</b></td>
+    <td><b>${Number(tongtien).toLocaleString()}</b></td>
+  </tr></tbody></table>`;
+});
 
       html += `<p style="text-align:right;">Người lập phiếu: <i>(ký tên)</i></p></body></html>`;
 
