@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
       data.forEach(item => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><input type="checkbox" class="row-check"></td>
+          <td><input type="checkbox" class="row-check" data-id="${item._id}"></td>
           <td>${item.ngay}</td>
           <td>${item.tenhang}</td>
           <td>${item.dvt}</td>
@@ -183,8 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const tenHangList = rows.map(row => row.cells[2]?.textContent || "mặt hàng").join(", ");
-    const ids = rows.map(row => row.dataset.id).filter(Boolean);
+   const ids = rows.map(row => row.querySelector(".row-check")?.dataset.id).filter(Boolean);
+const tenHangList = rows.map(row => row.cells[2]?.textContent || "mặt hàng").join(", ");
 
     if (!ids.length) {
       Swal.fire("Lỗi", "Không lấy được ID dòng cần xóa", "error");
