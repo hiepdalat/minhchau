@@ -99,6 +99,10 @@ const receiptSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const StockReceipt = mongoose.model('StockReceipt', receiptSchema);
+// === MODEL MỚI CHO COLLECTION 'PhieuNhapKho' ===
+// Model này sẽ được sử dụng cho trang nhaphang.html
+const PhieuNhapKhoEntry = mongoose.model('PhieuNhapKhoEntry', receiptSchema, 'PhieuNhapKho');
+
 
 // ======= SCHEMA KHO HÀNG =======
 const productSchema = new mongoose.Schema({
@@ -132,8 +136,8 @@ app.get('/congno', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'congno.html'));
 });
 
-app.get('/khohang', requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'khohang.html'));
+app.get('/nhaphang', requireLogin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'nhaphang.html'));
 });
 
 app.get('/banhang', requireLogin, (req, res) => {
@@ -202,158 +206,69 @@ app.post('/thanhtoan', requireLogin, async (req, res) => {
 });
 
 // ======= API NHẬP HÀNG =======
-
-app.post('/api/stock/receive', requireLogin, async (req, res) => {
-  try {
-    const { supplier, date, items } = req.body;
-    if (!supplier || !date || !items?.length) return res.status(400).json({ error: 'Thiếu dữ liệu' });
-
-    const mapped = items.map((it) => {
-      const giaNhap = it.price * (1 - it.discount / 100);
-      const thanhTien = giaNhap * it.qty;
-      return {
-         _id: new mongoose.Types.ObjectId(),
-        tenhang: it.product,
-        dvt: it.unit,
-        soluong: it.qty,
-        dongia: it.price,
-        ck: it.discount,
-        gianhap: giaNhap,
-        thanhtien: thanhTien
-      };
-    });
-    const tongtien = mapped.reduce((s, x) => s + x.thanhtien, 0);
-    const receipt = await StockReceipt.create({ ngay: new Date(date), daily: supplier, items: mapped, tongtien });
-    res.json({ id: receipt._id });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-app.get('/api/stock/search-daily', requireLogin, async (req, res) => {
-  try {
-    const kw = removeDiacritics(req.query.ten || '');
-    const thang = req.query.thang; // "2025-07"
-
-    if (!kw || !thang) {
-      return res.status(400).json({ error: "Thiếu tên hoặc tháng" });
-    }
-
-    const startDate = new Date(thang + "-01");
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(0); // ngày cuối tháng
-
-    const all = await StockReceipt.find({
-      ngay: { $gte: startDate, $lte: endDate }
-    });
-
-    const matched = all.filter(r => removeDiacritics(r.daily).includes(kw));
-
-    let result = [];
-    matched.forEach(r => {
-      r.items.forEach(item => {
-        result.push({
-          _id: item._id,
-          ngay: r.ngay.toISOString().split('T')[0],
-          daily: r.daily,
-          tenhang: item.tenhang,
-          dvt: item.dvt,
-          soluong: item.soluong,
-          dongia: item.dongia,
-          ck: item.ck,
-          gianhap: item.gianhap,
-          thanhtien: item.thanhtien
+// ======== API Nhập Hàng (SỬ DỤNG MODEL MỚI: PhieuNhapKhoEntry) =======
+app.post('/api/nhaphang', requireLogin, async (req, res) => {
+    try {
+        const { ngay, daily, items, tongtien } = req.body;
+        // Sử dụng PhieuNhapKhoEntry model để lưu vào collection 'PhieuNhapKho'
+        const newReceipt = new PhieuNhapKhoEntry({
+            ngay: new Date(ngay),
+            daily,
+            items,
+            tongtien
         });
-      });
-    });
-
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Lỗi server' });
-  }
-});
-app.get('/api/stock/search-supplier', requireLogin, async (req, res) => {
-  try {
-    const kw = removeDiacritics(req.query.ten || '');
-    const receipts = await StockReceipt.find();
-    const uniqueSuppliers = Array.from(new Set(
-      receipts
-        .map(r => ({ ten: r.daily, ten_khongdau: removeDiacritics(r.daily) }))
-        .filter(s => s.ten_khongdau.includes(kw))
-        .map(s => s.ten)
-    ));
-    res.json(uniqueSuppliers.map(ten => ({ ten })));
-  } catch (err) {
-    console.error("Lỗi tìm đại lý nhập hàng:", err);
-    res.status(500).json([]);
-  }
-});
-app.get('/api/stock/receipt-by-date', requireLogin, async (req, res) => {
-  try {
-    const { ngay } = req.query;
-    if (!ngay) return res.status(400).json({ error: 'Thiếu tham số ngày' });
-
-    const start = new Date(ngay);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(ngay);
-    end.setHours(23, 59, 59, 999);
-
-    const receipts = await StockReceipt.find({ ngay: { $gte: start, $lte: end } });
-    res.json(receipts);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Lỗi server' });
-  }
-});
-app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
-  const id = req.query.id;
-  if (!id) return res.status(400).json({ error: "Thiếu ID" });
-
-  try {
-    const objectId = new mongoose.Types.ObjectId(id);
-    const result = await StockReceipt.updateOne(
-      { "items._id": objectId },
-      { $pull: { items: { _id: objectId } } }
-    );
-
-    if (result.modifiedCount === 0) return res.status(404).json({ error: "Không tìm thấy dòng để xóa" });
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Lỗi khi xóa dòng:", err);
-    res.status(500).json({ error: "Lỗi server" });
-  }
-});
-app.post("/api/stock/delete-multiple-rows", requireLogin, async (req, res) => {
-  try {
-    const { ids } = req.body;
-
-    if (!Array.isArray(ids) || ids.length === 0) {
-      return res.status(400).json({ error: "Thiếu danh sách ID" });
+        await newReceipt.save();
+        res.status(201).json({ message: 'Phiếu nhập hàng đã được lưu thành công vào PhieuNhapKho!', receipt: newReceipt });
+    } catch (err) {
+        console.error('Lỗi khi lưu phiếu nhập hàng vào PhieuNhapKho:', err);
+        res.status(500).json({ error: 'Không thể lưu phiếu nhập hàng vào PhieuNhapKho.' });
     }
-
-    // Chỉ nhận ID hợp lệ (24 ký tự hex)
-    const validIds = ids
-      .filter(id => typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id))
-      .map(id => new mongoose.Types.ObjectId(id));
-
-    if (validIds.length === 0) {
-      return res.status(400).json({ error: "Không có ID nào hợp lệ để xóa" });
-    }
-
-    const result = await StockReceipt.updateMany(
-      { "items._id": { $in: validIds } },
-      { $pull: { items: { _id: { $in: validIds } } } }
-    );
-
-    res.json({ success: true, deleted: result.modifiedCount });
-  } catch (err) {
-    console.error("Lỗi khi xóa nhiều dòng:", err);
-    res.status(500).json({ error: "Lỗi server" });
-  }
 });
+
+app.get('/api/nhaphang', requireLogin, async (req, res) => {
+    try {
+        const { daily, month } = req.query;
+        let query = {};
+
+        if (daily) {
+            query.daily = new RegExp(daily, 'i');
+        }
+
+        if (month) {
+            const [year, monthNum] = month.split('-');
+            const startDate = new Date(year, parseInt(monthNum) - 1, 1);
+            const endDate = new Date(year, parseInt(monthNum), 0);
+
+            query.ngay = {
+                $gte: startDate,
+                $lte: endDate
+            };
+        }
+        // Sử dụng PhieuNhapKhoEntry model để lấy dữ liệu từ collection 'PhieuNhapKho'
+        const receipts = await PhieuNhapKhoEntry.find(query).sort({ ngay: -1 });
+        res.json(receipts);
+    } catch (err) {
+        console.error('Lỗi khi lấy danh sách nhập hàng từ PhieuNhapKho:', err);
+        res.status(500).json({ error: 'Không thể lấy danh sách nhập hàng từ PhieuNhapKho.' });
+    }
+});
+
+app.delete('/api/nhaphang', requireLogin, async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'Vui lòng cung cấp ít nhất một ID để xóa.' });
+        }
+        // Sử dụng PhieuNhapKhoEntry model để xóa dữ liệu từ collection 'PhieuNhapKho'
+        const result = await PhieuNhapKhoEntry.deleteMany({ _id: { $in: ids } });
+        res.status(200).json({ message: `Đã xóa ${result.deletedCount} phiếu nhập hàng từ PhieuNhapKho.`, deletedCount: result.deletedCount });
+    } catch (err) {
+        console.error('Lỗi khi xóa phiếu nhập hàng từ PhieuNhapKho:', err);
+        res.status(500).json({ error: 'Không thể xóa phiếu nhập hàng từ PhieuNhapKho.' });
+    }
+});
+
+
 // ======= API SẢN PHẨM (cho bán hàng) =======
 app.get('/api/products/stock', requireLogin, async (req, res) => {
   try {
