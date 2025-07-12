@@ -200,7 +200,8 @@ document.addEventListener('DOMContentLoaded', async () => {
      * Fetches and renders saved receipts as a flattened list of items.
      */
     async function fetchAndRenderReceipts() {
-        receiptsBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
+        // Cập nhật colspan cho thông báo tải
+        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
         const dailySearch = searchDailyNameInput.value.trim();
         const monthSearch = searchMonthInput.value; // YYYY-MM format
 
@@ -221,7 +222,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let grandTotal = 0;
 
                 if (receipts.length === 0) {
-                    receiptsBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
+                    // Cập nhật colspan cho thông báo không tìm thấy
+                    receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
                     grandTotalAllItemsSpan.textContent = formatCurrency(0);
                     return;
                 }
@@ -253,6 +255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <td class="py-2 px-4 border-b border-gray-700">${item.ck}%</td>
                             <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.gianhap)}</td>
                             <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.thanhtien)}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(receipt.tongtien)}</td>
                         `;
                         grandTotal += item.thanhtien;
                     });
@@ -264,12 +267,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                receiptsBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-400">Lỗi: ${errorData.error || response.statusText}</td></tr>`;
+                // Cập nhật colspan cho thông báo lỗi
+                receiptsBody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-red-400">Lỗi: ${errorData.error || response.statusText}</td></tr>`;
                 grandTotalAllItemsSpan.textContent = formatCurrency(0);
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            receiptsBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-400">Lỗi kết nối đến server.</td></tr>`;
+            // Cập nhật colspan cho thông báo lỗi kết nối
+            receiptsBody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-red-400">Lỗi kết nối đến server.</td></tr>`;
             grandTotalAllItemsSpan.textContent = formatCurrency(0);
         }
     }
@@ -342,8 +347,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         selectAllReceiptsCheckbox.checked = false; // Uncheck select all
         await fetchAndRenderReceipts(); // Refresh the list
     });
-
-    // Removed the 'view-details-btn' logic as items are now displayed directly.
 
     // --- Date Ticker Logic (from existing style.css) ---
     const dateTicker = document.getElementById('dateTicker');
