@@ -1,102 +1,150 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Quản Lý Nhập Hàng</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Nhập Hàng</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body data-page="nhaphang">
-  <header class="header-container">
-    <div class="header-top">
-      <h2>Nhập Hàng Vào Kho</h2>
-      <button id="btnLogout" class="btn btn-logout">Đăng xuất</button>
+<body class="congno-body">
+    <div class="header-container">
+        <div class="header-top">
+            <h2>Nhập Hàng Vào Kho</h2>
+            <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+        </div>
+        <div id="dateTicker">
+            <div id="tickerWrap"></div>
+        </div>
     </div>
-  </header>
 
-  <!-- Thông tin chung -->
-  <div class="card">
-    <input type="text" id="supplier" placeholder="Tên đại lý">
-    <input type="date" id="date">
-  </div>
+    <div class="container p-4">
+        <!-- Input Section for New Receipt -->
+        <div class="card mb-4">
+            <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="dailyName" class="block text-sm font-medium text-gray-300">Tên đại lý:</label>
+                    <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
+                </div>
+                <div>
+                    <label for="receiptDate" class="block text-sm font-medium text-gray-300">Ngày:</label>
+                    <input type="date" id="receiptDate" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
+                </div>
+            </div>
 
-  <!-- Thêm mặt hàng -->
-  <div class="card">
-    <input type="text" id="product" placeholder="Tên hàng">
-    <input type="text" id="unit" placeholder="Đơn vị tính (ví dụ: cái, kg, hộp)">
-    <label for="qty">Số lượng</label>
-<input type="number" id="qty" value="1" min="1">
+            <h3 class="text-lg font-bold mb-2">Thêm mặt hàng</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+                <div>
+                    <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
+                    <input type="text" id="itemName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
+                </div>
+                <div>
+                    <label for="itemUnit" class="block text-sm font-medium text-gray-300">Đơn vị tính:</label>
+                    <input type="text" id="itemUnit" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
+                </div>
+                <div>
+                    <label for="itemQuantity" class="block text-sm font-medium text-gray-300">Số lượng:</label>
+                    <input type="number" id="itemQuantity" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
+                </div>
+                <div>
+                    <label for="itemPrice" class="block text-sm font-medium text-gray-300">Đơn giá:</label>
+                    <input type="number" id="itemPrice" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
+                </div>
+                <div>
+                    <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
+                    <input type="number" id="itemDiscount" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
+                </div>
+                <div class="flex items-end">
+                    <button id="addItemBtn" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>Thêm món
+                    </button>
+                </div>
+            </div>
 
-<label for="price">Đơn giá</label>
-<input type="number" id="price" value="0" min="0">
+            <!-- Table for Current Items in Receipt -->
+            <div class="table-wrapper mb-4">
+                <table id="currentItemsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tên hàng</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">ĐVT</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">SL</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đơn giá</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">CK(%)</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">G-Nhập</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Thành tiền</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="currentItemsBody" class="divide-y divide-gray-700">
+                        <!-- Items will be added here by JavaScript -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" class="py-2 px-4 text-right font-bold text-gray-300">Tổng tiền:</td>
+                            <td id="totalAmount" class="py-2 px-4 text-right font-bold text-green-400">0</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <button id="saveReceiptBtn" class="w-full py-2 px-4 rounded-md bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
+                Lưu phiếu nhập
+            </button>
+        </div>
 
-<label for="discount">Chiết khấu (%)</label>
-<input type="number" id="discount" value="0" min="0" max="100">
-    <button id="addItem" class="btn btn-primary">➕ Thêm món</button>
-    
-  </div>
+        <!-- Search and Display Section -->
+        <div class="card">
+            <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="searchDailyName" class="block text-sm font-medium text-gray-300">Tìm theo tên đại lý:</label>
+                    <input type="text" id="searchDailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
+                </div>
+                <div>
+                    <label for="searchMonth" class="block text-sm font-medium text-gray-300">Tháng:</label>
+                    <input type="month" id="searchMonth" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
+                </div>
+                <div class="flex items-end space-x-2">
+                    <button id="searchBtn" class="w-full py-2 px-4 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
+                        <i class="fas fa-search mr-2"></i>Tìm
+                    </button>
+                    <button id="deleteSelectedBtn" class="w-full py-2 px-4 rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200">
+                        <i class="fas fa-trash-alt mr-2"></i>Xóa đã chọn
+                    </button>
+                </div>
+            </div>
 
-  <!-- Danh sách tạm -->
-  <div class="card table-wrapper" id="khungDanhSachTam" style="display: none;">
-    <table id="itemsTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Tên hàng</th>
-          <th>ĐVT</th>
-          <th>SL</th>
-          <th>Đơn giá</th>
-          <th>CK (%)</th>
-          <th>Giá nhập</th>
-          <th>Thành tiền</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr id="noData"><td colspan="9">Chưa có mặt hàng</td></tr>
-      </tbody>
-      <tfoot>
-        <tr><td colspan="7" style="text-align:right">Tổng tiền:</td><td id="grandTotal">0</td><td></td></tr>
-      </tfoot>
-    </table>
-    <div style="text-align:left;">
-    <button id="saveBtn" class="btn btn-success">💾 Lưu phiếu nhập</button>
-  </div>
-  </div>
+            <div class="table-wrapper">
+                <table id="receiptsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider"><input type="checkbox" id="selectAllReceipts"></th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Ngày</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đại lý</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tổng tiền</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody id="receiptsBody" class="divide-y divide-gray-700">
+                        <!-- Saved receipts will be loaded here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-  <!-- Vùng tìm kiếm -->
-  <div class="card">
-    <label for="searchSupplier">Tìm theo tên đại lý:</label>
-    <input id="searchSupplier" placeholder="Nhập tên đại lý">
-    <input type="month" id="searchMonth" value="">
-    <button id="btnSearchSupplier">🔍 Tìm</button>
-    <button id="btnDeleteSelected" class="btn btn-danger">🗑️ Xóa đã chọn</button>
-   
-  </div>
-<div class="card table-wrapper" id="khungKetQua" style="display: none;">
-  <h3>📦 Mặt hàng đã nhập từ đại lý</h3>
-   
-    <table>
-      <thead>
-        <tr>
-          <th>✓</th>
-          <th>Ngày</th>
-          <th>Tên hàng</th>
-          <th>ĐVT</th>
-          <th>SL</th>
-          <th>Đơn giá</th>
-          <th>CK (%)</th>
-          <th>G-Nhập</th>
-          <th>Thành tiền</th>
-        </tr>
-      </thead>
-      <tbody id="bangKetQua"></tbody>
-    </table>
-   <button id="detailBtn" class="btn btn-secondary">📋 Chi tiết đơn hàng</button>
-</div>
-  <div id="suggestions" class="suggest-wrap"></div>
-  <script src="/script-nhap.js" defer></script>
+    <!-- Message Box/Modal for alerts -->
+    <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center">
+            <p id="messageText" class="mb-4 text-lg"></p>
+            <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
+        </div>
+    </div>
+
+    <script src="script-nhap.js"></script>
 </body>
 </html>
