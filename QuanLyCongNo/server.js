@@ -298,7 +298,7 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
         }
 
         // Cập nhật lại tổng tiền của phiếu nhập
-        receipt.tongtien = receipt.items.reduce((sum, item) => sum + item.thanhtien, 0);
+        receipt.tongtien = receipt.items.reduce((sum, item) => item.thanhtien + sum, 0); // Corrected sum calculation
 
         await receipt.save();
 
@@ -308,6 +308,7 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
         res.status(500).json({ error: 'Không thể xóa món hàng khỏi phiếu nhập.' });
     }
 });
+
 
 
 
