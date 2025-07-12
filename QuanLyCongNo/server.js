@@ -312,17 +312,24 @@ app.delete('/api/stock/delete-row', requireLogin, async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 });
-app.post('/api/stock/delete-multiple-rows', requireLogin, async (req, res) => {
-  const ids = req.body.ids;
-  if (!Array.isArray(ids) || ids.length === 0) {
-    return res.status(400).json({ error: "Thiếu danh sách ID để xóa" });
-  }
-
+app.post("/api/stock/delete-multiple-rows", requireLogin, async (req, res) => {
   try {
-    const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
-    const result = await StockReceipt.updateMany(
-      { "items._id": { $in: objectIds } },
-      { $pull: { items: { _id: { $in: objectIds } } } }
+    const { ids } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "Thiếu danh sách ID" });
+    }
+
+    // Lọc các ID hợp lệ
+    const validIds = ids.filter(id => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id))
+                        .map(id => new ObjectId(id));
+
+    if (validIds.length === 0) {
+      return res.status(400).json({ error: "Không có ID nào hợp lệ để xóa" });
+    }
+
+    const result = await db.collection("phieunhap").updateMany(
+      { "items._id": { $in: validIds } },
+      { $pull: { items: { _id: { $in: validIds } } } }
     );
 
     res.json({ success: true, deleted: result.modifiedCount });
@@ -331,7 +338,6 @@ app.post('/api/stock/delete-multiple-rows', requireLogin, async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 });
-
 // ======= API SẢN PHẨM (cho bán hàng) =======
 app.get('/api/products/stock', requireLogin, async (req, res) => {
   try {
