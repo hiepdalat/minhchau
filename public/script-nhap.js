@@ -9,14 +9,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const itemDiscountInput = document.getElementById('itemDiscount');
     const addItemBtn = document.getElementById('addItemBtn');
     const currentItemsBody = document.getElementById('currentItemsBody');
-    const totalAmountSpan = document.getElementById('totalAmount');
+    const totalAmountSpan = document.getElementById('totalAmount'); // Tổng tiền cho phiếu đang tạo
     const saveReceiptBtn = document.getElementById('saveReceiptBtn');
     const searchDailyNameInput = document.getElementById('searchDailyName');
     const searchMonthInput = document.getElementById('searchMonth');
     const searchBtn = document.getElementById('searchBtn');
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
-    const receiptsBody = document.getElementById('receiptsBody');
+    const receiptsBody = document.getElementById('receiptsBody'); // Body của bảng "Mặt hàng đã nhập từ đại lý"
     const selectAllReceiptsCheckbox = document.getElementById('selectAllReceipts');
+    const grandTotalAllItemsSpan = document.getElementById('grandTotalAllItems'); // Tổng tiền tất cả mặt hàng hiển thị
+
     const messageBox = document.getElementById('messageBox');
     const messageText = document.getElementById('messageText');
     const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
@@ -195,10 +197,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     /**
-     * Fetches and renders saved receipts.
+     * Fetches and renders saved receipts as a flattened list of items.
      */
     async function fetchAndRenderReceipts() {
-        receiptsBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
+        receiptsBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
         const dailySearch = searchDailyNameInput.value.trim();
         const monthSearch = searchMonthInput.value; // YYYY-MM format
 
@@ -216,17 +218,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 const receipts = await response.json();
                 receiptsBody.innerHTML = ''; // Clear loading message
+                let grandTotal = 0;
 
                 if (receipts.length === 0) {
-                    receiptsBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
+                    receiptsBody.innerHTML = '<tr><td colspan="10" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
+                    grandTotalAllItemsSpan.textContent = formatCurrency(0);
                     return;
                 }
 
                 receipts.forEach(receipt => {
-                    const row = receiptsBody.insertRow();
-                    row.dataset.id = receipt._id; // Store receipt ID for deletion
-
-                    // Format date to dd/mm/yyyy
                     const receiptDate = new Date(receipt.ngay);
                     const formattedDate = receiptDate.toLocaleDateString('vi-VN', {
                         day: '2-digit',
@@ -234,26 +234,43 @@ document.addEventListener('DOMContentLoaded', async () => {
                         year: 'numeric'
                     });
 
-                    row.innerHTML = `
-                        <td class="py-2 px-4 border-b border-gray-700 text-center"><input type="checkbox" class="receipt-checkbox" data-id="${receipt._id}"></td>
-                        <td class="py-2 px-4 border-b border-gray-700">${formattedDate}</td>
-                        <td class="py-2 px-4 border-b border-gray-700">${receipt.daily}</td>
-                        <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(receipt.tongtien)}</td>
-                        <td class="py-2 px-4 border-b border-gray-700">
-                            <button class="bg-indigo-500 hover:bg-indigo-700 text-white py-1 px-2 rounded text-xs view-details-btn" data-id="${receipt._id}">Xem</button>
-                        </td>
-                    `;
+                    receipt.items.forEach((item) => { // item now has an _id
+                        const row = receiptsBody.insertRow();
+                        // Store both receipt ID and item ID for deletion
+                        row.dataset.receiptId = receipt._id;
+                        row.dataset.itemId = item._id;
+
+                        row.innerHTML = `
+                            <td class="py-2 px-4 border-b border-gray-700 text-center">
+                                <input type="checkbox" class="item-checkbox" data-receipt-id="${receipt._id}" data-item-id="${item._id}">
+                            </td>
+                            <td class="py-2 px-4 border-b border-gray-700">${formattedDate}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${receipt.daily}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${item.tenhang}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${item.dvt}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${item.soluong}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.dongia)}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${item.ck}%</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.gianhap)}</td>
+                            <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.thanhtien)}</td>
+                        `;
+                        grandTotal += item.thanhtien;
+                    });
                 });
+                grandTotalAllItemsSpan.textContent = formatCurrency(grandTotal);
+
             } else if (response.status === 401) {
                 showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                receiptsBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-400">Lỗi: ${errorData.error || response.statusText}</td></tr>`;
+                receiptsBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-400">Lỗi: ${errorData.error || response.statusText}</td></tr>`;
+                grandTotalAllItemsSpan.textContent = formatCurrency(0);
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            receiptsBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-red-400">Lỗi kết nối đến server.</td></tr>`;
+            receiptsBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-400">Lỗi kết nối đến server.</td></tr>`;
+            grandTotalAllItemsSpan.textContent = formatCurrency(0);
         }
     }
 
@@ -262,65 +279,71 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Event listener for select all checkbox
     selectAllReceiptsCheckbox.addEventListener('change', (event) => {
-        document.querySelectorAll('.receipt-checkbox').forEach(checkbox => {
+        // Select all individual item checkboxes
+        document.querySelectorAll('.item-checkbox').forEach(checkbox => {
             checkbox.checked = event.target.checked;
         });
     });
 
+
     /**
-     * Deletes selected receipts.
+     * Deletes selected items from receipts.
      */
     deleteSelectedBtn.addEventListener('click', async () => {
-        const selectedIds = Array.from(document.querySelectorAll('.receipt-checkbox:checked'))
-            .map(checkbox => checkbox.dataset.id);
-
-        if (selectedIds.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một phiếu nhập để xóa.');
-            return;
-        }
-
-        if (!confirm('Bạn có chắc chắn muốn xóa các phiếu nhập đã chọn?')) { // Using confirm for simplicity, but a custom modal is better
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/nhaphang', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ ids: selectedIds })
+        const selectedItemsToDelete = [];
+        document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+            selectedItemsToDelete.push({
+                receiptId: checkbox.dataset.receiptId,
+                itemId: checkbox.dataset.itemId
             });
+        });
 
-            if (response.ok) {
-                const result = await response.json();
-                showMessageBox(result.message);
-                selectAllReceiptsCheckbox.checked = false; // Uncheck select all
-                await fetchAndRenderReceipts(); // Refresh the list
-            } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-                setTimeout(() => window.location.href = '/index.html', 2000);
-            } else {
-                const errorData = await response.json();
-                showMessageBox(`Lỗi khi xóa phiếu nhập: ${errorData.error || response.statusText}`);
+        if (selectedItemsToDelete.length === 0) {
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.');
+            return;
+        }
+
+        if (!confirm('Bạn có chắc chắn muốn xóa các món hàng đã chọn?')) {
+            return;
+        }
+
+        let successCount = 0;
+        let failCount = 0;
+
+        // Process deletions sequentially to avoid overwhelming the server and handle errors per item
+        for (const itemInfo of selectedItemsToDelete) {
+            try {
+                const response = await fetch('/api/nhaphang/item', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(itemInfo)
+                });
+
+                if (response.ok) {
+                    successCount++;
+                } else if (response.status === 401) {
+                    showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    setTimeout(() => window.location.href = '/index.html', 2000);
+                    return; // Stop further processing
+                } else {
+                    failCount++;
+                    const errorData = await response.json();
+                    console.error(`Lỗi khi xóa món hàng ${itemInfo.itemId} từ phiếu ${itemInfo.receiptId}:`, errorData.error || response.statusText);
+                }
+            } catch (error) {
+                failCount++;
+                console.error(`Lỗi mạng hoặc server khi xóa món hàng ${itemInfo.itemId} từ phiếu ${itemInfo.receiptId}:`, error);
             }
-        } catch (error) {
-            console.error('Lỗi mạng hoặc server:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
         }
+
+        showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`);
+        selectAllReceiptsCheckbox.checked = false; // Uncheck select all
+        await fetchAndRenderReceipts(); // Refresh the list
     });
 
-    /**
-     * Handles viewing details of a receipt (placeholder for now).
-     */
-    receiptsBody.addEventListener('click', async (event) => {
-        if (event.target.classList.contains('view-details-btn')) {
-            const receiptId = event.target.dataset.id;
-            // In a real application, you would fetch details for this ID
-            // and display them in a modal or navigate to a detail page.
-            showMessageBox(`Xem chi tiết phiếu nhập ID: ${receiptId}\n(Chức năng này sẽ được phát triển thêm để hiển thị chi tiết các mặt hàng trong phiếu)`);
-        }
-    });
+    // Removed the 'view-details-btn' logic as items are now displayed directly.
 
     // --- Date Ticker Logic (from existing style.css) ---
     const dateTicker = document.getElementById('dateTicker');
