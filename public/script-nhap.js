@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
       data.forEach(item => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td><input type="checkbox" class="row-check" data-id="${item._id}"></td>
+          <td><input type="checkbox" class="row-check"></td>
           <td>${item.ngay}</td>
           <td>${item.tenhang}</td>
           <td>${item.dvt}</td>
