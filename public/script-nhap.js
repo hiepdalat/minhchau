@@ -175,8 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("btnDeleteSelected").addEventListener("click", async () => {
-    const rows = [...document.querySelectorAll("#bangKetQua tr")]
-      .filter(tr => tr.querySelector(".row-check")?.checked);
+    const rows = [...document.querySelectorAll("#bangKetQua .row-check:checked")]
+  .map(checkbox => checkbox.closest("tr"));
 
     if (rows.length === 0) {
       Swal.fire("Chưa chọn", "Vui lòng chọn ít nhất 1 dòng để xóa", "warning");
