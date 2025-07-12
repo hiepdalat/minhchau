@@ -122,11 +122,21 @@
                 <table id="receiptsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
                         <tr>
+                        <!--
                             <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider"><input type="checkbox" id="selectAllReceipts"></th>
                             <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Ngày</th>
                             <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đại lý</th>
                             <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tổng tiền</th>
                             <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Chi tiết</th>
+                        -->
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tên hàng</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">ĐVT</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">SL</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đơn giá</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">CK(%)</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">G-Nhập</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Thành tiền</th>
+                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Hành động</th>
                         </tr>
                     </thead>
                     <tbody id="receiptsBody" class="divide-y divide-gray-700">
@@ -141,7 +151,7 @@
     <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center">
             <p id="messageText" class="mb-4 text-lg"></p>
-            <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
+            <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">CHi Tiết Đơn Hàng</button>
         </div>
     </div>
 
