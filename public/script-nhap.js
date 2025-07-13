@@ -20,120 +20,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectAllReceiptsCheckbox = document.getElementById('selectAllReceipts');
     const grandTotalAllItemsSpan = document.getElementById('grandTotalAllItems'); // Tổng tiền tất cả mặt hàng hiển thị
 
-    const messageBox = document.getElementById('messageBox');
-    const messageText = document.getElementById('messageText');
-    const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
-    const messageBoxContent = messageBox.querySelector('.bg-gray-800'); // Lấy nội dung của modal
+    // const messageBox = document.getElementById('messageBox'); // Not needed with SweetAlert2
+    // const messageText = document.getElementById('messageText'); // Not needed with SweetAlert2
+    // const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn'); // Not needed with SweetAlert2
+    // const messageBoxContent = messageBox.querySelector('.bg-gray-800'); // Not needed with SweetAlert2
     const receiptsSectionCard = document.getElementById('receiptsSectionCard');
 
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
 
-    // --- Helper Functions ---
+    // --- Helper Functions (Now using SweetAlert2) ---
 
     /**
-     * Shows a custom message box.
-     * @param {string} message - The specific message to display (e.g., "Vui lòng nhập tên hàng.").
-     * @param {string} type - The type of message ('error', 'success', 'info').
-     * @param {boolean} isConfirmation - True if this is a confirmation dialog, false for simple message.
-     * @param {string} customTitle - Custom title for the message box (e.g., "Thiếu hoặc sai thông tin").
+     * Shows a SweetAlert2 message box.
+     * @param {string} title - The title of the message box.
+     * @param {string} text - The main text message.
+     * @param {string} icon - The icon type ('success', 'error', 'warning', 'info', 'question').
+     * @param {string} confirmButtonText - Text for the confirm button.
+     * @param {boolean} showCancelButton - Whether to show a cancel button.
+     * @param {string} cancelButtonText - Text for the cancel button.
+     * @returns {Promise<SweetAlertResult>} - SweetAlert2 result object.
      */
-    function showMessageBox(message, type = 'info', isConfirmation = false, customTitle = '') {
-        messageText.innerHTML = ''; // Clear previous content
-        messageBoxContent.className = 'bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center'; // Reset classes
-
-        let iconHtml = '';
-        let displayTitle = '';
-        let titleClass = '';
-        let messageClass = '';
-        let closeButtonText = 'Đóng'; // Default button text
-
-        switch (type) {
-            case 'error':
-                iconHtml = '<i class="fas fa-times-circle text-red-500 text-5xl mb-4"></i>'; // Larger red X
-                displayTitle = customTitle || 'Lỗi'; // Use customTitle if provided, else 'Lỗi'
-                titleClass = 'text-red-400 text-2xl font-bold mb-2'; // Bigger, bolder title
-                messageClass = 'text-lg text-gray-300'; // Specific message below title
-                closeButtonText = 'OK'; // For error, button text is OK
-                break;
-            case 'success':
-                iconHtml = '<i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>';
-                displayTitle = customTitle || 'Thành công';
-                titleClass = 'text-green-400 text-xl font-bold mb-2';
-                messageClass = 'text-lg text-gray-300';
-                closeButtonText = 'OK'; // For success, button text is OK
-                break;
-            case 'info':
-            default:
-                iconHtml = '<i class="fas fa-exclamation-circle text-yellow-500 text-3xl mb-2"></i>';
-                displayTitle = customTitle || 'Thông báo';
-                titleClass = 'text-yellow-400 text-xl font-bold mb-2';
-                messageClass = 'text-lg text-gray-300';
-                closeButtonText = 'Đóng'; // For info, button text is Đóng
-                break;
-        }
-
-        messageText.innerHTML = `
-            ${iconHtml}
-            <p class="${titleClass}">${displayTitle}</p>
-            <p class="${messageClass}">${message}</p>
-        `;
-        messageBox.classList.remove('hidden');
-
-        let confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
-        if (isConfirmation) {
-            if (!confirmBtn) {
-                confirmBtn = document.createElement('button');
-                confirmBtn.id = 'messageBoxConfirmBtn';
-                confirmBtn.textContent = 'Xác nhận';
-                confirmBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2 mt-4';
-                messageBox.querySelector('.bg-gray-800').appendChild(confirmBtn);
-            } else {
-                confirmBtn.classList.remove('hidden');
-            }
-            closeButtonText = 'Hủy'; // Change close button text to "Hủy" for confirmation
-            messageBoxCloseBtn.classList.remove('hidden');
-            messageBoxCloseBtn.classList.add('mt-4');
-        } else {
-            if (confirmBtn) confirmBtn.classList.add('hidden');
-            messageBoxCloseBtn.classList.remove('hidden');
-            messageBoxCloseBtn.classList.add('mt-4');
-        }
-        messageBoxCloseBtn.textContent = closeButtonText; // Apply button text
-    }
-
-    /**
-     * Shows a custom confirmation dialog.
-     * @param {string} message - The confirmation message.
-     * @returns {Promise<boolean>} - Resolves to true if confirmed, false otherwise.
-     */
-    function showConfirmationBox(message) {
-        return new Promise(resolve => {
-            showMessageBox(message, 'info', true, 'Xác nhận hành động'); // Custom title for confirmation
-
-            const confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
-            const handleConfirm = () => {
-                messageBox.classList.add('hidden');
-                confirmBtn.removeEventListener('click', handleConfirm);
-                messageBoxCloseBtn.removeEventListener('click', handleCancel);
-                resolve(true);
-            };
-
-            const handleCancel = () => {
-                messageBox.classList.add('hidden');
-                confirmBtn.removeEventListener('click', handleConfirm);
-                messageBoxCloseBtn.removeEventListener('click', handleCancel);
-                resolve(false);
-            };
-
-            confirmBtn.addEventListener('click', handleConfirm);
-            messageBoxCloseBtn.addEventListener('click', handleCancel);
+    async function showCustomAlert(title, text, icon, confirmButtonText = 'OK', showCancelButton = false, cancelButtonText = 'Hủy') {
+        return Swal.fire({
+            icon: icon,
+            title: title,
+            text: text,
+            confirmButtonText: confirmButtonText,
+            showCancelButton: showCancelButton,
+            cancelButtonText: cancelButtonText,
+            customClass: {
+                popup: 'bg-gray-800 text-white rounded-lg shadow-lg',
+                title: 'text-white',
+                content: 'text-gray-300',
+                confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded',
+                cancelButton: 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2'
+            },
+            buttonsStyling: false // Disable default styling to use customClass
         });
     }
-
-    // Event listener for message box close button (for simple messages)
-    messageBoxCloseBtn.addEventListener('click', () => {
-        messageBox.classList.add('hidden');
-    });
 
     /**
      * Formats a number as currency (Vietnamese Dong).
@@ -187,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     /**
      * Adds an item to the current receipt.
      */
-    addItemBtn.addEventListener('click', () => {
+    addItemBtn.addEventListener('click', async () => { // Made async to await Swal.fire
         const tenhang = itemNameInput.value.trim();
         const dvt = itemUnitInput.value.trim();
         const soluong = parseInt(itemQuantityInput.value);
@@ -196,23 +120,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR ADD ITEM BUTTON ---
         if (!tenhang) {
-            showMessageBox('Vui lòng nhập tên hàng.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên hàng.', 'error');
             return;
         }
         if (!dvt) {
-            showMessageBox('Vui lòng nhập đơn vị tính.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập đơn vị tính.', 'error');
             return;
         }
         if (isNaN(soluong) || soluong <= 0) {
-            showMessageBox('Số lượng phải là số và lớn hơn 0.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Số lượng phải là số và lớn hơn 0.', 'error');
             return;
         }
         if (isNaN(dongia) || dongia < 0) {
-            showMessageBox('Đơn giá phải là số và không âm.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Đơn giá phải là số và không âm.', 'error');
             return;
         }
         if (isNaN(ck) || ck < 0 || ck > 100) {
-            showMessageBox('Chiết khấu phải là số từ 0 đến 100.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Chiết khấu phải là số từ 0 đến 100.', 'error');
             return;
         }
         // --- END VALIDATION ---
@@ -260,15 +184,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR SAVE RECEIPT BUTTON ---
         if (!daily) {
-            showMessageBox('Vui lòng nhập tên đại lý.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên đại lý.', 'error');
             return;
         }
         if (!ngay) {
-            showMessageBox('Vui lòng chọn ngày nhập hàng.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn ngày nhập hàng.', 'error');
             return;
         }
         if (currentReceiptItems.length === 0) {
-            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error');
             return;
         }
         // --- END VALIDATION ---
@@ -290,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                showMessageBox('Phiếu nhập hàng đã được lưu thành công!', 'success');
+                await showCustomAlert('Thành công!', 'Phiếu nhập hàng đã được lưu thành công!', 'success');
                 // Clear form and current items
                 dailyNameInput.value = '';
                 receiptDateInput.value = new Date().toISOString().split('T')[0]; // Reset to current date
@@ -298,15 +222,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderCurrentItems();
                 // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị vẫn ẩn
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                showMessageBox(`Lỗi khi lưu phiếu nhập: ${errorData.error || response.statusText}`, 'error');
+                await showCustomAlert('Lỗi!', `Lỗi khi lưu phiếu nhập: ${errorData.error || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
+            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
 
@@ -320,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR SEARCH BUTTON ---
         if (!dailySearch && !monthSearch) {
-            showMessageBox('Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error');
             receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
             receiptsSectionCard.classList.add('hidden'); // Ẩn lại nếu không có tiêu chí
             return;
@@ -347,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 receiptsSectionCard.classList.remove('hidden');
 
                 if (receipts.length === 0) {
-                    showMessageBox('Không tìm thấy phiếu nhập nào phù hợp với tiêu chí tìm kiếm.', 'info'); // Thông báo khi không có kết quả
+                    await showCustomAlert('Thông báo!', 'Không tìm thấy phiếu nhập nào phù hợp với tiêu chí tìm kiếm.', 'info'); // Thông báo khi không có kết quả
                     receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
                     grandTotalAllItemsSpan.textContent = formatCurrency(0);
                     return;
@@ -389,17 +313,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 updateViewDetailsButtonState(); // Cập nhật trạng thái nút sau khi render
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                receiptsBody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-red-400">Lỗi: ${errorData.error || response.statusText}</td></tr>`;
-                grandTotalAllItemsSpan.textContent = formatCurrency(0);
+                await showCustomAlert('Lỗi!', `Lỗi khi tải chi tiết phiếu nhập: ${errorData.error || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            receiptsBody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-red-400">Lỗi kết nối đến server.</td></tr>`;
-            grandTotalAllItemsSpan.textContent = formatCurrency(0);
+            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     }
 
@@ -454,13 +376,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR DELETE SELECTED BUTTON ---
         if (selectedItemsToDelete.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn ít nhất một món hàng để xóa.', 'error');
             return;
         }
         // --- END VALIDATION ---
 
-        const confirmed = await showConfirmationBox('Bạn có chắc chắn muốn xóa các món hàng đã chọn?');
-        if (!confirmed) {
+        const result = await showCustomAlert('Xác nhận hành động', 'Bạn có chắc chắn muốn xóa các món hàng đã chọn?', 'warning', 'Xác nhận', true, 'Hủy');
+        if (!result.isConfirmed) {
             return;
         }
 
@@ -480,7 +402,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (response.ok) {
                     successCount++;
                 } else if (response.status === 401) {
-                    showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                    await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                     setTimeout(() => window.location.href = '/index.html', 2000);
                     return;
                 } else {
@@ -494,7 +416,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info');
+        await showCustomAlert('Thông báo!', `Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info');
         selectAllReceiptsCheckbox.checked = false;
         await fetchAndRenderReceipts();
     });
@@ -504,7 +426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
         // --- VALIDATION FOR VIEW DETAILS BUTTON ---
         if (checkedCheckboxes.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error', false, 'Thiếu hoặc sai thông tin');
+            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error');
             return;
         }
         // --- END VALIDATION ---
@@ -520,15 +442,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 window.open(`/print-receipt?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`, '_blank');
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error');
+                await showCustomAlert('Lỗi!', `Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập để in:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
+            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
 
@@ -573,12 +495,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const sessionCheck = await fetch('/session-check');
             if (!sessionCheck.ok) {
-                window.location.href = '/index.html'; // Redirect to login if session is invalid
+                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                setTimeout(() => window.location.href = '/index.html', 2000);
             }
         } catch (error) {
             console.error('Session check failed:', error);
-            showMessageBox('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', 'error');
-            // window.location.href = '/index.html'; // Redirect on network error
+            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng kiểm tra mạng và thử lại.', 'error');
         }
 
         updateDateTicker();
@@ -597,11 +519,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 window.location.href = '/index.html';
             } else {
-                showMessageBox('Đăng xuất thất bại.', 'error');
+                await showCustomAlert('Lỗi!', 'Đăng xuất thất bại.', 'error');
             }
         } catch (error) {
             console.error('Lỗi khi đăng xuất:', error);
-            showMessageBox('Lỗi kết nối. Không thể đăng xuất.', 'error');
+            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối. Không thể đăng xuất.', 'error');
         }
     };
 });
