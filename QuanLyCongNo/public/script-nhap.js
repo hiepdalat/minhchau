@@ -23,36 +23,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageBox = document.getElementById('messageBox');
     const messageText = document.getElementById('messageText');
     const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+    const messageBoxContent = messageBox.querySelector('.bg-gray-800'); // Lấy nội dung của modal
+    const receiptsSectionCard = document.getElementById('receiptsSectionCard');
 
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
 
     // --- Helper Functions ---
 
     /**
-     * Shows a custom message box instead of alert().
+     * Shows a custom message box.
      * @param {string} message - The message to display.
+     * @param {string} type - The type of message ('error', 'success', 'info').
+     * @param {boolean} isConfirmation - True if this is a confirmation dialog, false for simple message.
      */
-    function showMessageBox(message) {
-        messageText.textContent = message;
+    function showMessageBox(message, type = 'info', isConfirmation = false) {
+        messageText.innerHTML = ''; // Clear previous content
+        messageBoxContent.className = 'bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center'; // Reset classes
+
+        let iconHtml = '';
+        let titleClass = '';
+
+        switch (type) {
+            case 'error':
+                iconHtml = '<i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>';
+                titleClass = 'text-red-400';
+                break;
+            case 'success':
+                iconHtml = '<i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>';
+                titleClass = 'text-green-400';
+                break;
+            case 'info':
+            default:
+                iconHtml = '<i class="fas fa-exclamation-circle text-yellow-500 text-3xl mb-2"></i>';
+                titleClass = 'text-yellow-400';
+                break;
+        }
+
+        messageText.innerHTML = `${iconHtml}<p class="text-lg font-bold ${titleClass}">${message}</p>`;
         messageBox.classList.remove('hidden');
-        // Ensure only the "Đóng" button is visible for simple messages
-        const confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
-        if (confirmBtn) confirmBtn.classList.add('hidden');
-        messageBoxCloseBtn.classList.remove('hidden');
-    }
 
-    /**
-     * Shows a custom confirmation dialog.
-     * @param {string} message - The confirmation message.
-     * @returns {Promise<boolean>} - Resolves to true if confirmed, false otherwise.
-     */
-    function showConfirmationBox(message) {
-        return new Promise(resolve => {
-            messageText.textContent = message;
-            messageBox.classList.remove('hidden');
-
-            // Add confirm button if it doesn't exist, or show it
-            let confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
+        let confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
+        if (isConfirmation) {
             if (!confirmBtn) {
                 confirmBtn = document.createElement('button');
                 confirmBtn.id = 'messageBoxConfirmBtn';
@@ -62,14 +73,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 confirmBtn.classList.remove('hidden');
             }
-            messageBoxCloseBtn.textContent = 'Hủy'; // Change close button text to "Hủy"
-            messageBoxCloseBtn.classList.remove('hidden'); // Ensure it's visible
+            messageBoxCloseBtn.textContent = 'Hủy';
+            messageBoxCloseBtn.classList.remove('hidden');
+        } else {
+            if (confirmBtn) confirmBtn.classList.add('hidden');
+            messageBoxCloseBtn.textContent = 'Đóng';
+            messageBoxCloseBtn.classList.remove('hidden');
+        }
+    }
 
+    /**
+     * Shows a custom confirmation dialog.
+     * @param {string} message - The confirmation message.
+     * @returns {Promise<boolean>} - Resolves to true if confirmed, false otherwise.
+     */
+    function showConfirmationBox(message) {
+        return new Promise(resolve => {
+            showMessageBox(message, 'info', true); // Use info type for confirmation
+
+            const confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
             const handleConfirm = () => {
                 messageBox.classList.add('hidden');
                 confirmBtn.removeEventListener('click', handleConfirm);
                 messageBoxCloseBtn.removeEventListener('click', handleCancel);
-                messageBoxCloseBtn.textContent = 'Đóng'; // Reset text
                 resolve(true);
             };
 
@@ -77,7 +103,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 messageBox.classList.add('hidden');
                 confirmBtn.removeEventListener('click', handleConfirm);
                 messageBoxCloseBtn.removeEventListener('click', handleCancel);
-                messageBoxCloseBtn.textContent = 'Đóng'; // Reset text
                 resolve(false);
             };
 
@@ -151,7 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ck = parseFloat(itemDiscountInput.value);
 
         if (!tenhang || !dvt || isNaN(soluong) || soluong <= 0 || isNaN(dongia) || dongia < 0 || isNaN(ck) || ck < 0 || ck > 100) {
-            showMessageBox('Vui lòng nhập đầy đủ và hợp lệ thông tin mặt hàng (Số lượng > 0, Đơn giá >= 0, CK từ 0-100).');
+            showMessageBox('Thiếu hoặc sai thông tin!', 'error'); // Thêm type 'error'
             return;
         }
 
@@ -197,15 +222,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ngay = receiptDateInput.value; // YYYY-MM-DD format
 
         if (!daily) {
-            showMessageBox('Vui lòng nhập tên đại lý.');
+            showMessageBox('Vui lòng nhập tên đại lý.', 'error'); // Thêm type 'error'
             return;
         }
         if (!ngay) {
-            showMessageBox('Vui lòng chọn ngày nhập hàng.');
+            showMessageBox('Vui lòng chọn ngày nhập hàng.', 'error'); // Thêm type 'error'
             return;
         }
         if (currentReceiptItems.length === 0) {
-            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.');
+            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error'); // Thêm type 'error'
             return;
         }
 
@@ -226,23 +251,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                showMessageBox('Phiếu nhập hàng đã được lưu thành công!');
+                showMessageBox('Phiếu nhập hàng đã được lưu thành công!', 'success'); // Thêm type 'success'
                 // Clear form and current items
                 dailyNameInput.value = '';
                 receiptDateInput.value = new Date().toISOString().split('T')[0]; // Reset to current date
                 currentReceiptItems = [];
                 renderCurrentItems();
-                await fetchAndRenderReceipts(); // Refresh the list of saved receipts
+                // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị vẫn ẩn
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                showMessageBox(`Lỗi khi lưu phiếu nhập: ${errorData.error || response.statusText}`);
+                showMessageBox(`Lỗi khi lưu phiếu nhập: ${errorData.error || response.statusText}`, 'error'); // Thêm type 'error'
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
+            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error'); // Thêm type 'error'
         }
     });
 
@@ -269,6 +294,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const receipts = await response.json();
                 receiptsBody.innerHTML = ''; // Clear loading message
                 let grandTotal = 0;
+
+                // Hiển thị phần hiển thị phiếu nhập khi dữ liệu được tải thành công
+                receiptsSectionCard.classList.remove('hidden');
 
                 if (receipts.length === 0) {
                     receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
@@ -312,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 updateViewDetailsButtonState(); // Cập nhật trạng thái nút sau khi render
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
@@ -332,24 +360,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to update the state of the "View Details" button
     function updateViewDetailsButtonState() {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
-        // Nút "Xem chi tiết" được kích hoạt khi CÓ ÍT NHẤT MỘT checkbox được chọn
         if (checkedCheckboxes.length > 0) {
             viewDetailsBtn.disabled = false;
         } else {
             viewDetailsBtn.disabled = true;
         }
-        // Không cần gán receiptId vào dataset của nút ở đây nữa, sẽ lấy khi click
     }
 
     // Event listener for any item checkbox change
     receiptsBody.addEventListener('change', (event) => {
         if (event.target.classList.contains('item-checkbox')) {
             updateViewDetailsButtonState(); // Update button state after any checkbox changes
-            // If any item checkbox is unchecked, uncheck the "Select All" checkbox
             if (!event.target.checked) {
                 selectAllReceiptsCheckbox.checked = false;
             } else {
-                // If all item checkboxes are checked, check "Select All"
                 const allItemCheckboxes = document.querySelectorAll('.item-checkbox');
                 const allChecked = Array.from(allItemCheckboxes).every(cb => cb.checked);
                 selectAllReceiptsCheckbox.checked = allChecked;
@@ -380,7 +404,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (selectedItemsToDelete.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.');
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error'); // Thêm type 'error'
             return;
         }
 
@@ -405,7 +429,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (response.ok) {
                     successCount++;
                 } else if (response.status === 401) {
-                    showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
                     setTimeout(() => window.location.href = '/index.html', 2000);
                     return;
                 } else {
@@ -419,43 +443,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`);
+        showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info'); // Thêm type 'info'
         selectAllReceiptsCheckbox.checked = false;
         await fetchAndRenderReceipts();
     });
 
-    // --- View Details Button Logic (MODIFIED TO OPEN NEW TAB FOR PRINTING) ---
+    // --- View Details Button Logic ---
     viewDetailsBtn.addEventListener('click', async () => {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
         if (checkedCheckboxes.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.');
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error'); // Thêm type 'error'
             return;
         }
 
-        // Lấy receiptId của món hàng đầu tiên được chọn
         const firstCheckedReceiptId = checkedCheckboxes[0].dataset.receiptId;
 
         try {
-            // Gọi API để lấy chi tiết của phiếu nhập đầu tiên được chọn
             const response = await fetch(`/api/nhaphang/${firstCheckedReceiptId}`);
             if (response.ok) {
                 const receipt = await response.json();
                 const dailyName = receipt.daily;
-                // Lấy ngày ở định dạng YYYY-MM-DD để truyền qua URL
                 const receiptDate = new Date(receipt.ngay).toISOString().split('T')[0];
 
-                // Mở trang in hóa đơn mới, truyền tên đại lý và ngày qua URL
                 window.open(`/print-receipt?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`, '_blank');
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`);
+                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error'); // Thêm type 'error'
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập để in:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
+            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error'); // Thêm type 'error'
         }
     });
 
@@ -504,14 +524,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Session check failed:', error);
-            window.location.href = '/index.html'; // Redirect on network error
+            showMessageBox('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', 'error'); // Thêm type 'error'
+            // window.location.href = '/index.html'; // Redirect on network error
         }
 
         updateDateTicker();
         animateTicker();
         setInterval(updateDateTicker, 1000); // Update every second
 
-        await fetchAndRenderReceipts(); // Load initial receipts
+        // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị ẩn đi ban đầu
     }
 
     init(); // Call initialization function
@@ -523,11 +544,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 window.location.href = '/index.html';
             } else {
-                showMessageBox('Đăng xuất thất bại.');
+                showMessageBox('Đăng xuất thất bại.', 'error'); // Thêm type 'error'
             }
         } catch (error) {
             console.error('Lỗi khi đăng xuất:', error);
-            showMessageBox('Lỗi kết nối. Không thể đăng xuất.');
+            showMessageBox('Lỗi kết nối. Không thể đăng xuất.', 'error'); // Thêm type 'error'
         }
     };
 });
