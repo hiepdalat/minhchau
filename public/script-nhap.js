@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     /**
      * Shows a custom message box.
-     * @param {string} message - The message to display.
+     * @param {string} message - The specific message to display (e.g., "Vui lòng nhập tên hàng.").
      * @param {string} type - The type of message ('error', 'success', 'info').
      * @param {boolean} isConfirmation - True if this is a confirmation dialog, false for simple message.
      */
@@ -41,25 +41,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         messageBoxContent.className = 'bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center'; // Reset classes
 
         let iconHtml = '';
+        let titleText = '';
         let titleClass = '';
+        let messageClass = '';
 
         switch (type) {
             case 'error':
-                iconHtml = '<i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>';
-                titleClass = 'text-red-400';
+                iconHtml = '<i class="fas fa-times-circle text-red-500 text-5xl mb-4"></i>'; // Larger red X
+                titleText = 'Lỗi';
+                titleClass = 'text-red-400 text-2xl font-bold mb-2'; // Bigger, bolder title
+                messageClass = 'text-lg text-gray-300'; // Specific message below title
                 break;
             case 'success':
                 iconHtml = '<i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>';
-                titleClass = 'text-green-400';
+                titleText = 'Thành công';
+                titleClass = 'text-green-400 text-xl font-bold mb-2';
+                messageClass = 'text-lg text-gray-300';
                 break;
             case 'info':
             default:
                 iconHtml = '<i class="fas fa-exclamation-circle text-yellow-500 text-3xl mb-2"></i>';
-                titleClass = 'text-yellow-400';
+                titleText = 'Thông báo';
+                titleClass = 'text-yellow-400 text-xl font-bold mb-2';
+                messageClass = 'text-lg text-gray-300';
                 break;
         }
 
-        messageText.innerHTML = `${iconHtml}<p class="text-lg font-bold ${titleClass}">${message}</p>`;
+        messageText.innerHTML = `
+            ${iconHtml}
+            <p class="${titleClass}">${titleText}</p>
+            <p class="${messageClass}">${message}</p>
+        `;
         messageBox.classList.remove('hidden');
 
         let confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
@@ -68,17 +80,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 confirmBtn = document.createElement('button');
                 confirmBtn.id = 'messageBoxConfirmBtn';
                 confirmBtn.textContent = 'Xác nhận';
-                confirmBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2';
+                confirmBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2 mt-4'; // Added mt-4
                 messageBox.querySelector('.bg-gray-800').appendChild(confirmBtn);
             } else {
                 confirmBtn.classList.remove('hidden');
             }
             messageBoxCloseBtn.textContent = 'Hủy';
             messageBoxCloseBtn.classList.remove('hidden');
+            messageBoxCloseBtn.classList.add('mt-4'); // Added mt-4
         } else {
             if (confirmBtn) confirmBtn.classList.add('hidden');
             messageBoxCloseBtn.textContent = 'Đóng';
             messageBoxCloseBtn.classList.remove('hidden');
+            messageBoxCloseBtn.classList.add('mt-4'); // Added mt-4
         }
     }
 
