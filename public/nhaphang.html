@@ -6,8 +6,10 @@
     <title>Quản Lý Nhập Hàng</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons (Đã kiểm tra lại đường dẫn) -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7s0/QzY/3j+0qFzNlB3tFf+9D+J+Q+A+B+G+C+D+E+F+G+H+I+J+K+L+M+N+O+P+Q+R+S+T+U+V+W+X+Y+Z" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* CSS riêng cho bảng "Mặt hàng đã nhập từ đại lý" trong nhaphang.html */
@@ -173,13 +175,13 @@
         </div>
     </div>
 
-    <!-- Message Box/Modal for alerts -->
-    <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <!-- The custom messageBox is no longer needed as SweetAlert2 handles it -->
+    <!-- <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center">
             <p id="messageText" class="mb-4 text-lg"></p>
             <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
         </div>
-    </div>
+    </div> -->
 
     <script src="script-nhap.js"></script>
 </body>
