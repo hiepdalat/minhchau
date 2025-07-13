@@ -47,36 +47,36 @@
         <!-- Input Section for New Receipt (Visible by default) -->
         <div class="card mb-4">
             <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-4">
-                <div>
+            <div class="flex flex-wrap gap-2 items-end mb-4">
+                <div class="flex-1 min-w-[120px]">
                     <label for="dailyName" class="block text-sm font-medium text-gray-300">Tên đại lý:</label>
                     <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label for="receiptDate" class="block text-sm font-medium text-gray-300">Ngày:</label>
                     <input type="date" id="receiptDate" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
                 </div>
             </div>
 
             <h3 class="text-lg font-bold mb-2">Thêm mặt hàng</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
-                <div>
+            <div class="flex flex-wrap gap-2 items-end mb-4">
+                <div class="flex-1 min-w-[120px]">
                     <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
                     <input type="text" id="itemName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label for="itemUnit" class="block text-sm font-medium text-gray-300">Đơn vị tính:</label>
                     <input type="text" id="itemUnit" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label for="itemQuantity" class="block text-sm font-medium text-gray-300">Số lượng:</label>
                     <input type="number" id="itemQuantity" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label for="itemPrice" class="block text-sm font-medium text-gray-300">Đơn giá:</label>
                     <input type="number" id="itemPrice" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
                 </div>
-                <div>
+                <div class="flex-1 min-w-[120px]">
                     <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
                     <input type="number" id="itemDiscount" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
                 </div>
