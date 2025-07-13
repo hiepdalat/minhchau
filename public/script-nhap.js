@@ -107,14 +107,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         totalAmountSpan.textContent = formatCurrency(totalAmount);
         // ✅ THÊM ĐOẠN NÀY VÀO ĐÂY:
-        const currentItemsTable = document.getElementById("currentItemsTable");
+        const tableWrapper = document.getElementById("tableWrapper");
         const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
         if (currentReceiptItems.length > 0) {
-        currentItemsTable.style.display = "table";
+        tableWrapper.style.display = "block";   // ✅ hiện khung chứa bảng
         saveReceiptButton.style.display = "block";
         } else {
-        currentItemsTable.style.display = "none";
+        tableWrapper.style.display = "none";
         saveReceiptButton.style.display = "none";
         }
     }
