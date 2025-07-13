@@ -42,39 +42,43 @@
     </div>
 
     <div class="container p-4">
-        <!-- Input Section for New Receipt -->
+        <!-- Input Section for New Receipt (Visible by default) -->
         <div class="card mb-4">
             <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="dailyName" class="block text-sm font-medium text-gray-300">Tên đại lý:</label>
                     <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
-               
+                </div>
+                <div>
                     <label for="receiptDate" class="block text-sm font-medium text-gray-300">Ngày:</label>
                     <input type="date" id="receiptDate" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
                 </div>
             </div>
 
             <h3 class="text-lg font-bold mb-2">Thêm mặt hàng</h3>
-            <!-- Đã thay đổi grid layout để hiển thị các input theo hàng ngang -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                 <div>
                     <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
                     <input type="text" id="itemName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
-               
+                </div>
+                <div>
                     <label for="itemUnit" class="block text-sm font-medium text-gray-300">Đơn vị tính:</label>
                     <input type="text" id="itemUnit" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
-             
+                </div>
+                <div>
                     <label for="itemQuantity" class="block text-sm font-medium text-gray-300">Số lượng:</label>
                     <input type="number" id="itemQuantity" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
-              
+                </div>
+                <div>
                     <label for="itemPrice" class="block text-sm font-medium text-gray-300">Đơn giá:</label>
                     <input type="number" id="itemPrice" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
-             
+                </div>
+                <div>
                     <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
                     <input type="number" id="itemDiscount" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
                 </div>
-                <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5"> <!-- Nút "Thêm món" chiếm toàn bộ chiều rộng hàng mới -->
+                <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5">
                     <button id="addItemBtn" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
                         <i class="fas fa-plus mr-2"></i>Thêm món
                     </button>
@@ -82,7 +86,7 @@
             </div>
 
             <!-- Table for Current Items in Receipt -->
-            <div id="receiptsTableWrapper" class="table-wrapper mb-4"  style="display:none;">
+            <div class="table-wrapper mb-4">
                 <table id="currentItemsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
                         <tr>
@@ -113,8 +117,8 @@
             </button>
         </div>
 
-        <!-- Search and Display Section -->
-        <div class="card">
+        <!-- Search and Display Section (Hidden initially) -->
+        <div id="receiptsSectionCard" class="card hidden"> <!-- Đã thêm ID và lớp 'hidden' -->
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
@@ -138,8 +142,7 @@
                 </div>
             </div>
 
-            <!-- Đã thêm ID "receiptsTableWrapper" cho div này -->
-            <div id="receiptsTableWrapper" class="table-wrapper"  style="display:none;">
+            <div id="receiptsTableWrapper" class="table-wrapper">
                 <table id="receiptsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
                         <tr>
