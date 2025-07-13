@@ -57,7 +57,8 @@
             </div>
 
             <h3 class="text-lg font-bold mb-2">Thêm mặt hàng</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
+            <!-- Đã thay đổi grid layout để hiển thị các input theo hàng ngang -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
                 <div>
                     <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
                     <input type="text" id="itemName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
@@ -78,7 +79,7 @@
                     <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
                     <input type="number" id="itemDiscount" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
                 </div>
-                <div class="flex items-end">
+                <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5"> <!-- Nút "Thêm món" chiếm toàn bộ chiều rộng hàng mới -->
                     <button id="addItemBtn" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
                         <i class="fas fa-plus mr-2"></i>Thêm món
                     </button>
@@ -181,8 +182,6 @@
             <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
         </div>
     </div>
-
-    <!-- Đã XÓA khối receiptDetailsModal không sử dụng -->
 
     <script src="script-nhap.js"></script>
 </body>
