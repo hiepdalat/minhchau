@@ -8,6 +8,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* CSS riêng cho bảng "Mặt hàng đã nhập từ đại lý" trong nhaphang.html */
+        #receiptsTableWrapper { /* ID mới cho table-wrapper của bảng này */
+            max-height: 400px; /* Đặt chiều cao tối đa cho khung bảng */
+            overflow-y: auto;   /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao */
+            border: 1px solid #4a5568; /* Viền cho khung cuộn */
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        #receiptsTableWrapper table th {
+            position: sticky; /* Giữ tiêu đề cố định khi cuộn */
+            top: 0;
+            z-index: 1; /* Đảm bảo tiêu đề nằm trên nội dung */
+            background-color: #4a5568; /* Giữ màu nền cho tiêu đề khi cuộn */
+        }
+        
+        /* Đảm bảo các style chung của table vẫn được áp dụng từ style.css */
+        /* Ví dụ: table-layout: fixed; word-wrap: break-word; */
+    </style>
 </head>
 <body class="congno-body">
     <div class="header-container">
@@ -25,30 +46,35 @@
         <div class="card mb-4">
             <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                
+                <div>
                     <label for="dailyName" class="block text-sm font-medium text-gray-300">Tên đại lý:</label>
                     <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
-               
+                </div>
+                <div>
                     <label for="receiptDate" class="block text-sm font-medium text-gray-300">Ngày:</label>
                     <input type="date" id="receiptDate" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
-            
+                </div>
             </div>
 
             <h3 class="text-lg font-bold mb-2">Thêm mặt hàng</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-             
+                <div>
                     <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
                     <input type="text" id="itemName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
-               
+                </div>
+                <div>
                     <label for="itemUnit" class="block text-sm font-medium text-gray-300">Đơn vị tính:</label>
                     <input type="text" id="itemUnit" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
-              
+                </div>
+                <div>
                     <label for="itemQuantity" class="block text-sm font-medium text-gray-300">Số lượng:</label>
                     <input type="number" id="itemQuantity" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
-               
+                </div>
+                <div>
                     <label for="itemPrice" class="block text-sm font-medium text-gray-300">Đơn giá:</label>
                     <input type="number" id="itemPrice" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
-              
+                </div>
+                <div>
                     <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
                     <input type="number" id="itemDiscount" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
                 </div>
@@ -60,7 +86,7 @@
             </div>
 
             <!-- Table for Current Items in Receipt -->
-            <div class="table-wrapper mb-4">
+            <div id="receiptsTableWrapper" class="table-wrapper mb-4">
                 <table id="currentItemsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
                         <tr>
@@ -116,7 +142,8 @@
                 </div>
             </div>
 
-            <div class="table-wrapper">
+            <!-- Đã thêm ID "receiptsTableWrapper" cho div này -->
+            <div id="receiptsTableWrapper" class="table-wrapper">
                 <table id="receiptsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
                         <tr>
@@ -155,7 +182,8 @@
         </div>
     </div>
 
-    <!-- Receipt Details Modal -->
+    <!-- Receipt Details Modal (Không còn dùng cho "Xem chi tiết phiếu nhập" nữa, nhưng giữ lại nếu có mục đích khác) -->
+    <!-- Bạn có thể xóa modal này nếu không có nhu cầu sử dụng nữa -->
     <div id="receiptDetailsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-4xl w-full mx-4">
             <h3 class="text-xl font-bold mb-4">Chi tiết phiếu nhập</h3>
