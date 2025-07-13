@@ -155,7 +155,7 @@
 <body>
     <div class="invoice-container">
         <div class="header">
-            <img src="https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png" alt="Logo" class="logo"> <!-- Đã cập nhật đường dẫn logo -->
+            <img src="https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png" alt="Logo" class="logo">
             <div class="company-info">
                 <h2>ĐIỆN NƯỚC MINH CHÂU</h2>
                 <p>MST: 8056881027-001</p>
@@ -165,12 +165,12 @@
             </div>
         </div>
 
-        <h1 class="invoice-title">HÓA ĐƠN BÁN HÀNG</h1>
+        <h1 class="invoice-title">PHIẾU NHẬP HÀNG</h1> <!-- Đã đổi từ HÓA ĐƠN BÁN HÀNG -->
         <p class="invoice-date">Ngày: <span id="invoiceDate"></span></p>
 
         <div class="customer-info">
-            <p>Người mua hàng: <span id="customerName"></span></p>
-            <p>Địa chỉ: <span id="customerAddress"></span></p>
+            <p>Đại lý: <span id="dailyName"></span></p> <!-- Đã đổi từ Người mua hàng -->
+            <p>Địa chỉ: <span id="dailyAddress"></span></p> <!-- Đã đổi từ Địa chỉ -->
         </div>
 
         <table>
@@ -198,19 +198,19 @@
 
         <div class="signatures">
             <div class="signature-block">
-                <p>NGƯỜI MUA HÀNG</p>
+                <p>ĐẠI LÝ</p> <!-- Đã đổi từ NGƯỜI MUA HÀNG -->
                 <span>(Ký, ghi rõ họ tên)</span>
             </div>
             <div class="signature-block">
-                <p>NGƯỜI BÁN HÀNG</p>
-                <p>Ngày: <span id="sellerDate"></span></p>
+                <p>NGƯỜI NHẬP HÀNG</p> <!-- Đã đổi từ NGƯỜI BÁN HÀNG -->
+                <p>Ngày: <span id="importerDate"></span></p> <!-- Đã đổi từ sellerDate -->
                 <span>(Ký, ghi rõ họ tên)</span>
             </div>
         </div>
     </div>
 
     <div class="print-button-container">
-        <button class="print-button" onclick="window.print()">In Hóa Đơn</button>
+        <button class="print-button" onclick="window.print()">In Phiếu Nhập</button> <!-- Đã đổi text nút -->
     </div>
 
     <script src="/script-print-receipt.js"></script>
