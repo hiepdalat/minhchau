@@ -31,6 +31,11 @@
         #saveReceiptBtn {
           display: none;
          }
+        #inputScrollWrapper {
+          max-height: 300px;
+          overflow-y: auto;
+          padding-right: 4px; /* giúp không bị che chữ ở mép phải */
+        }
         /* Đảm bảo các style chung của table vẫn được áp dụng từ style.css */
         /* Ví dụ: table-layout: fixed; word-wrap: break-word; */
     </style>
@@ -86,6 +91,7 @@
             </div>
 
             <!-- Table for Current Items in Receipt -->
+            <div id="inputScrollWrapper">
             <div id="inputTableWrapper" class="table-wrapper mb-4">
               <table id="currentItemsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
@@ -116,7 +122,7 @@
                 Lưu phiếu nhập
             </button>
         </div>
-
+        </div>
         <!-- Search and Display Section (Hidden initially) -->
         <div id="receiptsSectionCard" class="card hidden">
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
