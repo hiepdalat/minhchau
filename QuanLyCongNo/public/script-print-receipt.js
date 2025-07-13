@@ -1,14 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const receiptId = urlParams.get('receiptId');
+    const dailyName = urlParams.get('daily');
+    const dateParam = urlParams.get('date'); // YYYY-MM-DD format
 
     const invoiceDateSpan = document.getElementById('invoiceDate');
-    const customerNameSpan = document.getElementById('customerName');
-    const customerAddressSpan = document.getElementById('customerAddress'); // Placeholder, since address is not in current data
+    const dailyNameSpan = document.getElementById('dailyName'); // Đã đổi từ customerNameSpan
+    const dailyAddressSpan = document.getElementById('dailyAddress'); // Đã đổi từ customerAddressSpan
     const invoiceItemsBody = document.getElementById('invoiceItems');
     const invoiceTotalSpan = document.getElementById('invoiceTotal');
     const amountInWordsSpan = document.getElementById('amountInWords');
-    const sellerDateSpan = document.getElementById('sellerDate');
+    const importerDateSpan = document.getElementById('importerDate'); // Đã đổi từ sellerDateSpan
 
     /**
      * Formats a number as currency (Vietnamese Dong).
@@ -71,18 +72,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             tempNum = Math.floor(tempNum / 1000);
             i++;
         }
-        return (result.trim() + ' đồng').replace(/\s+/g, ' '); // Remove extra spaces
+        return (result.trim() + ' đồng').replace(/\s+/g, ' ');
     }
 
 
-    async function loadReceiptDetails(id) {
+    async function loadReceiptDetailsByDailyAndDate(daily, date) {
         try {
-            const response = await fetch(`/api/nhaphang/${id}`);
-            if (response.ok) {
-                const receipt = await response.json();
-                console.log('Receipt data for printing:', receipt);
+            // Chuyển đổi ngày YYYY-MM-DD thành YYYY-MM cho tham số month của API
+            const month = date.substring(0, 7); // "YYYY-MM"
 
-                const receiptDate = new Date(receipt.ngay);
+            const response = await fetch(`/api/nhaphang?daily=${encodeURIComponent(daily)}&month=${encodeURIComponent(month)}`);
+            if (response.ok) {
+                const receipts = await response.json();
+                console.log('Filtered receipts data for printing:', receipts);
+
+                // Lọc thêm một lần nữa ở client để đảm bảo chính xác ngày
+                const filteredReceipts = receipts.filter(r => {
+                    const rDate = new Date(r.ngay).toISOString().split('T')[0];
+                    return rDate === date;
+                });
+
+                if (filteredReceipts.length === 0) {
+                    alert('Không tìm thấy phiếu nhập nào cho đại lý và ngày này.');
+                    window.close();
+                    return;
+                }
+
+                // Lấy thông tin từ phiếu nhập đầu tiên (hoặc bất kỳ phiếu nào trong danh sách)
+                const firstReceipt = filteredReceipts[0];
+                const receiptDate = new Date(firstReceipt.ngay);
                 const formattedDate = receiptDate.toLocaleDateString('vi-VN', {
                     day: '2-digit',
                     month: '2-digit',
@@ -90,33 +108,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 invoiceDateSpan.textContent = formattedDate;
-                customerNameSpan.textContent = receipt.daily; // Đại lý là người mua hàng trong ngữ cảnh này
-                customerAddressSpan.textContent = "________________________________________________"; // Placeholder, update if address is available
-                invoiceTotalSpan.textContent = formatCurrency(receipt.tongtien);
-                amountInWordsSpan.textContent = numberToVietnameseWords(receipt.tongtien);
-                sellerDateSpan.textContent = formattedDate; // Ngày bán hàng là ngày nhập hàng
+                dailyNameSpan.textContent = daily; // Tên đại lý từ URL
+                dailyAddressSpan.textContent = "________________________________________________"; // Placeholder
+                importerDateSpan.textContent = formattedDate; // Ngày nhập hàng
 
                 invoiceItemsBody.innerHTML = '';
-                if (receipt.items && receipt.items.length > 0) {
-                    receipt.items.forEach((item, index) => {
+                let totalAmountForDisplay = 0;
+                let itemCounter = 0;
+
+                filteredReceipts.forEach(receipt => {
+                    receipt.items.forEach(item => {
+                        itemCounter++;
                         const row = invoiceItemsBody.insertRow();
                         row.innerHTML = `
-                            <td>${index + 1}</td>
+                            <td>${itemCounter}</td>
                             <td style="text-align: left;">${item.tenhang}</td>
                             <td>${item.soluong} ${item.dvt}</td>
                             <td>${formatCurrency(item.dongia)}</td>
                             <td>${formatCurrency(item.thanhtien)}</td>
                         `;
+                        totalAmountForDisplay += item.thanhtien;
                     });
-                } else {
-                    const row = invoiceItemsBody.insertRow();
-                    row.innerHTML = `<td colspan="5" style="text-align: center;">Không có mặt hàng nào trong phiếu này.</td>`;
-                }
+                });
+
+                invoiceTotalSpan.textContent = formatCurrency(totalAmountForDisplay);
+                amountInWordsSpan.textContent = numberToVietnameseWords(totalAmountForDisplay);
 
             } else if (response.status === 401) {
-                alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'); // Using alert here as it's a new page
-                window.close(); // Close the print tab
-                window.opener.location.href = '/index.html'; // Redirect main window
+                alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                window.close();
+                window.opener.location.href = '/index.html';
             } else {
                 const errorData = await response.json();
                 alert(`Lỗi khi tải chi tiết phiếu nhập: ${errorData.error || response.statusText}`);
@@ -124,16 +145,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server khi tải chi tiết phiếu nhập:', error);
-            alert('Lỗi kết nối đến server. Không thể tải hóa đơn.');
+            alert('Lỗi kết nối đến server. Không thể tải phiếu nhập.');
             window.close();
         }
     }
 
-    if (receiptId) {
-        loadReceiptDetails(receiptId);
+    if (dailyName && dateParam) {
+        loadReceiptDetailsByDailyAndDate(dailyName, dateParam);
     } else {
-        alert('Không tìm thấy ID phiếu nhập. Vui lòng thử lại từ trang Nhập Hàng.');
+        alert('Không tìm thấy thông tin đại lý hoặc ngày. Vui lòng thử lại từ trang Nhập Hàng.');
         window.close();
     }
 });
-
