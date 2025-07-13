@@ -134,6 +134,11 @@ app.get('/banhang', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'banhang.html'));
 });
 
+// Đảm bảo route này tồn tại và chính xác
+app.get('/print-receipt', requireLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'print-receipt.html'));
+});
+
 app.get('/session-check', (req, res) => {
   if (req.session.user) res.sendStatus(200);
   else res.sendStatus(401);
