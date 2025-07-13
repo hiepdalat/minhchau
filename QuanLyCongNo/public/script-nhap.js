@@ -175,8 +175,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dongia = parseFloat(itemPriceInput.value);
         const ck = parseFloat(itemDiscountInput.value);
 
-        if (!tenhang || !dvt || isNaN(soluong) || soluong <= 0 || isNaN(dongia) || dongia < 0 || isNaN(ck) || ck < 0 || ck > 100) {
-            showMessageBox('Thiếu hoặc sai thông tin!', 'error'); // Thêm type 'error'
+        if (!tenhang) {
+            showMessageBox('Vui lòng nhập tên hàng.', 'error');
+            return;
+        }
+        if (!dvt) {
+            showMessageBox('Vui lòng nhập đơn vị tính.', 'error');
+            return;
+        }
+        if (isNaN(soluong) || soluong <= 0) {
+            showMessageBox('Số lượng phải là số và lớn hơn 0.', 'error');
+            return;
+        }
+        if (isNaN(dongia) || dongia < 0) {
+            showMessageBox('Đơn giá phải là số và không âm.', 'error');
+            return;
+        }
+        if (isNaN(ck) || ck < 0 || ck > 100) {
+            showMessageBox('Chiết khấu phải là số từ 0 đến 100.', 'error');
             return;
         }
 
@@ -222,15 +238,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ngay = receiptDateInput.value; // YYYY-MM-DD format
 
         if (!daily) {
-            showMessageBox('Vui lòng nhập tên đại lý.', 'error'); // Thêm type 'error'
+            showMessageBox('Vui lòng nhập tên đại lý.', 'error');
             return;
         }
         if (!ngay) {
-            showMessageBox('Vui lòng chọn ngày nhập hàng.', 'error'); // Thêm type 'error'
+            showMessageBox('Vui lòng chọn ngày nhập hàng.', 'error');
             return;
         }
         if (currentReceiptItems.length === 0) {
-            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error'); // Thêm type 'error'
+            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error');
             return;
         }
 
@@ -251,7 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                showMessageBox('Phiếu nhập hàng đã được lưu thành công!', 'success'); // Thêm type 'success'
+                showMessageBox('Phiếu nhập hàng đã được lưu thành công!', 'success');
                 // Clear form and current items
                 dailyNameInput.value = '';
                 receiptDateInput.value = new Date().toISOString().split('T')[0]; // Reset to current date
@@ -259,15 +275,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderCurrentItems();
                 // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị vẫn ẩn
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                showMessageBox(`Lỗi khi lưu phiếu nhập: ${errorData.error || response.statusText}`, 'error'); // Thêm type 'error'
+                showMessageBox(`Lỗi khi lưu phiếu nhập: ${errorData.error || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error'); // Thêm type 'error'
+            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
 
@@ -278,6 +294,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
         const dailySearch = searchDailyNameInput.value.trim();
         const monthSearch = searchMonthInput.value; // YYYY-MM format
+
+        if (!dailySearch && !monthSearch) {
+            showMessageBox('Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error');
+            receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
+            receiptsSectionCard.classList.add('hidden'); // Ẩn lại nếu không có tiêu chí
+            return;
+        }
 
         let url = '/api/nhaphang?';
         if (dailySearch) {
@@ -340,7 +363,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 updateViewDetailsButtonState(); // Cập nhật trạng thái nút sau khi render
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
@@ -404,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (selectedItemsToDelete.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error'); // Thêm type 'error'
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error');
             return;
         }
 
@@ -429,7 +452,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (response.ok) {
                     successCount++;
                 } else if (response.status === 401) {
-                    showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
+                    showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                     setTimeout(() => window.location.href = '/index.html', 2000);
                     return;
                 } else {
@@ -443,7 +466,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info'); // Thêm type 'info'
+        showMessageBox(`Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info');
         selectAllReceiptsCheckbox.checked = false;
         await fetchAndRenderReceipts();
     });
@@ -452,7 +475,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     viewDetailsBtn.addEventListener('click', async () => {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
         if (checkedCheckboxes.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error'); // Thêm type 'error'
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error');
             return;
         }
 
@@ -467,15 +490,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 window.open(`/print-receipt?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`, '_blank');
             } else if (response.status === 401) {
-                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error'); // Thêm type 'error'
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error'); // Thêm type 'error'
+                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập để in:', error);
-            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error'); // Thêm type 'error'
+            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
 
@@ -524,7 +547,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Session check failed:', error);
-            showMessageBox('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', 'error'); // Thêm type 'error'
+            showMessageBox('Lỗi kết nối. Vui lòng kiểm tra mạng và thử lại.', 'error');
             // window.location.href = '/index.html'; // Redirect on network error
         }
 
@@ -544,11 +567,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 window.location.href = '/index.html';
             } else {
-                showMessageBox('Đăng xuất thất bại.', 'error'); // Thêm type 'error'
+                showMessageBox('Đăng xuất thất bại.', 'error');
             }
         } catch (error) {
             console.error('Lỗi khi đăng xuất:', error);
-            showMessageBox('Lỗi kết nối. Không thể đăng xuất.', 'error'); // Thêm type 'error'
+            showMessageBox('Lỗi kết nối. Không thể đăng xuất.', 'error');
         }
     };
 });
