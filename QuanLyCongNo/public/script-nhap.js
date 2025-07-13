@@ -24,13 +24,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageText = document.getElementById('messageText');
     const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
 
-    const receiptDetailsModal = document.getElementById('receiptDetailsModal'); // Modal cũ, không dùng cho in ấn nữa
-    const detailDailyNameSpan = document.getElementById('detailDailyName');
-    const detailReceiptDateSpan = document.getElementById('detailReceiptDate');
-    const detailTotalAmountSpan = document.getElementById('detailTotalAmount');
-    const detailItemsBody = document.getElementById('detailItemsBody');
-    const closeDetailsModalBtn = document.getElementById('closeDetailsModalBtn');
-
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
 
     // --- Helper Functions ---
@@ -339,13 +332,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Function to update the state of the "View Details" button
     function updateViewDetailsButtonState() {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
-        if (checkedCheckboxes.length === 1) {
+        // Nút "Xem chi tiết" được kích hoạt khi CÓ ÍT NHẤT MỘT checkbox được chọn
+        if (checkedCheckboxes.length > 0) {
             viewDetailsBtn.disabled = false;
-            viewDetailsBtn.dataset.receiptId = checkedCheckboxes[0].dataset.receiptId;
         } else {
             viewDetailsBtn.disabled = true;
-            delete viewDetailsBtn.dataset.receiptId;
         }
+        // Không cần gán receiptId vào dataset của nút ở đây nữa, sẽ lấy khi click
     }
 
     // Event listener for any item checkbox change
@@ -432,20 +425,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- View Details Button Logic (MODIFIED TO OPEN NEW TAB FOR PRINTING) ---
-    viewDetailsBtn.addEventListener('click', () => {
-        const receiptId = viewDetailsBtn.dataset.receiptId;
-        if (!receiptId) {
-            showMessageBox('Vui lòng chọn một phiếu nhập để xem chi tiết.');
+    viewDetailsBtn.addEventListener('click', async () => {
+        const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+        if (checkedCheckboxes.length === 0) {
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.');
             return;
         }
-        // Open the new print-receipt.html page in a new tab, passing the receiptId
-        window.open(`/print-receipt?receiptId=${receiptId}`, '_blank');
-    });
 
-    // Removed the old modal close listener as the modal is no longer used for details display
-    // closeDetailsModalBtn.addEventListener('click', () => {
-    //     receiptDetailsModal.classList.add('hidden');
-    // });
+        // Lấy receiptId của món hàng đầu tiên được chọn
+        const firstCheckedReceiptId = checkedCheckboxes[0].dataset.receiptId;
+
+        try {
+            // Gọi API để lấy chi tiết của phiếu nhập đầu tiên được chọn
+            const response = await fetch(`/api/nhaphang/${firstCheckedReceiptId}`);
+            if (response.ok) {
+                const receipt = await response.json();
+                const dailyName = receipt.daily;
+                // Lấy ngày ở định dạng YYYY-MM-DD để truyền qua URL
+                const receiptDate = new Date(receipt.ngay).toISOString().split('T')[0];
+
+                // Mở trang in hóa đơn mới, truyền tên đại lý và ngày qua URL
+                window.open(`/print-receipt?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`, '_blank');
+            } else if (response.status === 401) {
+                showMessageBox('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                setTimeout(() => window.location.href = '/index.html', 2000);
+            } else {
+                const errorData = await response.json();
+                showMessageBox(`Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập để in:', error);
+            showMessageBox('Lỗi kết nối đến server. Vui lòng thử lại sau.');
+        }
+    });
 
 
     // --- Date Ticker Logic (from existing style.css) ---
