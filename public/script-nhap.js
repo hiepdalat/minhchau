@@ -106,8 +106,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         totalAmountSpan.textContent = formatCurrency(totalAmount);
-    }
+        // ✅ THÊM ĐOẠN NÀY VÀO ĐÂY:
+        const currentItemsTable = document.getElementById("currentItemsTable");
+        const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
+        if (currentReceiptItems.length > 0) {
+        currentItemsTable.style.display = "table";
+        saveReceiptButton.style.display = "block";
+        } else {
+        currentItemsTable.style.display = "none";
+        saveReceiptButton.style.display = "none";
+        }
+    }
+    
     /**
      * Adds an item to the current receipt.
      */
