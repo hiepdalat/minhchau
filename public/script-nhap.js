@@ -35,33 +35,35 @@ document.addEventListener('DOMContentLoaded', async () => {
      * @param {string} message - The specific message to display (e.g., "Vui lòng nhập tên hàng.").
      * @param {string} type - The type of message ('error', 'success', 'info').
      * @param {boolean} isConfirmation - True if this is a confirmation dialog, false for simple message.
+     * @param {string} customTitle - Custom title for the message box (e.g., "Thiếu hoặc sai thông tin").
      */
-    function showMessageBox(message, type = 'info', isConfirmation = false) {
+    function showMessageBox(message, type = 'info', isConfirmation = false, customTitle = '') {
         messageText.innerHTML = ''; // Clear previous content
         messageBoxContent.className = 'bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center'; // Reset classes
 
         let iconHtml = '';
-        let titleText = '';
+        let displayTitle = '';
         let titleClass = '';
         let messageClass = '';
+        let closeButtonText = 'Đóng'; // Default button text
 
         switch (type) {
             case 'error':
                 iconHtml = '<i class="fas fa-times-circle text-red-500 text-5xl mb-4"></i>'; // Larger red X
-                titleText = 'Lỗi';
+                displayTitle = customTitle || 'Lỗi'; // Use customTitle if provided, else 'Lỗi'
                 titleClass = 'text-red-400 text-2xl font-bold mb-2'; // Bigger, bolder title
                 messageClass = 'text-lg text-gray-300'; // Specific message below title
                 break;
             case 'success':
                 iconHtml = '<i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>';
-                titleText = 'Thành công';
+                displayTitle = customTitle || 'Thành công';
                 titleClass = 'text-green-400 text-xl font-bold mb-2';
                 messageClass = 'text-lg text-gray-300';
                 break;
             case 'info':
             default:
                 iconHtml = '<i class="fas fa-exclamation-circle text-yellow-500 text-3xl mb-2"></i>';
-                titleText = 'Thông báo';
+                displayTitle = customTitle || 'Thông báo';
                 titleClass = 'text-yellow-400 text-xl font-bold mb-2';
                 messageClass = 'text-lg text-gray-300';
                 break;
@@ -69,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         messageText.innerHTML = `
             ${iconHtml}
-            <p class="${titleClass}">${titleText}</p>
+            <p class="${titleClass}">${displayTitle}</p>
             <p class="${messageClass}">${message}</p>
         `;
         messageBox.classList.remove('hidden');
@@ -80,20 +82,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 confirmBtn = document.createElement('button');
                 confirmBtn.id = 'messageBoxConfirmBtn';
                 confirmBtn.textContent = 'Xác nhận';
-                confirmBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2 mt-4'; // Added mt-4
+                confirmBtn.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ml-2 mt-4';
                 messageBox.querySelector('.bg-gray-800').appendChild(confirmBtn);
             } else {
                 confirmBtn.classList.remove('hidden');
             }
-            messageBoxCloseBtn.textContent = 'Hủy';
+            closeButtonText = 'Hủy'; // Change close button text to "Hủy" for confirmation
             messageBoxCloseBtn.classList.remove('hidden');
-            messageBoxCloseBtn.classList.add('mt-4'); // Added mt-4
+            messageBoxCloseBtn.classList.add('mt-4');
         } else {
             if (confirmBtn) confirmBtn.classList.add('hidden');
-            messageBoxCloseBtn.textContent = 'Đóng';
+            // For simple error/success/info, the button is 'Đóng' or 'OK'
+            closeButtonText = 'OK'; // Set to OK as per your image for simple errors
             messageBoxCloseBtn.classList.remove('hidden');
-            messageBoxCloseBtn.classList.add('mt-4'); // Added mt-4
+            messageBoxCloseBtn.classList.add('mt-4');
         }
+        messageBoxCloseBtn.textContent = closeButtonText; // Apply button text
     }
 
     /**
@@ -103,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      */
     function showConfirmationBox(message) {
         return new Promise(resolve => {
-            showMessageBox(message, 'info', true); // Use info type for confirmation
+            showMessageBox(message, 'info', true, 'Xác nhận hành động'); // Custom title for confirmation
 
             const confirmBtn = messageBox.querySelector('#messageBoxConfirmBtn');
             const handleConfirm = () => {
@@ -191,23 +195,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR ADD ITEM BUTTON ---
         if (!tenhang) {
-            showMessageBox('Vui lòng nhập tên hàng.', 'error');
+            showMessageBox('Vui lòng nhập tên hàng.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         if (!dvt) {
-            showMessageBox('Vui lòng nhập đơn vị tính.', 'error');
+            showMessageBox('Vui lòng nhập đơn vị tính.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         if (isNaN(soluong) || soluong <= 0) {
-            showMessageBox('Số lượng phải là số và lớn hơn 0.', 'error');
+            showMessageBox('Số lượng phải là số và lớn hơn 0.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         if (isNaN(dongia) || dongia < 0) {
-            showMessageBox('Đơn giá phải là số và không âm.', 'error');
+            showMessageBox('Đơn giá phải là số và không âm.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         if (isNaN(ck) || ck < 0 || ck > 100) {
-            showMessageBox('Chiết khấu phải là số từ 0 đến 100.', 'error');
+            showMessageBox('Chiết khấu phải là số từ 0 đến 100.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         // --- END VALIDATION ---
@@ -255,15 +259,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR SAVE RECEIPT BUTTON ---
         if (!daily) {
-            showMessageBox('Vui lòng nhập tên đại lý.', 'error');
+            showMessageBox('Vui lòng nhập tên đại lý.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         if (!ngay) {
-            showMessageBox('Vui lòng chọn ngày nhập hàng.', 'error');
+            showMessageBox('Vui lòng chọn ngày nhập hàng.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         if (currentReceiptItems.length === 0) {
-            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error');
+            showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         // --- END VALIDATION ---
@@ -315,7 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR SEARCH BUTTON ---
         if (!dailySearch && !monthSearch) {
-            showMessageBox('Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error');
+            showMessageBox('Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error', false, 'Thiếu hoặc sai thông tin');
             receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
             receiptsSectionCard.classList.add('hidden'); // Ẩn lại nếu không có tiêu chí
             return;
@@ -449,7 +453,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR DELETE SELECTED BUTTON ---
         if (selectedItemsToDelete.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error');
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         // --- END VALIDATION ---
@@ -499,7 +503,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
         // --- VALIDATION FOR VIEW DETAILS BUTTON ---
         if (checkedCheckboxes.length === 0) {
-            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error');
+            showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error', false, 'Thiếu hoặc sai thông tin');
             return;
         }
         // --- END VALIDATION ---
