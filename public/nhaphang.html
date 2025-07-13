@@ -45,7 +45,8 @@
         <!-- Input Section for New Receipt (Visible by default) -->
         <div class="card mb-4">
             <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Đã thay đổi grid layout để hiển thị các input theo hàng ngang -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="dailyName" class="block text-sm font-medium text-gray-300">Tên đại lý:</label>
                     <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
@@ -118,7 +119,7 @@
         </div>
 
         <!-- Search and Display Section (Hidden initially) -->
-        <div id="receiptsSectionCard" class="card hidden"> <!-- Đã thêm ID và lớp 'hidden' -->
+        <div id="receiptsSectionCard" class="card hidden">
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
