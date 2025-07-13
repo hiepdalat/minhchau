@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dongia = parseFloat(itemPriceInput.value);
         const ck = parseFloat(itemDiscountInput.value);
 
+        // --- VALIDATION FOR ADD ITEM BUTTON ---
         if (!tenhang) {
             showMessageBox('Vui lòng nhập tên hàng.', 'error');
             return;
@@ -195,6 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showMessageBox('Chiết khấu phải là số từ 0 đến 100.', 'error');
             return;
         }
+        // --- END VALIDATION ---
 
         const { gianhap, thanhtien } = calculateItemTotals(dongia, ck, soluong);
 
@@ -237,6 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const daily = dailyNameInput.value.trim();
         const ngay = receiptDateInput.value; // YYYY-MM-DD format
 
+        // --- VALIDATION FOR SAVE RECEIPT BUTTON ---
         if (!daily) {
             showMessageBox('Vui lòng nhập tên đại lý.', 'error');
             return;
@@ -249,6 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             showMessageBox('Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error');
             return;
         }
+        // --- END VALIDATION ---
 
         const totalAmount = currentReceiptItems.reduce((sum, item) => sum + item.thanhtien, 0);
 
@@ -295,12 +299,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const dailySearch = searchDailyNameInput.value.trim();
         const monthSearch = searchMonthInput.value; // YYYY-MM format
 
+        // --- VALIDATION FOR SEARCH BUTTON ---
         if (!dailySearch && !monthSearch) {
             showMessageBox('Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error');
             receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
             receiptsSectionCard.classList.add('hidden'); // Ẩn lại nếu không có tiêu chí
             return;
         }
+        // --- END VALIDATION ---
 
         let url = '/api/nhaphang?';
         if (dailySearch) {
@@ -322,6 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 receiptsSectionCard.classList.remove('hidden');
 
                 if (receipts.length === 0) {
+                    showMessageBox('Không tìm thấy phiếu nhập nào phù hợp với tiêu chí tìm kiếm.', 'info'); // Thông báo khi không có kết quả
                     receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
                     grandTotalAllItemsSpan.textContent = formatCurrency(0);
                     return;
@@ -426,10 +433,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
 
+        // --- VALIDATION FOR DELETE SELECTED BUTTON ---
         if (selectedItemsToDelete.length === 0) {
             showMessageBox('Vui lòng chọn ít nhất một món hàng để xóa.', 'error');
             return;
         }
+        // --- END VALIDATION ---
 
         const confirmed = await showConfirmationBox('Bạn có chắc chắn muốn xóa các món hàng đã chọn?');
         if (!confirmed) {
@@ -474,10 +483,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- View Details Button Logic ---
     viewDetailsBtn.addEventListener('click', async () => {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
+        // --- VALIDATION FOR VIEW DETAILS BUTTON ---
         if (checkedCheckboxes.length === 0) {
             showMessageBox('Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error');
             return;
         }
+        // --- END VALIDATION ---
 
         const firstCheckedReceiptId = checkedCheckboxes[0].dataset.receiptId;
 
