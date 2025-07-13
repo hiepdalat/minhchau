@@ -53,12 +53,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 displayTitle = customTitle || 'Lỗi'; // Use customTitle if provided, else 'Lỗi'
                 titleClass = 'text-red-400 text-2xl font-bold mb-2'; // Bigger, bolder title
                 messageClass = 'text-lg text-gray-300'; // Specific message below title
+                closeButtonText = 'OK'; // For error, button text is OK
                 break;
             case 'success':
                 iconHtml = '<i class="fas fa-check-circle text-green-500 text-3xl mb-2"></i>';
                 displayTitle = customTitle || 'Thành công';
                 titleClass = 'text-green-400 text-xl font-bold mb-2';
                 messageClass = 'text-lg text-gray-300';
+                closeButtonText = 'OK'; // For success, button text is OK
                 break;
             case 'info':
             default:
@@ -66,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 displayTitle = customTitle || 'Thông báo';
                 titleClass = 'text-yellow-400 text-xl font-bold mb-2';
                 messageClass = 'text-lg text-gray-300';
+                closeButtonText = 'Đóng'; // For info, button text is Đóng
                 break;
         }
 
@@ -92,8 +95,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             messageBoxCloseBtn.classList.add('mt-4');
         } else {
             if (confirmBtn) confirmBtn.classList.add('hidden');
-            // For simple error/success/info, the button is 'Đóng' or 'OK'
-            closeButtonText = 'OK'; // Set to OK as per your image for simple errors
             messageBoxCloseBtn.classList.remove('hidden');
             messageBoxCloseBtn.classList.add('mt-4');
         }
