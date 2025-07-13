@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         totalAmountSpan.textContent = formatCurrency(totalAmount);
          // ✅ Hiển thị bảng và nút lưu khi có món hàng
-        const currentItemsTableWrapper = document.getElementById("inputTableWrapper");
+        const inputScrollWrapper = document.getElementById("inputScrollWrapper");
         const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
         if (currentReceiptItems.length > 0) {
