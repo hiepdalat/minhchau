@@ -107,7 +107,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         totalAmountSpan.textContent = formatCurrency(totalAmount);
          // ✅ Hiển thị bảng và nút lưu khi có món hàng
-       const currentItemsTableWrapper = document.getElementById("inputTableWrapper");
+      /*
+        const currentItemsTableWrapper = document.getElementById("inputTableWrapper");
         const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
         if (currentReceiptItems.length > 0) {
@@ -116,6 +117,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
           currentItemsTableWrapper.style.display = "none";
           saveReceiptButton.style.display = "none";
+}*/
+        // ✅ Hiển thị hoặc ẩn toàn bộ khung nhập hàng
+    const inputScrollWrapper = document.getElementById("inputScrollWrapper");
+    if (currentReceiptItems.length > 0) {
+        inputScrollWrapper.style.display = "block";
+    } else {
+        inputScrollWrapper.style.display = "none";
+    }
 }
     }
     
