@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <td style="text-align: left;">${item.tenhang}</td>
                             <td>${item.soluong} ${item.dvt}</td>
                             <td>${formatCurrency(item.dongia)}</td>
-                            <td>${formatCurrency(item.thanhtien)}</td>
+                            <td>${item.ck}%</td> <td>${formatCurrency(item.thanhtien)}</td>
                         `;
                         totalAmountForDisplay += item.thanhtien;
                     });
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (response.status === 401) {
                 alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
                 window.close();
-                window.opener.location.href = '/index.html';
+                window.opener.location.href = '/index.html'; // Redirect to login page in the opener window
             } else {
                 const errorData = await response.json();
                 alert(`Lỗi khi tải chi tiết phiếu nhập: ${errorData.error || response.statusText}`);
@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // --- Initial Load Logic ---
     if (dailyName && dateParam) {
         loadReceiptDetailsByDailyAndDate(dailyName, dateParam);
     } else {
