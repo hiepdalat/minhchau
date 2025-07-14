@@ -20,20 +20,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const selectAllReceiptsCheckbox = document.getElementById('selectAllReceipts');
     const grandTotalAllItemsSpan = document.getElementById('grandTotalAllItems'); // Tổng tiền tất cả mặt hàng hiển thị
 
-    // const messageBox = document.getElementById('messageBox'); // Not needed with SweetAlert2
-    // const messageText = document.getElementById('messageText'); // Not needed with SweetAlert2
-    // const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn'); // Not needed with SweetAlert2
-    // const messageBoxContent = messageBox.querySelector('.bg-gray-800'); // Not needed with SweetAlert2
     const receiptsSectionCard = document.getElementById('receiptsSectionCard');
 
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
-// Hàm loại bỏ dấu tiếng Việt
+
+    // Hàm loại bỏ dấu tiếng Việt
     function removeVietnameseTones(str) {
         return str.normalize("NFD")
             .replace(/\p{Diacritic}/gu, "")
             .replace(/đ/g, "d").replace(/Đ/g, "D")
             .toLowerCase();
     }
+
     // --- Helper Functions (Now using SweetAlert2) ---
 
     /**
@@ -112,39 +110,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         totalAmountSpan.textContent = formatCurrency(totalAmount);
-         // ✅ Hiển thị bảng và nút lưu khi có món hàng
-      /*
-        const currentItemsTableWrapper = document.getElementById("inputTableWrapper");
+
+        // Hiển thị hoặc ẩn toàn bộ khung nhập hàng
+        const inputScrollWrapper = document.getElementById("inputScrollWrapper");
         const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
         if (currentReceiptItems.length > 0) {
-          currentItemsTableWrapper.style.display = "block";
-          saveReceiptButton.style.display = "block";
-    } else {
-          currentItemsTableWrapper.style.display = "none";
-          saveReceiptButton.style.display = "none";
-}*/
-        // ✅ Hiển thị hoặc ẩn toàn bộ khung nhập hàng
-/*        // ✅ Hiển thị hoặc ẩn toàn bộ khung nhập hàng
-    const inputScrollWrapper = document.getElementById("inputScrollWrapper");
-const saveReceiptButton = document.getElementById("saveReceiptBtn");
-
-@@ -128,426 +128,435 @@
-} else {
-    inputScrollWrapper.style.display = "none";
-    saveReceiptButton.style.display = "none";
-}
-} */
-const inputScrollWrapper = document.getElementById("inputScrollWrapper");
-const saveReceiptButton = document.getElementById("saveReceiptBtn");
-
-if (currentReceiptItems.length > 0) {
-    inputScrollWrapper.classList.remove('hidden');
-    saveReceiptButton.classList.remove('hidden');
-} else {
-    inputScrollWrapper.classList.add('hidden');
-    saveReceiptButton.classList.add('hidden');
-}
+            inputScrollWrapper.classList.remove('hidden');
+            saveReceiptButton.classList.remove('hidden');
+        } else {
+            inputScrollWrapper.classList.add('hidden');
+            saveReceiptButton.classList.add('hidden');
+        }
     }
 
     /**
@@ -287,12 +264,23 @@ if (currentReceiptItems.length > 0) {
             await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error');
             receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
             receiptsSectionCard.classList.add('hidden');
+            grandTotalAllItemsSpan.textContent = '0 ₫'; // Reset total on no search criteria
+            updateViewDetailsButtonState(); // Update button state
             return;
         }
 
         try {
             const response = await fetch('/api/nhaphang');
-            if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
+            if (!response.ok) {
+                if (response.status === 401) {
+                    await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                    setTimeout(() => window.location.href = '/index.html', 2000);
+                    return;
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(`Lỗi khi tải dữ liệu: ${errorData.error || response.statusText}`);
+                }
+            }
             const receipts = await response.json();
 
             const filtered = receipts.filter(receipt => {
@@ -307,10 +295,12 @@ if (currentReceiptItems.length > 0) {
             if (filtered.length === 0) {
                 receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
                 grandTotalAllItemsSpan.textContent = '0 ₫';
+                receiptsSectionCard.classList.add('hidden'); // Hide the section card if no results
+                updateViewDetailsButtonState(); // Update button state
                 return;
             }
 
-            receiptsSectionCard.classList.remove('hidden');
+            receiptsSectionCard.classList.remove('hidden'); // Show the section card if there are results
 
             filtered.forEach(receipt => {
                 const receiptDate = new Date(receipt.ngay);
@@ -343,22 +333,13 @@ if (currentReceiptItems.length > 0) {
             });
 
             grandTotalAllItemsSpan.textContent = formatCurrency(grandTotal);
+            updateViewDetailsButtonState(); // Cập nhật trạng thái nút sau khi render thành công
         } catch (error) {
             console.error('Lỗi:', error);
             receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-red-500">Lỗi khi tải dữ liệu.</td></tr>';
-        }
-    }
-                updateViewDetailsButtonState(); // Cập nhật trạng thái nút sau khi render
-            } else if (response.status === 401) {
-                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
-                setTimeout(() => window.location.href = '/index.html', 2000);
-            } else {
-                const errorData = await response.json();
-                await showCustomAlert('Lỗi!', `Lỗi khi tải chi tiết phiếu nhập: ${errorData.error || response.statusText}`, 'error');
-            }
-        } catch (error) {
-            console.error('Lỗi mạng hoặc server:', error);
-            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
+            receiptsSectionCard.classList.add('hidden'); // Hide on error
+            grandTotalAllItemsSpan.textContent = '0 ₫'; // Reset total on error
+            updateViewDetailsButtonState(); // Update button state on error
         }
     }
 
@@ -389,7 +370,6 @@ if (currentReceiptItems.length > 0) {
         }
     });
 
-
     // Event listener for select all checkbox
     selectAllReceiptsCheckbox.addEventListener('change', (event) => {
         document.querySelectorAll('.item-checkbox').forEach(checkbox => {
@@ -397,7 +377,6 @@ if (currentReceiptItems.length > 0) {
         });
         updateViewDetailsButtonState(); // Update button state after select all
     });
-
 
     /**
      * Deletes selected items from receipts.
@@ -441,7 +420,7 @@ if (currentReceiptItems.length > 0) {
                 } else if (response.status === 401) {
                     await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                     setTimeout(() => window.location.href = '/index.html', 2000);
-                    return;
+                    return; // Exit loop and function if session expires
                 } else {
                     failCount++;
                     const errorData = await response.json();
@@ -454,8 +433,8 @@ if (currentReceiptItems.length > 0) {
         }
 
         await showCustomAlert('Thông báo!', `Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info');
-        selectAllReceiptsCheckbox.checked = false;
-        await fetchAndRenderReceipts();
+        selectAllReceiptsCheckbox.checked = false; // Uncheck select all after deletion
+        await fetchAndRenderReceipts(); // Re-render receipts to show updated list
     });
 
     // --- View Details Button Logic ---
@@ -468,6 +447,7 @@ if (currentReceiptItems.length > 0) {
         }
         // --- END VALIDATION ---
 
+        // Lấy receiptId của món hàng được chọn đầu tiên để xem chi tiết phiếu nhập
         const firstCheckedReceiptId = checkedCheckboxes[0].dataset.receiptId;
 
         try {
@@ -490,7 +470,6 @@ if (currentReceiptItems.length > 0) {
             await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
-
 
     // --- Date Ticker Logic (from existing style.css) ---
     const dateTicker = document.getElementById('dateTicker');
@@ -544,7 +523,10 @@ if (currentReceiptItems.length > 0) {
         animateTicker();
         setInterval(updateDateTicker, 1000); // Update every second
 
-        // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị ẩn đi ban đầu
+        // Đảm bảo phần hiển thị các phiếu nhập từ đại lý ẩn đi ban đầu
+        receiptsSectionCard.classList.add('hidden');
+        grandTotalAllItemsSpan.textContent = '0 ₫';
+        updateViewDetailsButtonState(); // Đảm bảo nút xem chi tiết bị vô hiệu hóa khi chưa có gì được tải
     }
 
     init(); // Call initialization function
