@@ -120,11 +120,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 }*/
         // ✅ Hiển thị hoặc ẩn toàn bộ khung nhập hàng
     const inputScrollWrapper = document.getElementById("inputScrollWrapper");
-    if (currentReceiptItems.length > 0) {
-        inputScrollWrapper.style.display = "block";
-    } else {
-        inputScrollWrapper.style.display = "none";
-    }
+const saveReceiptButton = document.getElementById("saveReceiptBtn");
+
+if (currentReceiptItems.length > 0) {
+    inputScrollWrapper.style.display = "block";
+    saveReceiptButton.style.display = "block";
+} else {
+    inputScrollWrapper.style.display = "none";
+    saveReceiptButton.style.display = "none";
+}
 
     }
     
