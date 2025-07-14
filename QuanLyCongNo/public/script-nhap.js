@@ -1,14 +1,12 @@
-// ===== script-nhap.js (hoan chinh) =====
+// ===== script-nhap.js (hoan chinh - CÁCH 1: lọc không dấu phía client) =====
 document.addEventListener('DOMContentLoaded', async () => {
-    // === Hàm xóa dấu tiếng Việt ===
     function removeVietnameseTones(str) {
         return str.normalize("NFD")
-            .replace(/\u0300-\u036f/g, "")
+            .replace(/\p{Diacritic}/gu, '')
             .replace(/đ/g, "d").replace(/Đ/g, "D")
             .toLowerCase();
     }
 
-    // --- DOM Elements ---
     const dailyNameInput = document.getElementById('dailyName');
     const receiptDateInput = document.getElementById('receiptDate');
     const itemNameInput = document.getElementById('itemName');
@@ -117,10 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        let url = '/api/nhaphang?';
-        if (dailySearchRaw) url += `daily=${encodeURIComponent(dailySearchRaw)}&`;
-        if (monthSearch) url += `month=${encodeURIComponent(monthSearch)}&`;
-        url = url.slice(0, -1);
+        const url = '/api/nhaphang';
 
         try {
             const response = await fetch(url);
@@ -132,9 +127,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 receiptsSectionCard.classList.remove('hidden');
 
                 const filteredReceipts = receipts.filter(receipt => {
-                    if (!dailySearch) return true;
-                    const tenDaily = removeVietnameseTones(receipt.daily || '');
-                    return tenDaily.includes(dailySearch);
+                    const dailyName = removeVietnameseTones(receipt.daily || '');
+                    const matchDaily = !dailySearch || dailyName.includes(dailySearch);
+
+                    const matchMonth = !monthSearch || (receipt.ngay && receipt.ngay.startsWith(monthSearch));
+
+                    return matchDaily && matchMonth;
                 });
 
                 if (filteredReceipts.length === 0) {
