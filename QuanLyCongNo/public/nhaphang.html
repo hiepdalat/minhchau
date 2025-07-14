@@ -27,6 +27,8 @@
             top: 0;
             z-index: 1; /* Đảm bảo tiêu đề nằm trên nội dung */
             background-color: #4a5568; /* Giữ màu nền cho tiêu đề khi cuộn */
+            overflow-y: auto;
+          overflow-x: auto;
         }
         #inputTableWrapper,
         #saveReceiptBtn {
@@ -36,13 +38,7 @@
           overflow-x: auto;
           padding-right: 4px;
          }
-        #inputScrollWrapper {
-             display: none; /* Ẩn mặc định */
-          max-height: 300px;
-          overflow-y: auto;
-          overflow-x: auto;
-          padding-right: 4px;
-        }
+        
         /* Đảm bảo các style chung của table vẫn được áp dụng từ style.css */
         /* Ví dụ: table-layout: fixed; word-wrap: break-word; */
     </style>
