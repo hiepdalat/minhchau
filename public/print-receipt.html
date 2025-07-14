@@ -1,216 +1,223 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phiếu Nhập Hàng</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            color: #333;
-        }
-        .invoice-container {
-            width: 210mm; /* A4 width */
-            min-height: 297mm; /* A4 height */
-            background-color: #fff;
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-        .header .logo {
-            width: 80px; /* Adjust as needed */
-            height: auto;
-            margin-right: 20px;
-        }
-        .company-info {
-            flex-grow: 1;
-        }
-        .company-info h2 {
-            margin: 0 0 5px 0;
-            font-size: 20px;
-            color: #0056b3;
-        }
-        .company-info p {
-            margin: 0;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-        .invoice-title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #0056b3;
-        }
-        .invoice-date {
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 20px;
-            color: #555;
-        }
-        .customer-info {
-            margin-bottom: 20px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .customer-info p {
-            margin: 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 13px;
-        }
-        table th, table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        table th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-            color: #333;
-        }
-        .total-row td {
-            font-weight: bold;
-            text-align: right;
-            padding-right: 10px;
-        }
-        .total-row td:last-child {
-            text-align: center;
-        }
-        .notes {
-            font-size: 13px;
-            margin-bottom: 30px;
-            font-style: italic;
-            color: #666;
-        }
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            text-align: center;
-        }
-        .signature-block {
-            width: 45%;
-        }
-        .signature-block p {
-            margin: 0;
-            font-weight: bold;
-        }
-        .signature-block span {
-            display: block;
-            margin-top: 5px;
-            font-style: italic;
-            color: #777;
-        }
-        @media print {
-            body {
-                background-color: #fff;
-                padding: 0;
-            }
-            .invoice-container {
-                box-shadow: none;
-                margin: 0;
-                border: none;
-            }
-            .print-button {
-                display: none; /* Hide print button when printing */
-            }
-        }
-        .print-button-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .print-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .print-button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Nhập Hàng</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px; /* Add padding to the body for space around the container */
+            background-color: #f4f4f4; /* Light gray background for the page */
+            /* Removed flexbox properties from body for more standard document flow */
+            /* display: flex; */
+            /* justify-content: center; */
+            /* align-items: flex-start; */
+            /* min-height: 100vh; */
+            color: #333;
+        }
+        .invoice-container {
+            width: 210mm; /* A4 width */
+            min-height: 297mm; /* A4 height */
+            background-color: #fff; /* White background for the invoice itself */
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            margin: 20px auto; /* Centers the container horizontally and adds top/bottom margin */
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .header .logo {
+            width: 80px; /* Ensures the logo width */
+            height: auto; /* Maintains aspect ratio */
+            margin-right: 20px;
+            /* Added for extra robustness if images are problematic */
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .company-info {
+            flex-grow: 1;
+        }
+        .company-info h2 {
+            margin: 0 0 5px 0;
+            font-size: 20px;
+            color: #0056b3;
+        }
+        .company-info p {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .invoice-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0056b3;
+        }
+        .invoice-date {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .customer-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .customer-info p {
+            margin: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+        .total-row td {
+            font-weight: bold;
+            text-align: right;
+            padding-right: 10px;
+        }
+        .total-row td:last-child {
+            text-align: center;
+        }
+        .notes {
+            font-size: 13px;
+            margin-bottom: 30px;
+            font-style: italic;
+            color: #666;
+        }
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            text-align: center;
+        }
+        .signature-block {
+            width: 45%;
+        }
+        .signature-block p {
+            margin: 0;
+            font-weight: bold;
+        }
+        .signature-block span {
+            display: block;
+            margin-top: 5px;
+            font-style: italic;
+            color: #777;
+        }
+        @media print {
+            body {
+                background-color: #fff; /* Ensure white background for printing */
+                padding: 0; /* No padding on body when printing */
+            }
+            .invoice-container {
+                box-shadow: none; /* No shadow when printing */
+                margin: 0; /* No margin when printing */
+                border: none;
+            }
+            .print-button {
+                display: none; /* Hide print button when printing */
+            }
+        }
+        .print-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .print-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .print-button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <div class="invoice-container">
-        <div class="header">
-            <img src="https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png" alt="Logo" class="logo">
-            <div class="company-info">
-                <h2>ĐIỆN NƯỚC MINH CHÂU</h2>
-                <p>MST: 8056881027-001</p>
-                <p>Chợ Xuân Thọ – P. Xuân Trường – TP Đà Lạt</p>
-                <p>ĐT: 0973778279 – Zalo: 0938039084</p>
-                <p>STK: 9973778279 – Vietcombank – Dương Xuân Hiệp</p>
-            </div>
-        </div>
+    <div class="invoice-container">
+        <div class="header">
+            <img src="https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png" alt="Logo" class="logo">
+            <div class="company-info">
+                <h2>ĐIỆN NƯỚC MINH CHÂU</h2>
+                <p>MST: 8056881027-001</p>
+                <p>Chợ Xuân Thọ – P. Xuân Trường – TP Đà Lạt</p>
+                <p>ĐT: 0973778279 – Zalo: 0938039084</p>
+                <p>STK: 9973778279 – Vietcombank – Dương Xuân Hiệp</p>
+            </div>
+        </div>
 
-        <h1 class="invoice-title">PHIẾU NHẬP HÀNG</h1>
-        <p class="invoice-date">Ngày: <span id="invoiceDate"></span></p>
+        <h1 class="invoice-title">PHIẾU NHẬP HÀNG</h1>
+        <p class="invoice-date">Ngày: <span id="invoiceDate"></span></p>
 
-        <div class="customer-info">
-            <p>Đại lý: <span id="dailyName"></span></p>
-            <p>Địa chỉ: <span id="dailyAddress"></span></p>
-        </div>
+        <div class="customer-info">
+            <p>Đại lý: <span id="dailyName"></span></p>
+            <p>Địa chỉ: <span id="dailyAddress"></span></p>
+        </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>STT</th>
-                    <th>Tên hàng hóa, dịch vụ</th>
-                    <th>Số lượng</th>
-                    <th>Đơn giá</th>
-                    <th>CK (%)</th>                     <th>Thành tiền</th>
-                </tr>
-            </thead>
-            <tbody id="invoiceItems">
-                            </tbody>
-            <tfoot>
-                <tr class="total-row">
-                    <td colspan="5">Tổng cộng</td>                     <td id="invoiceTotal">0</td>
-                </tr>
-            </tfoot>
-        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Tên hàng hóa, dịch vụ</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>CK (%)</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceItems">
+                </tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="5">Tổng cộng</td>
+                    <td id="invoiceTotal">0</td>
+                </tr>
+            </tfoot>
+        </table>
 
-        <p class="notes">Số tiền viết bằng chữ: <span id="amountInWords"></span></p>
+        <p class="notes">Số tiền viết bằng chữ: <span id="amountInWords"></span></p>
 
-        <div class="signatures">
-            <div class="signature-block">
-                <p>ĐẠI LÝ</p>
-                <span>(Ký, ghi rõ họ tên)</span>
-            </div>
-            <div class="signature-block">
-                <p>NGƯỜI NHẬP HÀNG</p>
-                <p>Ngày: <span id="importerDate"></span></p>
-                <span>(Ký, ghi rõ họ tên)</span>
-            </div>
-        </div>
-    </div>
+        <div class="signatures">
+            <div class="signature-block">
+                <p>ĐẠI LÝ</p>
+                <span>(Ký, ghi rõ họ tên)</span>
+            </div>
+            <div class="signature-block">
+                <p>NGƯỜI NHẬP HÀNG</p>
+                <p>Ngày: <span id="importerDate"></span></p>
+                <span>(Ký, ghi rõ họ tên)</span>
+            </div>
+        </div>
+    </div>
 
-    <div class="print-button-container">
-        <button class="print-button" onclick="window.print()">In Phiếu Nhập</button>
-    </div>
+    <div class="print-button-container">
+        <button class="print-button" onclick="window.print()">In Phiếu Nhập</button>
+    </div>
 
-    <script src="/script-print-receipt.js"></script>
+    <script src="/script-print-receipt.js"></script>
 </body>
 </html>
