@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           currentItemsTableWrapper.style.display = "none";
           saveReceiptButton.style.display = "none";
 }*/
-        // ✅ Hiển thị hoặc ẩn toàn bộ khung nhập hàng
+/*        // ✅ Hiển thị hoặc ẩn toàn bộ khung nhập hàng
     const inputScrollWrapper = document.getElementById("inputScrollWrapper");
 const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
@@ -128,8 +128,17 @@ if (currentReceiptItems.length > 0) {
 } else {
     inputScrollWrapper.style.display = "none";
     saveReceiptButton.style.display = "none";
-}
+} */
+const inputScrollWrapper = document.getElementById("inputScrollWrapper");
+const saveReceiptButton = document.getElementById("saveReceiptBtn");
 
+if (currentReceiptItems.length > 0) {
+    inputScrollWrapper.classList.remove('hidden');
+    saveReceiptButton.classList.remove('hidden');
+} else {
+    inputScrollWrapper.classList.add('hidden');
+    saveReceiptButton.classList.add('hidden');
+}
     }
     
     /**
