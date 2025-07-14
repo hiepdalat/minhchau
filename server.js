@@ -207,7 +207,6 @@ app.post('/api/nhaphang', requireLogin, async (req, res) => {
         const newReceipt = new PhieuNhapKhoEntry({
             ngay: new Date(ngay),
             daily,
-            daily_khongdau: removeDiacritics(daily), // LƯU TÊN ĐẠI LÝ KHÔNG DẤU
             items,
             tongtien
         });
@@ -219,16 +218,13 @@ app.post('/api/nhaphang', requireLogin, async (req, res) => {
     }
 });
 
-// ======== API Lấy danh sách nhập hàng (Đã cập nhật để tìm kiếm theo daily_khongdau) =======
 app.get('/api/nhaphang', requireLogin, async (req, res) => {
     try {
         const { daily, month } = req.query;
         let query = {};
 
         if (daily) {
-            // CHUẨN HÓA CHUỖI TÌM KIẾM VÀ TÌM TRÊN TRƯỜNG daily_khongdau
-            const searchDailyNormalized = removeDiacritics(daily);
-            query.daily_khongdau = new RegExp(searchDailyNormalized, 'i'); // 'i' cho tìm kiếm không phân biệt chữ hoa/thường
+            query.daily = new RegExp(daily, 'i');
         }
 
         if (month) {
@@ -249,6 +245,7 @@ app.get('/api/nhaphang', requireLogin, async (req, res) => {
     }
 });
 
+// API MỚI: Lấy một phiếu nhập cụ thể theo ID
 app.get('/api/nhaphang/:id', requireLogin, async (req, res) => {
     try {
         const { id } = req.params;
@@ -263,9 +260,11 @@ app.get('/api/nhaphang/:id', requireLogin, async (req, res) => {
     }
 });
 
+
+// API để xóa TOÀN BỘ phiếu nhập (dựa trên _id của phiếu)
 app.delete('/api/nhaphang', requireLogin, async (req, res) => {
     try {
-        const { ids } = req.body;
+        const { ids } = req.body; // Expect an array of receipt IDs to delete
         if (!Array.isArray(ids) || ids.length === 0) {
             return res.status(400).json({ error: 'Vui lòng cung cấp ít nhất một ID phiếu nhập để xóa.' });
         }
@@ -277,6 +276,7 @@ app.delete('/api/nhaphang', requireLogin, async (req, res) => {
     }
 });
 
+// API để xóa một món hàng cụ thể khỏi một phiếu nhập
 app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
     try {
         const { receiptId, itemId } = req.body;
@@ -293,13 +293,16 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
 
         const initialItemCount = receipt.items.length;
 
+        // Sử dụng $pull để xóa subdocument theo _id của nó
         receipt.items.pull(itemId);
 
         if (receipt.items.length === initialItemCount) {
+             // If item count didn't change, it means the item was not found.
              return res.status(404).json({ error: 'Không tìm thấy món hàng trong phiếu nhập này.' });
         }
 
-        receipt.tongtien = receipt.items.reduce((sum, item) => item.thanhtien + sum, 0);
+        // Cập nhật lại tổng tiền của phiếu nhập
+        receipt.tongtien = receipt.items.reduce((sum, item) => item.thanhtien + sum, 0); // Corrected sum calculation
 
         await receipt.save();
 
@@ -309,9 +312,6 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
         res.status(500).json({ error: 'Không thể xóa món hàng khỏi phiếu nhập.' });
     }
 });
-
-
-
 
 
 // ======= API SẢN PHẨM (cho bán hàng) =======
