@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         inputScrollWrapper.style.display = "none";
     }
-}
+
     }
     
     /**
