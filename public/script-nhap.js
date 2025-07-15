@@ -136,23 +136,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR ADD ITEM BUTTON ---
         if (!tenhang) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên hàng.', 'error');
+            await showCustomAlert('⚠️Bạn chưa nhập tên hàng hóa!', 'Vui lòng nhập tên hàng.', 'error');
             return;
         }
         if (!dvt) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập đơn vị tính.', 'error');
+            await showCustomAlert('⚠️Bạn chưa nhập đơn vị tính!', 'Vui lòng nhập đơn vị tính.', 'error');
             return;
         }
         if (isNaN(soluong) || soluong <= 0) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Số lượng phải là số và lớn hơn 0.', 'error');
+            await showCustomAlert('⚠️Bạn chưa nhập số lượng!', 'Số lượng phải là số và lớn hơn 0.', 'error');
             return;
         }
         if (isNaN(dongia) || dongia < 0) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Đơn giá phải là số và không âm.', 'error');
+            await showCustomAlert('⚠️Bạn chưa nhập đơn giá!', 'Đơn giá phải là số và không âm.', 'error');
             return;
         }
         if (isNaN(ck) || ck < 0 || ck > 100) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Chiết khấu phải là số từ 0 đến 100.', 'error');
+            await showCustomAlert('⚠️Bạn chưa nhập chiếc khấu!', 'Chiết khấu phải là số từ 0 đến 100.', 'error');
             return;
         }
         // --- END VALIDATION ---
@@ -200,15 +200,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR SAVE RECEIPT BUTTON ---
         if (!daily) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên đại lý.', 'error');
+            await showCustomAlert('⚠️', 'Vui lòng nhập tên đại lý.', 'error');
             return;
         }
         if (!ngay) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn ngày nhập hàng.', 'error');
+            await showCustomAlert('⚠️', 'Vui lòng chọn ngày nhập hàng.', 'error');
             return;
         }
         if (currentReceiptItems.length === 0) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error');
+            await showCustomAlert('⚠️', 'Vui lòng thêm ít nhất một mặt hàng vào phiếu nhập.', 'error');
             return;
         }
         // --- END VALIDATION ---
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.ok) {
-                await showCustomAlert('Thành công!', 'Phiếu nhập hàng đã được lưu thành công!', 'success');
+                await showCustomAlert('✅ Thành công!', 'Phiếu nhập hàng đã được lưu thành công!', 'success');
                 // Clear form and current items
                 dailyNameInput.value = '';
                 receiptDateInput.value = new Date().toISOString().split('T')[0]; // Reset to current date
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderCurrentItems();
                 // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị vẫn ẩn
             } else if (response.status === 401) {
-                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                await showCustomAlert('⚠️', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server:', error);
-            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
+            await showCustomAlert('⚠️', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
 
@@ -367,8 +367,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const monthSearch = searchMonthInput.value;
 
     if (!selectedDaily && !monthSearch) {
-        await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn tên đại lý hoặc tháng để tìm kiếm.', 'error');
-        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
+        await showCustomAlert('⚠️', 'Vui lòng chọn tên đại lý và tháng để tìm kiếm.', 'error');
+        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">⚠️ Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
         receiptsSectionCard.classList.add('hidden');
         return;
     }
@@ -482,12 +482,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- VALIDATION FOR DELETE SELECTED BUTTON ---
         if (selectedItemsToDelete.length === 0) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn ít nhất một món hàng để xóa.', 'error');
+            await showCustomAlert('⚠️', 'Vui lòng chọn ít nhất một món hàng để xóa.', 'error');
             return;
         }
         // --- END VALIDATION ---
 
-        const result = await showCustomAlert('Xác nhận hành động', 'Bạn có chắc chắn muốn xóa các món hàng đã chọn?', 'warning', 'Xác nhận', true, 'Hủy');
+        const result = await showCustomAlert('⚠️', 'Bạn có chắc chắn muốn xóa các món hàng đã chọn?', 'warning', 'Xác nhận', true, 'Hủy');
         if (!result.isConfirmed) {
             return;
         }
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (response.ok) {
                     successCount++;
                 } else if (response.status === 401) {
-                    await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                    await showCustomAlert('⚠️', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                     setTimeout(() => window.location.href = '/index.html', 2000);
                     return; // Exit loop and function if session expires
                 } else {
@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        await showCustomAlert('Thông báo!', `Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info');
+        await showCustomAlert('Thông báo!', `✅ Đã xóa thành công ${successCount} món hàng. Thất bại: ${failCount} món hàng.`, 'info');
         selectAllReceiptsCheckbox.checked = false; // Uncheck select all after deletion
         await fetchAndRenderReceipts(); // Re-render receipts to show updated list
     });
@@ -532,7 +532,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
         // --- VALIDATION FOR VIEW DETAILS BUTTON ---
         if (checkedCheckboxes.length === 0) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error');
+            await showCustomAlert('⚠️', 'Vui lòng chọn ít nhất một món hàng để xem chi tiết.', 'error');
             return;
         }
         // --- END VALIDATION ---
@@ -549,15 +549,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 window.open(`/print-receipt?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`, '_blank');
             } else if (response.status === 401) {
-                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                await showCustomAlert('⚠️', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             } else {
                 const errorData = await response.json();
-                await showCustomAlert('Lỗi!', `Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error');
+                await showCustomAlert('⚠️', `Lỗi khi lấy chi tiết phiếu nhập để in: ${errorData.error || response.statusText}`, 'error');
             }
         } catch (error) {
             console.error('Lỗi mạng hoặc server khi lấy chi tiết phiếu nhập để in:', error);
-            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
+            await showCustomAlert('⚠️', 'Lỗi kết nối đến server. Vui lòng thử lại sau.', 'error');
         }
     });
 
@@ -601,12 +601,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const sessionCheck = await fetch('/session-check');
             if (!sessionCheck.ok) {
-                await showCustomAlert('Lỗi!', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
+                await showCustomAlert('⚠️', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
             }
         } catch (error) {
             console.error('Session check failed:', error);
-            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng kiểm tra mạng và thử lại.', 'error');
+            await showCustomAlert('⚠️', 'Lỗi kết nối đến server. Vui lòng kiểm tra mạng và thử lại.', 'error');
         }
         await loadDailyNamesToSelect(); // ✅ GỌI loaddata NGAY TRONG INIT
         updateDateTicker();
@@ -628,11 +628,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (response.ok) {
                 window.location.href = '/index.html';
             } else {
-                await showCustomAlert('Lỗi!', 'Đăng xuất thất bại.', 'error');
+                await showCustomAlert('⚠️', 'Đăng xuất thất bại.', 'error');
             }
         } catch (error) {
             console.error('Lỗi khi đăng xuất:', error);
-            await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối. Không thể đăng xuất.', 'error');
+            await showCustomAlert('⚠️!', 'Lỗi kết nối. Không thể đăng xuất.', 'error');
         }
     };
 });
