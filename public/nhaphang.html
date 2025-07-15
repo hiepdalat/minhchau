@@ -60,6 +60,12 @@
         </div>
     </div>
 
+    <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5">
+                    <button id="btnBatDauNhap" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
+                        <i class="fas fa-plus mr-2">Bấm để nhập hàng mới</i>
+                    </button>
+
+<div id="formNhapHang" class="hidden mt-4">
     <div class="container p-4">
         <!-- Input Section for New Receipt (Visible by default) -->
         <div class="card mb-4">
@@ -132,6 +138,7 @@
             </button>
         </div>
     </div>
+</div>
         <!-- Search and Display Section (Hidden initially) -->
         <div id="receiptsSectionCard" class="card hidden">
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
@@ -142,7 +149,6 @@
                     <input type="text" id="searchDailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
                -->
                     <!-- Ô chọn đại lý (thay thế ô tìm trước kia) -->
-                    <select id="dailyNameSelect" class="w-full h-10 p-2 bg-gray-800 border border-gray-600 rounded text-white">
 <select id="dailyNameSelect" class="w-full h-14 p-2 bg-gray-800 border border-gray-600 rounded text-white">
   <option value="">-- Chọn đại lý --</option>
 </select>
