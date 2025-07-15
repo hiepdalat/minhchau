@@ -39,7 +39,7 @@
           padding-right: 4px;
          }
         #inputScrollWrapper {
- /* display: none; /* Ẩn mặc định */
+  /*display: none; /* Ẩn mặc định */
   max-height: 300px;
   overflow-y: auto;
   overflow-x: auto;
@@ -98,9 +98,9 @@
                     </button>
                 </div>
             </div>
-/*id="currentItemsTable"*?
+/*id="currentItemsTable"*/
             <!-- Table for Current Items in Receipt -->
-            <div id="inputScrollWrapper" class="hidden">
+           <div id="inputScrollWrapper" class="hidden">
             <div id="inputTableWrapper" class="table-wrapper mb-4">
               <table  class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
                     <thead>
@@ -137,9 +137,14 @@
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
+                   <!--
                     <label for="searchDailyName" class="block text-sm font-medium text-gray-300">Tìm theo tên đại lý:</label>
                     <input type="text" id="searchDailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
-               
+               -->
+                    <!-- Ô chọn đại lý (thay thế ô tìm trước kia) -->
+<select id="dailyNameSelect" class="w-full p-2 bg-gray-800 border border-gray-600 rounded text-white">
+  <option value="">-- Chọn đại lý --</option>
+</select>
                     <label for="searchMonth" class="block text-sm font-medium text-gray-300">Tháng:</label>
                     <input type="month" id="searchMonth" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
                 </div>
