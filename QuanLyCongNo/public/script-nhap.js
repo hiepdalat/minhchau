@@ -565,17 +565,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     const dateTicker = document.getElementById('dateTicker');
     const tickerWrap = document.getElementById('tickerWrap');
 
-    function updateDateTicker() {
+        function updateDateTicker() {
         const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+          /* const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
         const formattedDate = now.toLocaleDateString('vi-VN', options);
         tickerWrap.textContent = formattedDate;
+    */
+        const dateStr = now.toLocaleDateString('vi-VN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    const timeStr = now.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    const fullStr = `📅 ${dateStr} - 🕒 ${timeStr}`;
+    tickerWrap.textContent = fullStr;
+
+    // Gọi lại animateTicker mỗi khi cập nhật
+    animateTicker();
     }
 
     function animateTicker() {
-        const tickerWidth = tickerWrap.offsetWidth;
+       // const tickerWidth = tickerWrap.offsetWidth;
+       // const containerWidth = dateTicker.offsetWidth;
+        const tickerWidth = tickerWrap.scrollWidth;
         const containerWidth = dateTicker.offsetWidth;
-
+        
         if (tickerWidth > containerWidth) {
             let position = containerWidth;
             function frame() {
@@ -586,12 +607,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tickerWrap.style.transform = `translateX(${position}px)`;
                 requestAnimationFrame(frame);
             }
+            tickerWrap.style.willChange = "transform";
             requestAnimationFrame(frame);
         } else {
             tickerWrap.style.transform = `translateX(${(containerWidth - tickerWidth) / 2}px)`;
         }
     }
+        // Cập nhật liên tục mỗi giây
+        setInterval(updateDateTicker, 1000);
 
+        // Khởi tạo ngay khi load trang
+        document.addEventListener("DOMContentLoaded", updateDateTicker);
+    
     // --- Initial Load ---
     async function init() {
         // Set current date for the receiptDate input
