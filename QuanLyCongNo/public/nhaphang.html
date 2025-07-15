@@ -57,6 +57,9 @@
   vertical-align: middle;    /* Canh giữa so với các thành phần khác */
   appearance: none;  
 }
+        .input-compact {
+  max-width: 180px;        /* hoặc 160px, điều chỉnh cho vừa */
+}
         /* Đảm bảo các style chung của table vẫn được áp dụng từ style.css */
         /* Ví dụ: table-layout: fixed; word-wrap: break-word; */
     </style>
@@ -90,19 +93,19 @@
             <div class="flex flex-wrap gap-2 items-end mb-4">
                 <div class="flex-1 min-w-[120px]">
                     <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
-                    <input type="text" id="itemName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
+                    <input type="text" id="itemName" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
                
                     <label for="itemUnit" class="block text-sm font-medium text-gray-300">Đơn vị tính:</label>
-                    <input type="text" id="itemUnit" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
+                    <input type="text" id="itemUnit" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
                 
                     <label for="itemQuantity" class="block text-sm font-medium text-gray-300">Số lượng:</label>
-                    <input type="number" id="itemQuantity" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
+                    <input type="number" id="itemQuantity" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
                 
                     <label for="itemPrice" class="block text-sm font-medium text-gray-300">Đơn giá:</label>
-                    <input type="number" id="itemPrice" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
+                    <input type="number" id="itemPrice" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
                 
                     <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
-                    <input type="number" id="itemDiscount" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
+                    <input type="number" id="itemDiscount" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
                 </div>
                 <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5">
                     <button id="addItemBtn" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
