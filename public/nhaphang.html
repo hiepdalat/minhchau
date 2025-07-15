@@ -145,22 +145,25 @@
         <!-- Search and Display Section (Hidden initially) -->
         <div id="receiptsSectionCard" class="card hidden">
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
+            <div class="mb-4">
+                
                    <!--
                     <label for="searchDailyName" class="block text-sm font-medium text-gray-300">Tìm theo tên đại lý:</label>
                     <input type="text" id="searchDailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
                -->
                     <!-- Ô chọn đại lý (thay thế ô tìm trước kia) -->
-<select id="dailyNameSelect" class="dailyNameSelect">
-  <option value="">-- Chọn đại lý --</option>
-</select>
+                    <div class="flex items-center space-x-2">
+                        <select id="dailyNameSelect" class="dailyNameSelect">
+                             <option value="">-- Chọn đại lý --</option>
+                        </select>
                     <label for="searchMonth" class="block text-sm font-medium text-gray-300">Tháng:</label>
                     <input type="month" id="searchMonth" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
                 <button id="searchBtn" class="w-full py-2 px-4 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
                         🔍 Tìm 
                     </button>
                 </div>
+            </div>
+            
                 <div class="flex items-end space-x-2">
                     
                     <button id="viewDetailsBtn" class="w-full py-2 px-4 rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200" disabled>
