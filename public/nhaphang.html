@@ -60,12 +60,6 @@
         </div>
     </div>
 
-    <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5">
-                    <button id="btnBatDauNhap" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
-                        Bấm Để Nhập Hàng Mới
-                    </button>
-    </div>
-
     <div class="container p-4">
         <!-- Input Section for New Receipt (Visible by default) -->
         <div class="card mb-4">
@@ -154,11 +148,12 @@
 </select>
                     <label for="searchMonth" class="block text-sm font-medium text-gray-300">Tháng:</label>
                     <input type="month" id="searchMonth" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
+                <button id="searchBtn" class="w-full py-2 px-4 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
+                        <i class="fas fa-search mr-2"></i>Tìm 
+                    </button>
                 </div>
                 <div class="flex items-end space-x-2">
-                    <button id="searchBtn" class="w-full py-2 px-4 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
-                        <i class="fas fa-search mr-2"></i>Tìm
-                    </button>
+                    
                     <button id="viewDetailsBtn" class="w-full py-2 px-4 rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200" disabled>
                         <i class="fas fa-eye mr-2"></i>Xem chi tiết phiếu nhập
                     </button>
