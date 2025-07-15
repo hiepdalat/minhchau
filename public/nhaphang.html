@@ -45,14 +45,17 @@
   overflow-x: auto;
   padding-right: 4px;
 }
- .dailyNameSelect {
-  height: 30px;         /* hoặc 56px nếu muốn cao hơn */
-  padding: 8px;
+.dailyNameSelect {
+  height: 40px;              /* Cân với input */
+  padding: 0 12px;           /* Padding trái/phải, không thêm top/bottom */
   font-size: 16px;
+  line-height: 1.5;          /* Đảm bảo chiều cao dòng phù hợp */
   background-color: #ffffff;
-  color: 000000;
+  color: #000000;
   border: 1px solid #4a5568;
   border-radius: 6px;
+  vertical-align: middle;    /* Canh giữa so với các thành phần khác */
+  appearance: none;  
 }
         /* Đảm bảo các style chung của table vẫn được áp dụng từ style.css */
         /* Ví dụ: table-layout: fixed; word-wrap: break-word; */
