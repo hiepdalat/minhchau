@@ -82,22 +82,17 @@ button:active {
 }
 
 #dateTicker {
-  position: absolute;
-  bottom: 6px;
-  left: 0;
-  right: 0;
-  height: 24px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.4);
-  color: #ffff66;
-  font-size: 16px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px #000;
-  z-index: 99;
-  padding-left: 12px;
+  white-space: nowrap;
+  height: 28px;
+  position: relative;
+  font-weight: 500;
+  font-size: 15px;
+  color: #fff;
 }
 
 #tickerWrap {
+  position: absolute;
   white-space: nowrap;
   will-change: transform;
 }
