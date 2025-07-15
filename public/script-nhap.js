@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
 
+    document.getElementById("btnBatDauNhap").addEventListener("click", () => {
+  const formNhap = document.getElementById("formNhapHang");
+  formNhap.classList.remove("hidden");
+});
     // Hàm loại bỏ dấu tiếng Việt
     function removeVietnameseTones(str) {
         return str.normalize("NFD")
@@ -32,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             .toLowerCase();
     }
 
-    // --- Helper Functions (Now using SweetAlert2) ---
 
     /**
      * Shows a SweetAlert2 message box.
