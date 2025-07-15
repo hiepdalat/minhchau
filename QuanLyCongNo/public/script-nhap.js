@@ -250,11 +250,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    /**
-     * Fetches and renders saved receipts as a flattened list of items.
-     */
+    // ========== Hàm tải danh sách Đại Lý =============
+     async function loadDailyNamesToSelect() {
+    try {
+        const res = await fetch('/api/nhaphang');
+        if (!res.ok) throw new Error('Không lấy được danh sách phiếu nhập');
+        const data = await res.json();
+
+        const uniqueNames = [...new Set(data.map(r => r.daily).filter(Boolean))];
+        const select = document.getElementById('dailyNameSelect');
+        uniqueNames.sort().forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Lỗi khi tải danh sách đại lý:', error);
+    }
+}
     // --- Sửa lại fetchAndRenderReceipts() để tìm kiếm không dấu ---
-    async function fetchAndRenderReceipts() {
+  /*  async function fetchAndRenderReceipts() {
         receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
         const dailySearchRaw = searchDailyNameInput.value.trim();
         const dailySearch = removeVietnameseTones(dailySearchRaw);
@@ -342,7 +358,81 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateViewDetailsButtonState(); // Update button state on error
         }
     }
+*/
+    // =========Chọn Đại Lý =============
+    async function fetchAndRenderReceipts() {
+    receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
 
+    const selectedDaily = document.getElementById('dailyNameSelect').value.trim();
+    const monthSearch = searchMonthInput.value;
+
+    if (!selectedDaily && !monthSearch) {
+        await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng chọn tên đại lý hoặc tháng để tìm kiếm.', 'error');
+        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
+        receiptsSectionCard.classList.add('hidden');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/nhaphang');
+        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
+        const receipts = await response.json();
+
+        const filtered = receipts.filter(receipt => {
+            const matchName = !selectedDaily || receipt.daily === selectedDaily;
+            const matchMonth = !monthSearch || (new Date(receipt.ngay)).toISOString().slice(0, 7) === monthSearch;
+            return matchName && matchMonth;
+        });
+
+        receiptsBody.innerHTML = '';
+        let grandTotal = 0;
+
+        if (filtered.length === 0) {
+            receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
+            grandTotalAllItemsSpan.textContent = '0 ₫';
+            receiptsSectionCard.classList.remove('hidden');
+            return;
+        }
+
+        receiptsSectionCard.classList.remove('hidden');
+
+        filtered.forEach(receipt => {
+            const receiptDate = new Date(receipt.ngay);
+            const formattedDate = receiptDate.toLocaleDateString('vi-VN', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+
+            receipt.items.forEach((item) => {
+                const row = receiptsBody.insertRow();
+                row.dataset.receiptId = receipt._id;
+                row.dataset.itemId = item._id;
+
+                row.innerHTML = `
+                    <td class="py-2 px-4 border-b border-gray-700 text-center">
+                        <input type="checkbox" class="item-checkbox" data-receipt-id="${receipt._id}" data-item-id="${item._id}">
+                    </td>
+                    <td class="py-2 px-4 border-b border-gray-700">${formattedDate}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${receipt.daily}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${item.tenhang}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${item.dvt}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${item.soluong}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.dongia)}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${item.ck}%</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.gianhap)}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.thanhtien)}</td>
+                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(receipt.tongtien)}</td>
+                `;
+                grandTotal += item.thanhtien;
+            });
+        });
+
+        grandTotalAllItemsSpan.textContent = formatCurrency(grandTotal);
+        updateViewDetailsButtonState();
+    } catch (error) {
+        console.error('Lỗi:', error);
+        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-red-500">Lỗi khi tải dữ liệu.</td></tr>';
+    }
+}
     // Event listener for search button
     searchBtn.addEventListener('click', fetchAndRenderReceipts);
 
@@ -518,7 +608,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Session check failed:', error);
             await showCustomAlert('Lỗi kết nối!', 'Lỗi kết nối đến server. Vui lòng kiểm tra mạng và thử lại.', 'error');
         }
-
+        await loadDailyNamesToSelect(); // ✅ GỌI loaddata NGAY TRONG INIT
         updateDateTicker();
         animateTicker();
         setInterval(updateDateTicker, 1000); // Update every second
