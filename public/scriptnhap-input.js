@@ -1,6 +1,6 @@
 // scriptnhap-input.js
 
-// --- 1. Hàm tiện ích và quản lý Local Storage ---
+// --- 1. Hàm tiện ích và quản lý dữ liệu (tương tác với API) ---
 
 /**
  * Chuẩn hóa chuỗi: bỏ dấu tiếng Việt, chuyển về chữ thường, và cắt khoảng trắng đầu/cuối.
@@ -18,7 +18,6 @@ function normalizeString(str) {
  * @returns {string} Chuỗi số tiền đã được định dạng.
  */
 function formatCurrency(amount) {
-    // Đảm bảo amount là một số hợp lệ, nếu không thì mặc định là 0
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount)) {
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(0);
@@ -26,36 +25,33 @@ function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(numAmount);
 }
 
-/**
- * Lưu danh sách phiếu nhập vào Local Storage.
- * @param {Array<Object>} receipts - Mảng các đối tượng phiếu nhập.
- */
-function saveReceipts(receipts) {
-    try {
-        localStorage.setItem('importReceipts', JSON.stringify(receipts));
-    } catch (e) {
-        console.error("Lỗi khi lưu dữ liệu vào Local Storage:", e);
-        Swal.fire('Lỗi!', 'Không thể lưu dữ liệu. Vui lòng kiểm tra bộ nhớ trình duyệt.', 'error');
-    }
-}
+// Biến toàn cục để lưu trữ tất cả các phiếu nhập (tải từ API)
+let allReceipts = [];
 
 /**
- * Tải danh sách phiếu nhập từ Local Storage.
- * @returns {Array<Object>} Mảng các đối tượng phiếu nhập hoặc mảng rỗng nếu không có dữ liệu.
+ * Tải danh sách phiếu nhập từ API backend.
  */
-function loadReceipts() {
+async function loadReceipts() {
     try {
-        const receiptsJSON = localStorage.getItem('importReceipts');
-        return receiptsJSON ? JSON.parse(receiptsJSON) : [];
+        const response = await fetch('/api/nhaphang');
+        if (!response.ok) {
+            // Nếu không được xác thực, chuyển hướng về trang đăng nhập
+            if (response.status === 401) {
+                window.location.href = '/index.html';
+                return;
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        allReceipts = data; // Cập nhật biến toàn cục
+        applyFilters(); // Áp dụng bộ lọc và render lại bảng sau khi tải dữ liệu
     } catch (e) {
-        console.error("Lỗi khi tải dữ liệu từ Local Storage:", e);
-        Swal.fire('Lỗi!', 'Không thể tải dữ liệu. Dữ liệu có thể bị hỏng.', 'error');
-        return [];
+        console.error("Lỗi khi tải dữ liệu nhập hàng từ server:", e);
+        Swal.fire('Lỗi!', 'Không thể tải dữ liệu nhập hàng. Vui lòng thử lại sau.', 'error');
+        allReceipts = []; // Đảm bảo allReceipts là mảng rỗng nếu có lỗi
+        applyFilters(); // Vẫn render bảng trống nếu có lỗi
     }
 }
-
-// Biến toàn cục để lưu trữ tất cả các phiếu nhập
-let allReceipts = loadReceipts();
 
 // --- 2. Hiển thị dữ liệu lên bảng ---
 
@@ -83,17 +79,15 @@ function renderReceiptsTable(receiptsToDisplay) {
     // Nhóm các mặt hàng theo phiếu nhập để tính tổng tiền phiếu và hiển thị gộp hàng
     const receiptsGrouped = {};
     receiptsToDisplay.forEach(item => {
-        // Tạo một ID duy nhất cho mỗi mặt hàng nếu chưa có (để dễ dàng xóa từng mặt hàng nếu cần)
-        if (!item.id) {
-            item.id = Date.now() + Math.random().toString(36).substring(2, 9);
-        }
-        const receiptKey = `${normalizeString(item.dailyName)}_${item.receiptDate}`; // Key duy nhất cho mỗi phiếu
+        // Sử dụng dailyName và receiptDate để tạo key cho phiếu nhập
+        // Key này sẽ được dùng để nhóm các mặt hàng thuộc cùng một phiếu
+        const receiptKey = `${normalizeString(item.dailyName)}_${item.receiptDate}`;
         if (!receiptsGrouped[receiptKey]) {
             receiptsGrouped[receiptKey] = {
                 dailyName: item.dailyName,
                 receiptDate: item.receiptDate,
                 items: [],
-                totalReceiptAmount: 0 // Tổng tiền cho phiếu này
+                totalReceiptAmount: 0
             };
         }
         receiptsGrouped[receiptKey].items.push(item);
@@ -103,8 +97,13 @@ function renderReceiptsTable(receiptsToDisplay) {
     for (const key in receiptsGrouped) {
         let currentReceiptTotal = 0;
         receiptsGrouped[key].items.forEach(item => {
-            const importPrice = item.itemPrice * (1 - item.itemDiscount / 100);
-            const totalItemAmount = importPrice * item.itemQuantity;
+            // Đảm bảo các giá trị là số trước khi tính toán
+            const itemPrice = parseFloat(item.itemPrice) || 0;
+            const itemDiscount = parseFloat(item.itemDiscount) || 0;
+            const itemQuantity = parseFloat(item.itemQuantity) || 0;
+
+            const importPrice = itemPrice * (1 - itemDiscount / 100);
+            const totalItemAmount = importPrice * itemQuantity;
             currentReceiptTotal += totalItemAmount;
         });
         receiptsGrouped[key].totalReceiptAmount = currentReceiptTotal;
@@ -117,12 +116,15 @@ function renderReceiptsTable(receiptsToDisplay) {
 
         receipt.items.forEach((item, index) => {
             const row = receiptsBody.insertRow();
-            // Store unique item ID and the group key
-            row.dataset.itemId = item.id;
-            row.dataset.receiptKey = key;
+            row.dataset.itemId = item.id; // ID của mặt hàng riêng lẻ (từ MongoDB _id)
+            row.dataset.receiptKey = key; // Key của phiếu nhập chứa mặt hàng này
 
-            const importPrice = item.itemPrice * (1 - item.itemDiscount / 100);
-            const totalItemAmount = importPrice * item.itemQuantity;
+            const itemPrice = parseFloat(item.itemPrice) || 0;
+            const itemDiscount = parseFloat(item.itemDiscount) || 0;
+            const itemQuantity = parseFloat(item.itemQuantity) || 0;
+
+            const importPrice = itemPrice * (1 - itemDiscount / 100);
+            const totalItemAmount = importPrice * itemQuantity;
             grandTotal += totalItemAmount; // Tổng tiền của tất cả mặt hàng hiển thị
 
             row.innerHTML = `
@@ -152,7 +154,6 @@ function applyFilters() {
     const searchDailyNameInput = document.getElementById('searchDailyNameInput');
     const searchMonthInput = document.getElementById('searchMonth');
 
-    // Kiểm tra xem các phần tử tồn tại trước khi truy cập .value
     const searchTerm = searchDailyNameInput ? normalizeString(searchDailyNameInput.value) : '';
     const searchMonth = searchMonthInput ? searchMonthInput.value : ''; // YYYY-MM
 
@@ -166,7 +167,6 @@ function applyFilters() {
         // Lọc theo tháng
         let matchesMonth = true;
         if (searchMonth) {
-            // Lấy phần YYYY-MM từ ngày của mặt hàng
             const itemMonth = item.receiptDate ? item.receiptDate.substring(0, 7) : '';
             matchesMonth = itemMonth === searchMonth;
         }
@@ -234,8 +234,12 @@ document.getElementById('viewDetailsBtn')?.addEventListener('click', function() 
         `;
         let totalReceiptAmount = 0;
         itemsInSelectedReceipt.forEach(item => {
-            const importPrice = item.itemPrice * (1 - item.itemDiscount / 100);
-            const totalItemAmount = importPrice * item.itemQuantity;
+            const itemPrice = parseFloat(item.itemPrice) || 0;
+            const itemDiscount = parseFloat(item.itemDiscount) || 0;
+            const itemQuantity = parseFloat(item.itemQuantity) || 0;
+
+            const importPrice = itemPrice * (1 - itemDiscount / 100);
+            const totalItemAmount = importPrice * itemQuantity;
             totalReceiptAmount += totalItemAmount;
             detailsHtml += `
                 <tr>
@@ -264,10 +268,10 @@ document.getElementById('viewDetailsBtn')?.addEventListener('click', function() 
         Swal.fire({
             title: 'Chi tiết phiếu nhập',
             html: detailsHtml,
-            width: '90%', // Chiều rộng lớn hơn để hiển thị bảng tốt hơn
+            width: '90%',
             confirmButtonText: 'Đóng',
             customClass: {
-                container: 'swal2-container-custom' // Add a custom class for potential custom styling
+                container: 'swal2-container-custom'
             }
         });
     }
@@ -276,9 +280,9 @@ document.getElementById('viewDetailsBtn')?.addEventListener('click', function() 
 // --- 6. Xóa các mục đã chọn ---
 
 /**
- * Xóa các phiếu nhập đã chọn khỏi danh sách và cập nhật Local Storage.
+ * Xóa các phiếu nhập đã chọn khỏi cơ sở dữ liệu thông qua API.
  */
-document.getElementById('deleteSelectedBtn')?.addEventListener('click', function() {
+document.getElementById('deleteSelectedBtn')?.addEventListener('click', async function() {
     const selectedReceiptKeys = new Set();
     document.querySelectorAll('.receipt-checkbox:checked').forEach(checkbox => {
         selectedReceiptKeys.add(checkbox.dataset.receiptKey);
@@ -298,21 +302,56 @@ document.getElementById('deleteSelectedBtn')?.addEventListener('click', function
         cancelButtonColor: '#3085d6',
         confirmButtonText: 'Có, xóa đi!',
         cancelButtonText: 'Hủy'
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
-            let initialReceiptCount = allReceipts.length;
-            // Lọc ra các mặt hàng không thuộc bất kỳ phiếu nhập nào đã chọn
-            allReceipts = allReceipts.filter(item => {
-                const itemReceiptKey = `${normalizeString(item.dailyName)}_${item.receiptDate}`;
-                return !selectedReceiptKeys.has(itemReceiptKey);
-            });
+            let successCount = 0;
+            let errorCount = 0;
 
-            if (allReceipts.length < initialReceiptCount) {
-                saveReceipts(allReceipts); // Lưu lại dữ liệu sau khi xóa
-                applyFilters(); // Render lại bảng để cập nhật dữ liệu
-                Swal.fire('Đã xóa!', 'Các phiếu nhập đã chọn đã được xóa.', 'success');
+            for (const key of selectedReceiptKeys) {
+                // Tách dailyName và receiptDate từ key
+                const parts = key.split('_');
+                if (parts.length < 2) {
+                    console.error("Invalid receipt key format:", key);
+                    errorCount++;
+                    continue;
+                }
+                const normalizedDailyNameFromKey = parts[0];
+                const receiptDateFromKey = parts[1];
+
+                try {
+                    // Tìm item gốc trong allReceipts để lấy `dailyName` chính xác (không normalized)
+                    const originalReceiptItem = allReceipts.find(item =>
+                        normalizeString(item.dailyName) === normalizedDailyNameFromKey && item.receiptDate === receiptDateFromKey
+                    );
+
+                    if (!originalReceiptItem) {
+                        console.warn(`Original receipt for key ${key} not found in current data.`);
+                        errorCount++;
+                        continue;
+                    }
+                    
+                    // Sử dụng dailyName và receiptDate gốc để gửi yêu cầu DELETE
+                    const deleteUrl = `/api/nhaphang/${encodeURIComponent(originalReceiptItem.dailyName)}/${encodeURIComponent(receiptDateFromKey)}`;
+                    
+                    const response = await fetch(deleteUrl, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Failed to delete receipt for key ${key}, status: ${response.status}`);
+                    }
+                    successCount++;
+                } catch (error) {
+                    console.error(`Lỗi khi xóa phiếu nhập ${key}:`, error);
+                    errorCount++;
+                }
+            }
+
+            if (successCount > 0) {
+                await loadReceipts(); // Tải lại dữ liệu sau khi xóa thành công
+                Swal.fire('Hoàn tất!', `Đã xóa thành công ${successCount} phiếu nhập. ${errorCount > 0 ? `(${errorCount} phiếu nhập gặp lỗi)` : ''}`, 'success');
             } else {
-                Swal.fire('Thông báo', 'Không có phiếu nhập nào được xóa.', 'info');
+                Swal.fire('Thất bại!', 'Không có phiếu nhập nào được xóa. Vui lòng kiểm tra lại.', 'error');
             }
         }
     });
@@ -354,8 +393,8 @@ function logout() {
         cancelButtonText: 'Không'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Thực hiện các bước đăng xuất cần thiết (ví dụ: xóa token, session)
-            window.location.href = 'login.html'; // Thay thế bằng URL trang đăng nhập thực tế của bạn
+            // Chuyển hướng đến endpoint logout của server
+            window.location.href = '/logout';
         }
     });
 }
@@ -370,7 +409,8 @@ document.addEventListener('DOMContentLoaded', () => {
         searchMonthInput.value = currentMonth;
     }
 
-    applyFilters(); // Hiển thị tất cả dữ liệu ban đầu khi tải trang
+    // Tải dữ liệu ban đầu từ server
+    loadReceipts();
 
     // Gắn sự kiện cho nút tìm kiếm và các input lọc
     document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
