@@ -1,95 +1,291 @@
-﻿:root {
-  --primary: #4b6043;
-  --danger: #dc3545;
-  --success: #198754;
-  --bg: #dde3d5;
+/* style.css */
+
+/* --- QUAN TRỌNG: Import Tailwind CSS đầu tiên --- */
+@import url('https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css');
+/* ------------------------------------------------ */
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden; /* Giúp ngăn cuộn ngang không mong muốn trên toàn trang */
 }
+
 body {
-  font-family: system-ui, sans-serif;
-  margin: 0;
-  padding: 1rem;
-  background: var(--bg);
+  font-family: 'Roboto', sans-serif;
+  transition: background 0.6s ease-in-out;
+  /* Các thuộc tính màu nền và chữ sẽ được ghi đè bởi body.congno-body nếu có */
 }
-h1 {
-  margin-top: 0;
-  color: var(--primary);
-  font-size: 1.5rem;
+
+body.congno-body {
+  background-color: #1a202c; /* dark gray background, tương tự Tailwind bg-gray-900 */
+  color: #fff; /* light gray text */
+  padding: 20px;
 }
+
 .card {
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
+  background: rgba(20, 40, 60, 0.85); /* Nền tối trong suốt */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  margin-bottom: 20px;
+  color: #fff;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+
+input, button {
+  margin: 3px;
+  padding: 5px;
 }
-label {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-  display: block;
+
+button {
+  background: linear-gradient(135deg, #4CAF50, #388E3C); /* Nền gradient xanh lá */
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  font-weight: bold;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
 }
-input,
-select {
-  width: 70%;
-  max-width: 300px;
-  padding: 0.4rem 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.95rem;
+
+button:hover {
+  background: linear-gradient(135deg, #45A049, #2E7D32);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+  transform: scale(1.05);
 }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 0.4rem;
-  text-align: center;
+
+.btn-logout {
+    /* Các thuộc tính này sẽ được áp dụng nếu không bị ghi đè bởi button chung */
+    background: #e53e3e; /* red-600 */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem; /* rounded-md */
+    font-weight: 700;
+    transition: background-color 0.2s;
 }
-th {
-  background: #f0f2f5;
+
+.btn-logout:hover {
+  background: #f44336; /* Màu đỏ đậm hơn khi hover */
 }
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  border: none;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
+
+.header-container {
+  position: relative;
+  background: #2c3e50; /* Màu nền header */
+  padding: 10px 20px 32px;
+  color: #fff;
 }
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+
+.header-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
+
+.header-top h2 {
+  flex: 1;
+  margin: 0;
+  text-align: center;
+  font-size: 24px;
 }
-.btn-danger {
-  background: var(--danger);
-  color: #fff;
+
+.header-container .btn-logout {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
-.btn-success {
-  background: var(--success);
-  color: #fff;
+
+#dateTicker {
+  overflow: hidden;
+  white-space: nowrap;
+  height: 28px;
+  position: relative;
+  font-weight: 500;
+  font-size: 15px;
+  color: #fff;
 }
-.text-right {
-  text-align: right;
+
+#tickerWrap {
+  position: absolute;
+  white-space: nowrap;
+  will-change: transform;
 }
-.total {
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--primary);
+
+/* Styles cho bảng chung (có thể được sử dụng bởi .table-wrapper) */
+.box-danhsach {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 300px;
+  width: 100%;
+  padding: 5px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #ccc;
 }
-.align-end {
-  display: flex;
-  align-items: flex-end;
+
+.box-danhsach table {
+  width: 100%;
+  min-width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  background: #fff;
+  color: #000;
+}
+
+.box-danhsach th,
+.box-danhsach td {
+  word-wrap: break-word;
+  white-space: normal;
+  padding: 8px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+.box-danhsach thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 2;
+  color: #000;
+}
+
+.box-danhsach table tbody tr:hover {
+  background-color: #f0f8ff;
+  transition: background-color 0.2s;
+}
+
+.box-danhsach td:nth-child(4),
+.box-danhsach th:nth-child(4) {
+  max-width: 200px;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+.tr-thanh-toan {
+  background-color: #fa1e1e;
+  color: #fff !important;
+  font-weight: bold;
+}
+.row-paid {
+  background-color: #fa1e1e !important;
+  color: #fff !important;
+  font-weight: bold;
+}
+
+/* ==== TỐI ƯU KHUNG "DỮ LIỆU ĐÃ LƯU" (có thể là #receiptsTableWrapper) ==== */
+/* CSS riêng cho bảng "Mặt hàng đã nhập từ đại lý" trong nhaphang.html */
+#receiptsTableWrapper { /* ID mới cho table-wrapper của bảng này */
+    max-height: 400px; /* Đặt chiều cao tối đa cho khung bảng */
+    overflow-y: auto;   /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao */
+    border: 1px solid #4a5568; /* Viền cho khung cuộn */
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+#receiptsTableWrapper table th {
+    position: sticky; /* Giữ tiêu đề cố định khi cuộn */
+    top: 0;
+    z-index: 1; /* Đảm bảo tiêu đề nằm trên nội dung */
+    background-color: #4a5568; /* Giữ màu nền cho tiêu đề khi cuộn */
+    /* overflow-y: auto; */ /* Thuộc tính này không phù hợp cho th */
+    /* overflow-x: auto; */ /* Thuộc tính này không phù hợp cho th */
+}
+
+/* Các kiểu dáng tối ưu cho bảng #ds (nếu được sử dụng) */
+#ds th:nth-child(1),
+#ds td:nth-child(1) {
+  width: 36px;
+  text-align: center;
+}
+
+#ds th:nth-child(3),
+#ds td:nth-child(3) {
+  width: 110px;
+  white-space: nowrap;
+}
+
+#ds th:nth-child(5),
+#ds td:nth-child(5),
+#ds th:nth-child(6),
+#ds td:nth-child(6),
+#ds th:nth-child(7),
+#ds td:nth-child(7) {
+  width: 90px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+#ds th:nth-child(4),
+#ds td:nth-child(4) {
+  max-width: 240px;
+  word-break: break-word;
+}
+
+/* Styles cho .table-wrapper (áp dụng cho #receiptsTableWrapper) */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto; /* Thêm thanh cuộn ngang nếu bảng quá rộng */
+}
+
+.table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff; /* Nền trắng cho bảng */
+  color: #000; /* Chữ đen cho bảng */
+}
+
+.table-wrapper th,
+.table-wrapper td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+.table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@keyframes spinBorder {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  input,
+  button {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+
+  .card input,
+  .card button {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .box-danhsach table,
+  .table-wrapper table { /* Áp dụng cho cả hai loại bảng */
+    font-size: 13px;
+  }
 }
