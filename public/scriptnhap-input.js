@@ -46,6 +46,7 @@ async function loadReceipts() {
         const data = await response.json();
         allReceipts = data; // Cập nhật biến toàn cục
         console.log("Dữ liệu nhập hàng đã tải:", allReceipts.length, "mục.");
+        console.log("Dữ liệu chi tiết allReceipts (kiểm tra cấu trúc):", allReceipts); // LOG QUAN TRỌNG: Xem dữ liệu gốc
         applyFilters(); // Áp dụng bộ lọc và render lại bảng sau khi tải dữ liệu
     } catch (e) {
         console.error("Lỗi khi tải dữ liệu nhập hàng từ server:", e);
@@ -156,24 +157,32 @@ function applyFilters() {
     const searchTerm = searchDailyNameInput ? normalizeString(searchDailyNameInput.value) : '';
     const searchMonth = searchMonthInput ? searchMonthInput.value : ''; // YYYY-MM
 
-    console.log(`applyFilters: searchTerm='${searchTerm}', searchMonth='${searchMonth}'`);
-    console.log(`allReceipts length before filter: ${allReceipts.length}`);
+    console.log(`--- applyFilters START ---`);
+    console.log(`Search Term (normalized): '${searchTerm}'`);
+    console.log(`Search Month: '${searchMonth}'`);
+    console.log(`Total items in allReceipts: ${allReceipts.length}`);
 
     const filteredReceipts = allReceipts.filter(item => {
         const normalizedDailyName = normalizeString(item.dailyName);
         const normalizedItemName = normalizeString(item.itemName);
+        const itemMonth = item.receiptDate ? item.receiptDate.substring(0, 7) : '';
 
         const matchesName = searchTerm === '' || normalizedDailyName.includes(searchTerm) || normalizedItemName.includes(searchTerm);
+        const matchesMonth = searchMonth === '' || itemMonth === searchMonth; // Nếu searchMonth rỗng thì luôn khớp
 
-        let matchesMonth = true;
-        if (searchMonth) {
-            const itemMonth = item.receiptDate ? item.receiptDate.substring(0, 7) : '';
-            matchesMonth = itemMonth === searchMonth;
-        }
+        // LOG CỤ THỂ CHO TỪNG MỤC:
+        console.log(`  Processing item: Daily='${item.dailyName}', Item='${item.itemName}', Date='${item.receiptDate}'`);
+        console.log(`    Normalized Daily: '${normalizedDailyName}', Normalized Item: '${normalizedItemName}'`);
+        console.log(`    Item Month: '${itemMonth}'`);
+        console.log(`    Matches Name ('${searchTerm}'): ${matchesName}`);
+        console.log(`    Matches Month ('${searchMonth}'): ${matchesMonth}`);
+        console.log(`    Overall match: ${matchesName && matchesMonth}`);
+
         return matchesName && matchesMonth;
     });
 
-    console.log(`filteredReceipts length: ${filteredReceipts.length}`);
+    console.log(`Filtered receipts count: ${filteredReceipts.length}`);
+    console.log(`--- applyFilters END ---`);
     renderReceiptsTable(filteredReceipts);
 }
 
@@ -414,10 +423,9 @@ document.addEventListener('DOMContentLoaded', () => {
     loadReceipts();
 
     // Gắn sự kiện cho nút tìm kiếm và các input lọc
-    // Sử dụng ?. để đảm bảo phần tử tồn tại trước khi gắn sự kiện
     document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
-    document.getElementById('searchDailyNameInput')?.addEventListener('input', applyFilters); // Tìm kiếm khi gõ
-    document.getElementById('searchMonth')?.addEventListener('change', applyFilters); // Tìm kiếm khi thay đổi tháng
+    document.getElementById('searchDailyNameInput')?.addEventListener('input', applyFilters);
+    document.getElementById('searchMonth')?.addEventListener('change', applyFilters);
 
     // Bắt đầu ticker thời gian
     setupDateTicker();
