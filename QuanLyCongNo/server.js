@@ -130,6 +130,11 @@ app.get('/nhaphang', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'nhaphang.html'));
 });
 
+// Updated route for nhaphang to point to the new HTML file name
+app.get('/nhaphang', requireLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'nhaphang-input.html')); // Changed filename
+});
+
 app.get('/banhang', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'banhang.html'));
 });
@@ -314,16 +319,153 @@ app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
 });
 
 
+// ======= API NHẬP HÀNG (Stock Receipt Management) =======
 
-// ======= API SẢN PHẨM (cho bán hàng) =======
-app.get('/api/products/stock', requireLogin, async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.json(products);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Lỗi server');
-  }
+// GET /api/nhaphang - Fetch receipts with search and filter capabilities
+app.get('/api/nhaphang', requireLogin, async (req, res) => {
+    try {
+        const { q, month } = req.query; // 'q' for query, 'month' for YYYY-MM
+        let filter = {};
+
+        // Filter by month
+        if (month) {
+            const [year, monthNum] = month.split('-').map(Number);
+            // Dates are stored as ISO strings in MongoDB, so we need to query based on date ranges
+            const startDate = new Date(Date.UTC(year, monthNum - 1, 1)); // Start of the month (UTC)
+            const endDate = new Date(Date.UTC(year, monthNum, 0, 23, 59, 59, 999)); // End of the month (UTC)
+
+            filter.ngay = {
+                $gte: startDate,
+                $lte: endDate
+            };
+        }
+
+        // Search by daily name or item name (case-insensitive, accent-insensitive)
+        if (q) {
+            const searchRegex = new RegExp(removeDiacritics(q), 'i'); // Case-insensitive regex
+            filter.$or = [
+                { 'daily_khongdau': searchRegex }, // Search in daily name (without diacritics)
+                { 'items.tenhang': new RegExp(q, 'i') } // Search in item names (original, case-insensitive)
+            ];
+        }
+
+        // Fetch receipts using the PhieuNhapKhoEntry model
+        const receipts = await PhieuNhapKhoEntry.find(filter).sort({ ngay: -1, createdAt: -1 });
+        res.json(receipts);
+    } catch (err) {
+        console.error('Error fetching stock receipts:', err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi tải phiếu nhập.' });
+    }
+});
+
+// POST /api/nhaphang - Create a new stock receipt
+app.post('/api/nhaphang', requireLogin, async (req, res) => {
+    try {
+        const { ngay, daily, items, tongtien } = req.body;
+
+        // Add daily_khongdau for search
+        const daily_khongdau = removeDiacritics(daily);
+
+        const newReceipt = new PhieuNhapKhoEntry({
+            ngay: new Date(ngay), // Convert date string to Date object
+            daily,
+            daily_khongdau,
+            items,
+            tongtien
+        });
+
+        await newReceipt.save();
+        res.status(201).json({ message: 'Phiếu nhập đã được lưu thành công!', receipt: newReceipt });
+    } catch (err) {
+        console.error('Error saving stock receipt:', err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi lưu phiếu nhập.' });
+    }
+});
+
+// GET /api/nhaphang/:id - Get a single receipt by ID (for details/printing)
+app.get('/api/nhaphang/:id', requireLogin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const receipt = await PhieuNhapKhoEntry.findById(id);
+
+        if (!receipt) {
+            return res.status(404).json({ error: 'Không tìm thấy phiếu nhập.' });
+        }
+        res.json(receipt);
+    } catch (err) {
+        console.error('Error fetching single receipt:', err);
+        // Handle invalid ObjectId format
+        if (err.name === 'CastError') {
+            return res.status(400).json({ error: 'ID phiếu nhập không hợp lệ.' });
+        }
+        res.status(500).json({ error: 'Lỗi máy chủ khi tải chi tiết phiếu nhập.' });
+    }
+});
+
+// DELETE /api/nhaphang/item - Delete a specific item from a receipt
+app.delete('/api/nhaphang/item', requireLogin, async (req, res) => {
+    try {
+        const { receiptId, itemId } = req.body;
+
+        if (!receiptId || !itemId) {
+            return res.status(400).json({ error: 'Thiếu receiptId hoặc itemId.' });
+        }
+
+        // Find the receipt and pull the item from its items array
+        const updatedReceipt = await PhieuNhapKhoEntry.findOneAndUpdate(
+            { _id: receiptId },
+            { $pull: { items: { _id: itemId } } }, // Pull the item by its _id
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedReceipt) {
+            return res.status(404).json({ error: 'Không tìm thấy phiếu nhập hoặc món hàng.' });
+        }
+
+        // Recalculate tongtien after item deletion
+        const newTongTien = updatedReceipt.items.reduce((sum, item) => sum + item.thanhtien, 0);
+        updatedReceipt.tongtien = newTongTien;
+        await updatedReceipt.save(); // Save the receipt with the updated total
+
+        // If the receipt becomes empty, you might want to delete the entire receipt
+        if (updatedReceipt.items.length === 0) {
+            await PhieuNhapKhoEntry.findByIdAndDelete(receiptId);
+            return res.status(200).json({ message: 'Món hàng và phiếu nhập rỗng đã được xóa thành công.' });
+        }
+
+        res.status(200).json({ message: 'Món hàng đã được xóa thành công.', receipt: updatedReceipt });
+    } catch (err) {
+        console.error('Error deleting item from receipt:', err);
+        // Handle invalid ObjectId format
+        if (err.name === 'CastError') {
+            return res.status(400).json({ error: 'ID phiếu nhập hoặc món hàng không hợp lệ.' });
+        }
+        res.status(500).json({ error: 'Lỗi máy chủ khi xóa món hàng.' });
+    }
+});
+
+
+// DELETE /api/nhaphang - Delete multiple receipts by their IDs (for mass deletion of entire receipts)
+// This endpoint is for deleting entire receipts, not individual items within them.
+app.delete('/api/nhaphang', requireLogin, async (req, res) => {
+    try {
+        const { ids } = req.body; // Array of receipt IDs to delete
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ error: 'Thiếu hoặc sai định dạng IDs phiếu nhập.' });
+        }
+
+        const result = await PhieuNhapKhoEntry.deleteMany({ _id: { $in: ids } });
+
+        if (result.deletedCount > 0) {
+            res.status(200).json({ message: `Đã xóa thành công ${result.deletedCount} phiếu nhập.` });
+        } else {
+            res.status(404).json({ message: 'Không tìm thấy phiếu nhập nào để xóa.' });
+        }
+    } catch (err) {
+        console.error('Error deleting multiple receipts:', err);
+        res.status(500).json({ error: 'Lỗi máy chủ khi xóa phiếu nhập.' });
+    }
 });
 
 // ======= KHỞI ĐỘNG SERVER =======
