@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('/api/receipts', {
+            const response = await fetch('/api/nhaphang', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await fetch('/api/receipts', {
+                    const response = await fetch('/api/nhaphang', {
                         method: 'DELETE',
                         headers: {
                             'Content-Type': 'application/json'
@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalOverallAmount = 0;
 
         try {
-            const response = await fetch('/api/receipts/details', {
+            const response = await fetch('/api/nhaphang/details', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
