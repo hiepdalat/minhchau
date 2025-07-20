@@ -130,9 +130,9 @@ app.get('/nhaphang', requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'nhaphang.html'));
 });
 
-// Updated route for nhaphang to point to the new HTML file name
+
 app.get('/nhaphang', requireLogin, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'nhaphang-input.html')); // Changed filename
+    res.sendFile(path.join(__dirname, 'public', 'nhaphang-input.html'));
 });
 
 app.get('/banhang', requireLogin, (req, res) => {
