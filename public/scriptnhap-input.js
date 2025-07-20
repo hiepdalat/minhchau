@@ -173,7 +173,21 @@ async function loadReceipts() {
     });
 @@ -413,9 +414,10 @@
     loadReceipts();
+document.getElementById('viewDetailsBtn')?.addEventListener('click', () => {
+    const selectedKeys = Array.from(document.querySelectorAll('.receipt-checkbox:checked'))
+        .map(cb => cb.dataset.receiptKey);
+    
+    if (selectedKeys.length !== 1) {
+        Swal.fire('Chọn 1 dòng duy nhất', 'Vui lòng chọn đúng 1 phiếu để xem chi tiết.', 'warning');
+        return;
+    }
 
+    const [dailyNameRaw, receiptDate] = selectedKeys[0].split('_');
+    const dailyName = decodeURIComponent(dailyNameRaw); // nếu encode từ server
+
+    const detailURL = `/chi-tiet-phieu-nhap?daily=${encodeURIComponent(dailyName)}&ngay=${receiptDate}`;
+    window.open(detailURL, '_blank');
+});
     // Gắn sự kiện cho nút tìm kiếm và các input lọc
     // Sử dụng ?. để đảm bảo phần tử tồn tại trước khi gắn sự kiện
     document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
