@@ -1,83 +1,76 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const supplierInput = document.getElementById('dailyName');
-  const dateInput = document.getElementById('receiptDate');
+  const dailyNameInput = document.getElementById('dailyName');
+  const receiptDateInput = document.getElementById('receiptDate');
   const itemNameInput = document.getElementById('itemName');
   const itemUnitInput = document.getElementById('itemUnit');
   const itemQuantityInput = document.getElementById('itemQuantity');
   const itemPriceInput = document.getElementById('itemPrice');
-  const addItemButton = document.getElementById('addItemBtn');
-  const saveReceiptButton = document.getElementById('saveReceiptBtn');
-  const itemTableBody = document.querySelector('#itemTable tbody');
-  const receiptResultsBody = document.querySelector('#receiptResults tbody');
-  const filterInput = document.getElementById('filterInput');
-  const filterMonth = document.getElementById('filterMonth');
-  const filterYear = document.getElementById('filterYear');
+  const addItemBtn = document.getElementById('addItem');
+  const saveReceiptBtn = document.getElementById('saveReceipt');
+  const itemTableBody = document.getElementById('itemTableBody');
+  const searchQueryInput = document.getElementById('searchQuery');
+  const searchMonthInput = document.getElementById('searchMonth');
+  const searchBtn = document.getElementById('searchBtn');
+  const receiptsTableBody = document.getElementById('receiptsTableBody');
 
   let currentItems = [];
 
-  function toUnsigned(str) {
-    return str
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d")
-      .replace(/Đ/g, "D")
-      .toLowerCase();
+  function removeDiacritics(str) {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   }
 
-  function formatNumber(n) {
-    return n.toLocaleString("vi-VN");
-  }
-
-  function renderItems() {
+  function renderCurrentItems() {
     itemTableBody.innerHTML = '';
     currentItems.forEach((item, index) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${item.name}</td>
-        <td>${item.unit}</td>
-        <td>${item.quantity}</td>
-        <td>${formatNumber(item.price)}</td>
-        <td>${formatNumber(item.quantity * item.price)}</td>
-        <td><button class="text-red-600 font-bold delete-item-btn" data-index="${index}">X</button></td>
+      const row = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${item.name}</td>
+          <td>${item.unit}</td>
+          <td>${item.quantity}</td>
+          <td>${item.price}</td>
+          <td>${item.quantity * item.price}</td>
+          <td><button class="text-red-600 delete-item" data-index="${index}">Xóa</button></td>
+        </tr>
       `;
-      itemTableBody.appendChild(row);
+      itemTableBody.insertAdjacentHTML('beforeend', row);
     });
-    document.querySelectorAll('.delete-item-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const index = btn.dataset.index;
-        currentItems.splice(index, 1);
-        renderItems();
+
+    document.querySelectorAll('.delete-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.dataset.index);
+        currentItems.splice(idx, 1);
+        renderCurrentItems();
       });
     });
   }
 
-  addItemButton.addEventListener('click', () => {
+  addItemBtn.addEventListener('click', () => {
     const name = itemNameInput.value.trim();
     const unit = itemUnitInput.value.trim();
     const quantity = parseFloat(itemQuantityInput.value);
     const price = parseFloat(itemPriceInput.value);
 
     if (!name || !unit || isNaN(quantity) || isNaN(price)) {
-      alert('Vui lòng nhập đầy đủ và đúng thông tin mặt hàng.');
+      alert('Vui lòng nhập đầy đủ thông tin món hàng.');
       return;
     }
 
     currentItems.push({ name, unit, quantity, price });
-    renderItems();
+    renderCurrentItems();
 
     itemNameInput.value = '';
     itemUnitInput.value = '';
     itemQuantityInput.value = '';
     itemPriceInput.value = '';
-    itemNameInput.focus();
   });
 
-  saveReceiptButton.addEventListener('click', async () => {
-    const supplier = supplierInput.value.trim();
-    const date = dateInput.value;
+  saveReceiptBtn.addEventListener('click', async () => {
+    const supplier = dailyNameInput.value.trim();
+    const date = receiptDateInput.value;
 
     if (!supplier || !date || currentItems.length === 0) {
-      alert('Vui lòng nhập đầy đủ thông tin và ít nhất 1 mặt hàng.');
+      alert('Vui lòng điền đầy đủ thông tin và ít nhất một món hàng.');
       return;
     }
 
@@ -87,79 +80,95 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ supplier, date, items: currentItems })
       });
+
       const result = await res.json();
       if (res.ok) {
-        alert('Đã lưu phiếu nhập.');
+        alert('Lưu phiếu nhập thành công!');
         currentItems = [];
-        renderItems();
-        loadReceipts(); // reload
+        renderCurrentItems();
+        loadReceipts(); // reload danh sách
       } else {
-        alert(result.error || 'Lỗi khi lưu phiếu.');
+        alert('Lỗi khi lưu: ' + result.error);
       }
-    } catch (err) {
-      alert('Lỗi khi gửi dữ liệu.');
-      console.error(err);
+    } catch (error) {
+      console.error('Lỗi khi lưu phiếu nhập:', error);
     }
   });
 
   async function loadReceipts() {
+    const query = removeDiacritics(searchQueryInput.value.trim());
+    const month = searchMonthInput.value;
+
     try {
-      const query = toUnsigned(filterInput.value.trim());
-      const month = filterMonth.value;
-      const year = filterYear.value;
-      const res = await fetch(`/api/receipts?q=${query}&month=${month}&year=${year}`);
+      const res = await fetch(`/api/nhaphang?q=${encodeURIComponent(query)}&month=${month}`);
       const data = await res.json();
-
-      if (!Array.isArray(data)) throw new Error('Dữ liệu không hợp lệ');
-
-      receiptResultsBody.innerHTML = '';
-      data.forEach((r, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${r.supplier}</td>
-          <td>${r.date?.slice(0, 10)}</td>
-          <td>${r.items.length}</td>
-          <td>${formatNumber(r.items.reduce((t, i) => t + i.quantity * i.price, 0))}</td>
-          <td>
-            <button class="text-blue-600 font-bold view-btn" data-id="${r._id}">Xem</button> |
-            <button class="text-red-600 font-bold delete-btn" data-id="${r._id}">Xóa</button>
-          </td>
-        `;
-        receiptResultsBody.appendChild(row);
-      });
-
-      document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const id = btn.dataset.id;
-          const res = await fetch(`/api/receipt/${id}`);
-          const receipt = await res.json();
-          alert(`Phiếu nhập từ: ${receipt.supplier}\nNgày: ${receipt.date}\nTổng món: ${receipt.items.length}`);
-        });
-      });
-
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('Xóa phiếu nhập này?')) return;
-          const id = btn.dataset.id;
-          const res = await fetch(`/api/receipt/${id}`, { method: 'DELETE' });
-          if (res.ok) {
-            alert('Đã xóa.');
-            loadReceipts();
-          } else {
-            alert('Lỗi khi xóa phiếu.');
-          }
-        });
-      });
-
-    } catch (err) {
-      console.error('Lỗi khi tải phiếu nhập:', err);
+      renderReceipts(data);
+    } catch (error) {
+      console.error('Lỗi khi tải phiếu nhập:', error);
     }
   }
 
-  filterInput.addEventListener('input', loadReceipts);
-  filterMonth.addEventListener('change', loadReceipts);
-  filterYear.addEventListener('change', loadReceipts);
+  function renderReceipts(data) {
+    receiptsTableBody.innerHTML = '';
+    data.forEach((receipt, idx) => {
+      const total = receipt.items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+      const row = `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${receipt.supplier}</td>
+          <td>${new Date(receipt.date).toLocaleDateString()}</td>
+          <td>${receipt.items.length}</td>
+          <td>${total.toLocaleString()} đ</td>
+          <td>
+            <button class="text-blue-600 view-detail" data-id="${receipt._id}">Chi tiết</button> |
+            <button class="text-red-600 delete-receipt" data-id="${receipt._id}">Xóa</button>
+          </td>
+        </tr>
+      `;
+      receiptsTableBody.insertAdjacentHTML('beforeend', row);
+    });
 
-  loadReceipts(); // initial
+    document.querySelectorAll('.delete-receipt').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id;
+        if (confirm('Bạn có chắc muốn xóa phiếu này?')) {
+          try {
+            const res = await fetch(`/api/nhaphang/${id}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (res.ok) {
+              alert('Đã xóa phiếu!');
+              loadReceipts();
+            } else {
+              alert(result.error || 'Lỗi khi xóa.');
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      });
+    });
+
+    document.querySelectorAll('.view-detail').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const id = e.target.dataset.id;
+        try {
+          const res = await fetch(`/api/nhaphang/${id}`);
+          const receipt = await res.json();
+          let chiTiet = `Nhà cung cấp: ${receipt.supplier}\nNgày: ${new Date(receipt.date).toLocaleDateString()}\n\n`;
+          chiTiet += receipt.items.map((item, i) => 
+            `${i + 1}. ${item.name} - SL: ${item.quantity}, ĐG: ${item.price}, TT: ${item.quantity * item.price}`
+          ).join('\n');
+          alert(chiTiet);
+        } catch (err) {
+          console.error(err);
+          alert('Không thể tải chi tiết.');
+        }
+      });
+    });
+  }
+
+  searchBtn.addEventListener('click', loadReceipts);
+
+  // Tải danh sách ban đầu
+  loadReceipts();
 });
