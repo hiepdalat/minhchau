@@ -1,159 +1,165 @@
-// scriptnhap-input.js
+document.addEventListener('DOMContentLoaded', () => {
+  const supplierInput = document.getElementById('dailyName');
+  const dateInput = document.getElementById('receiptDate');
+  const itemNameInput = document.getElementById('itemName');
+  const itemUnitInput = document.getElementById('itemUnit');
+  const itemQuantityInput = document.getElementById('itemQuantity');
+  const itemPriceInput = document.getElementById('itemPrice');
+  const addItemButton = document.getElementById('addItemBtn');
+  const saveReceiptButton = document.getElementById('saveReceiptBtn');
+  const itemTableBody = document.querySelector('#itemTable tbody');
+  const receiptResultsBody = document.querySelector('#receiptResults tbody');
+  const filterInput = document.getElementById('filterInput');
+  const filterMonth = document.getElementById('filterMonth');
+  const filterYear = document.getElementById('filterYear');
 
-let currentItems = [];
+  let currentItems = [];
 
-function formatCurrency(number) {
-    return Number(number).toLocaleString('vi-VN');
-}
+  function toUnsigned(str) {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D")
+      .toLowerCase();
+  }
 
-function removeVietnameseTones(str) {
-    return str.normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '')
-        .replace(/đ/g, 'd')
-        .replace(/Đ/g, 'D');
-}
+  function formatNumber(n) {
+    return n.toLocaleString("vi-VN");
+  }
 
-function renderCurrentItems() {
-    const tbody = document.querySelector('#inputTable tbody');
-    tbody.innerHTML = '';
+  function renderItems() {
+    itemTableBody.innerHTML = '';
     currentItems.forEach((item, index) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${item.name}</td>
-            <td>${item.unit}</td>
-            <td>${item.quantity}</td>
-            <td>${formatCurrency(item.price)}</td>
-            <td>${formatCurrency(item.quantity * item.price)}</td>
-            <td><button onclick="removeItem(${index})" class="text-red-500">🗑️</button></td>
-        `;
-        tbody.appendChild(row);
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.unit}</td>
+        <td>${item.quantity}</td>
+        <td>${formatNumber(item.price)}</td>
+        <td>${formatNumber(item.quantity * item.price)}</td>
+        <td><button class="text-red-600 font-bold delete-item-btn" data-index="${index}">X</button></td>
+      `;
+      itemTableBody.appendChild(row);
     });
-    updateTotalSummary();
-}
+    document.querySelectorAll('.delete-item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = btn.dataset.index;
+        currentItems.splice(index, 1);
+        renderItems();
+      });
+    });
+  }
 
-function removeItem(index) {
-    currentItems.splice(index, 1);
-    renderCurrentItems();
-}
-
-function updateTotalSummary() {
-    let total = 0;
-    currentItems.forEach(item => total += item.quantity * item.price);
-    document.getElementById('tongTien').textContent = formatCurrency(total);
-}
-
-document.getElementById('addItemBtn').addEventListener('click', () => {
-    const name = document.getElementById('itemName').value.trim();
-    const unit = document.getElementById('itemUnit').value.trim();
-    const quantity = parseFloat(document.getElementById('itemQuantity').value);
-    const price = parseFloat(document.getElementById('itemPrice').value);
+  addItemButton.addEventListener('click', () => {
+    const name = itemNameInput.value.trim();
+    const unit = itemUnitInput.value.trim();
+    const quantity = parseFloat(itemQuantityInput.value);
+    const price = parseFloat(itemPriceInput.value);
 
     if (!name || !unit || isNaN(quantity) || isNaN(price)) {
-        alert('Vui lòng nhập đầy đủ và hợp lệ.');
-        return;
+      alert('Vui lòng nhập đầy đủ và đúng thông tin mặt hàng.');
+      return;
     }
 
     currentItems.push({ name, unit, quantity, price });
-    renderCurrentItems();
+    renderItems();
 
-    document.getElementById('itemName').value = '';
-    document.getElementById('itemUnit').value = '';
-    document.getElementById('itemQuantity').value = '';
-    document.getElementById('itemPrice').value = '';
-});
+    itemNameInput.value = '';
+    itemUnitInput.value = '';
+    itemQuantityInput.value = '';
+    itemPriceInput.value = '';
+    itemNameInput.focus();
+  });
 
-document.getElementById('saveReceiptBtn').addEventListener('click', async () => {
-    const supplier = document.getElementById('dailyName').value.trim();
-    const date = document.getElementById('receiptDate').value;
+  saveReceiptButton.addEventListener('click', async () => {
+    const supplier = supplierInput.value.trim();
+    const date = dateInput.value;
 
     if (!supplier || !date || currentItems.length === 0) {
-        alert('Vui lòng điền đủ thông tin và ít nhất 1 món hàng.');
-        return;
+      alert('Vui lòng nhập đầy đủ thông tin và ít nhất 1 mặt hàng.');
+      return;
     }
 
-    const response = await fetch('/api/nhaphang', {
+    try {
+      const res = await fetch('/api/nhaphang', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ supplier, date, items: currentItems })
-    });
-
-    if (response.ok) {
+      });
+      const result = await res.json();
+      if (res.ok) {
         alert('Đã lưu phiếu nhập.');
         currentItems = [];
-        renderCurrentItems();
-        loadReceipts();
-    } else {
-        alert('Lỗi khi lưu phiếu.');
+        renderItems();
+        loadReceipts(); // reload
+      } else {
+        alert(result.error || 'Lỗi khi lưu phiếu.');
+      }
+    } catch (err) {
+      alert('Lỗi khi gửi dữ liệu.');
+      console.error(err);
     }
-});
+  });
 
-async function loadReceipts() {
-    const res = await fetch('/api/nhaphang');
-    const data = await res.json();
-    const tbody = document.querySelector('#receiptsTable tbody');
-    tbody.innerHTML = '';
-    data.forEach((r, i) => {
+  async function loadReceipts() {
+    try {
+      const query = toUnsigned(filterInput.value.trim());
+      const month = filterMonth.value;
+      const year = filterYear.value;
+      const res = await fetch(`/api/receipts?q=${query}&month=${month}&year=${year}`);
+      const data = await res.json();
+
+      if (!Array.isArray(data)) throw new Error('Dữ liệu không hợp lệ');
+
+      receiptResultsBody.innerHTML = '';
+      data.forEach((r, index) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${r.supplier}</td>
-            <td>${r.date}</td>
-            <td>${formatCurrency(r.total || 0)}</td>
-            <td>
-                <button onclick="viewDetails('${r._id}')" class="text-blue-500">👁️</button>
-                <button onclick="deleteReceipt('${r._id}')" class="text-red-500">🗑️</button>
-            </td>
+          <td>${index + 1}</td>
+          <td>${r.supplier}</td>
+          <td>${r.date?.slice(0, 10)}</td>
+          <td>${r.items.length}</td>
+          <td>${formatNumber(r.items.reduce((t, i) => t + i.quantity * i.price, 0))}</td>
+          <td>
+            <button class="text-blue-600 font-bold view-btn" data-id="${r._id}">Xem</button> |
+            <button class="text-red-600 font-bold delete-btn" data-id="${r._id}">Xóa</button>
+          </td>
         `;
-        tbody.appendChild(row);
-    });
-}
+        receiptResultsBody.appendChild(row);
+      });
 
-async function viewDetails(id) {
-    const res = await fetch(`/api/nhaphang/${id}`);
-    const data = await res.json();
-    const content = data.items.map((item, i) => `
-        ${i + 1}. ${item.name} - SL: ${item.quantity} - Đơn giá: ${formatCurrency(item.price)} - Thành tiền: ${formatCurrency(item.quantity * item.price)}
-    `).join('\n');
-    alert(`Phiếu nhập ngày ${data.date} - Đại lý: ${data.supplier}\n\n${content}`);
-}
+      document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.dataset.id;
+          const res = await fetch(`/api/receipt/${id}`);
+          const receipt = await res.json();
+          alert(`Phiếu nhập từ: ${receipt.supplier}\nNgày: ${receipt.date}\nTổng món: ${receipt.items.length}`);
+        });
+      });
 
-async function deleteReceipt(id) {
-    const confirmDelete = confirm('Bạn có chắc muốn xóa phiếu này?');
-    if (!confirmDelete) return;
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Xóa phiếu nhập này?')) return;
+          const id = btn.dataset.id;
+          const res = await fetch(`/api/receipt/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            alert('Đã xóa.');
+            loadReceipts();
+          } else {
+            alert('Lỗi khi xóa phiếu.');
+          }
+        });
+      });
 
-    const res = await fetch(`/api/nhaphang/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-        alert('Đã xóa phiếu.');
-        loadReceipts();
-    } else {
-        alert('Không thể xóa.');
+    } catch (err) {
+      console.error('Lỗi khi tải phiếu nhập:', err);
     }
-}
+  }
 
-document.getElementById('searchInput').addEventListener('input', async () => {
-    const keyword = removeVietnameseTones(document.getElementById('searchInput').value.trim().toLowerCase());
-    const res = await fetch('/api/nhaphang');
-    const data = await res.json();
-    const tbody = document.querySelector('#receiptsTable tbody');
-    tbody.innerHTML = '';
-    data.filter(r => removeVietnameseTones(r.supplier.toLowerCase()).includes(keyword)).forEach((r, i) => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${r.supplier}</td>
-            <td>${r.date}</td>
-            <td>${formatCurrency(r.total || 0)}</td>
-            <td>
-                <button onclick="viewDetails('${r._id}')" class="text-blue-500">👁️</button>
-                <button onclick="deleteReceipt('${r._id}')" class="text-red-500">🗑️</button>
-            </td>
-        `;
-        tbody.appendChild(row);
-    });
-});
+  filterInput.addEventListener('input', loadReceipts);
+  filterMonth.addEventListener('change', loadReceipts);
+  filterYear.addEventListener('change', loadReceipts);
 
-// Initial load
-window.addEventListener('DOMContentLoaded', () => {
-    loadReceipts();
+  loadReceipts(); // initial
 });
