@@ -56,7 +56,7 @@ async function loadReceipts() {
     receiptsToDisplay.forEach(item => {
         // Sử dụng dailyName và receiptDate để tạo key cho phiếu nhập
         // Key này sẽ được dùng để nhóm các mặt hàng thuộc cùng một phiếu
-        const receiptKey = `${normalizeString(item.dailyName)}_${item.receiptDate}`;
+       
         const receiptKey = `${normalizeString(item.dailyName)}_${item.receiptDate}`; // Key duy nhất cho mỗi phiếu
         if (!receiptsGrouped[receiptKey]) {
             receiptsGrouped[receiptKey] = {
