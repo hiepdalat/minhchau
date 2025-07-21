@@ -1,7 +1,3 @@
-// scriptnhap-input.js
-
-// --- 1. Hàm tiện ích và quản lý dữ liệu (tương tác với API) ---
-
 function normalizeString(str) {
     if (typeof str !== 'string') return '';
     return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
@@ -63,113 +59,56 @@ function applyFilters() {
     });
 
     console.log(`filteredReceipts length: ${filteredReceipts.length}`);
-    renderReceiptsTable(filteredReceipts);
+    renderReceiptTable(filteredReceipts); // Đã sửa đúng tên hàm
 }
-/*
-function renderReceiptsTable(receiptsToDisplay) {
-    const receiptsBody = document.getElementById('receiptsBody');
-    receiptsBody.innerHTML = '';
 
-    const receiptsGrouped = {};
-    receiptsToDisplay.forEach(item => {
-        const receiptKey = `${normalizeString(item.dailyName)}_${item.receiptDate}`;
-        if (!receiptsGrouped[receiptKey]) {
-            receiptsGrouped[receiptKey] = {
-                dailyName: item.dailyName,
-                receiptDate: item.receiptDate,
-                items: []
-            };
-        }
-        receiptsGrouped[receiptKey].items.push(item);
-    });
-
-    let grandTotal = 0;
-    for (const key in receiptsGrouped) {
-        const receipt = receiptsGrouped[key];
-
-        const row = receiptsBody.insertRow();
-        row.innerHTML = `
-            <td class="py-2 px-4 font-semibold" colspan="6">
-                <input type="checkbox" class="receipt-checkbox" data-receipt-key="${key}">
-                Đại lý: ${receipt.dailyName} | Ngày: ${receipt.receiptDate}
-            </td>
-        `;
-
-        receipt.items.forEach((item, index) => {
-            const row = receiptsBody.insertRow();
-            row.dataset.itemId = item.id;
-            row.dataset.receiptKey = key;
-
-            const itemPrice = parseFloat(item.itemPrice) || 0;
-            const itemDiscount = parseFloat(item.itemDiscount) || 0;
-            const itemQuantity = parseFloat(item.itemQuantity) || 0;
-
-            const importPrice = itemPrice * (1 - itemDiscount / 100);
-            const totalItemAmount = importPrice * itemQuantity;
-            grandTotal += totalItemAmount;
-
-            row.innerHTML = `
-                <td class="py-2 px-4"></td>
-                <td class="py-2 px-4">${item.itemName}</td>
-                <td class="py-2 px-4">${item.itemUnit}</td>
-                <td class="py-2 px-4">${item.itemQuantity}</td>
-                <td class="py-2 px-4">${formatCurrency(item.itemPrice)}</td>
-                <td class="py-2 px-4">${formatCurrency(totalItemAmount)}</td>
-            `;
-        });
-    }
-
-    const totalRow = receiptsBody.insertRow();
-    totalRow.innerHTML = `
-        <td colspan="5" class="text-right font-bold py-2 px-4">Tổng cộng:</td>
-        <td class="py-2 px-4 font-bold">${formatCurrency(grandTotal)}</td>
-    `;
-}
-*/
 function renderReceiptTable(receipts) {
-  console.log("⏬ Dữ liệu truyền vào bảng:");
-  console.log(receipts); // 👉 kiểm tra dữ liệu từng dòng
+    console.log("⏬ Dữ liệu truyền vào bảng:");
+    console.log(receipts);
 
-  const tbody = document.querySelector("#receiptsTable tbody");
-  tbody.innerHTML = "";
+    const tbody = document.querySelector("#receiptsTable tbody");
+    if (!tbody) {
+        console.error("Không tìm thấy tbody của bảng receiptsTable.");
+        return;
+    }
+    tbody.innerHTML = "";
 
-  const grouped = {};
-  receipts.forEach(item => {
-    // Ghi log từng item để kiểm tra giá trị
-    console.log("📄 Item:", item);
+    const grouped = {};
+    receipts.forEach(item => {
+        console.log("📄 Item:", item);
 
-    const key = `${item.receiptDate}__${item.dailyName}`;
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(item);
-  });
-
-  Object.keys(grouped).forEach(receiptKey => {
-    const [receiptDate, dailyName] = receiptKey.split("__");
-    const items = grouped[receiptKey];
-
-    const headerRow = document.createElement("tr");
-    headerRow.innerHTML = `
-      <td colspan="10" class="bg-gray-700 text-white font-semibold">
-        ▶️ Đại lý: ${dailyName} | Ngày: ${receiptDate}
-      </td>`;
-    tbody.appendChild(headerRow);
-
-    items.forEach(item => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td><input type="checkbox" class="receiptCheckbox" data-date="${item.receiptDate}" data-daily="${item.dailyName}"></td>
-        <td>${item.receiptDate}</td>
-        <td>${item.dailyName}</td>
-        <td>${item.itemName}</td>
-        <td>${item.itemUnit}</td>
-        <td>${item.itemQuantity}</td>
-        <td>${item.itemPrice} đ</td>
-        <td>${item.itemDiscount}%</td>
-        <td>${item.importPrice} đ</td>
-        <td>${item.totalItemAmount} đ</td>`;
-      tbody.appendChild(row);
+        const key = `${item.receiptDate}__${item.dailyName}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(item);
     });
-  });
+
+    Object.keys(grouped).forEach(receiptKey => {
+        const [receiptDate, dailyName] = receiptKey.split("__");
+        const items = grouped[receiptKey];
+
+        const headerRow = document.createElement("tr");
+        headerRow.innerHTML = `
+            <td colspan="10" class="bg-gray-700 text-white font-semibold">
+                ▶️ Đại lý: ${dailyName} | Ngày: ${receiptDate}
+            </td>`;
+        tbody.appendChild(headerRow);
+
+        items.forEach(item => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><input type="checkbox" class="receipt-checkbox" data-receipt-key="${normalizeString(item.dailyName)}_${item.receiptDate}"></td>
+                <td>${item.receiptDate}</td>
+                <td>${item.dailyName}</td>
+                <td>${item.itemName}</td>
+                <td>${item.itemUnit}</td>
+                <td>${item.itemQuantity}</td>
+                <td>${formatCurrency(item.itemPrice)}</td>
+                <td>${item.itemDiscount || 0}%</td>
+                <td>${formatCurrency(item.importPrice)}</td>
+                <td>${formatCurrency(item.totalItemAmount)}</td>`;
+            tbody.appendChild(row);
+        });
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -192,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         window.open(detailURL, '_blank');
     });
 
-    //setupDateTicker();
+    // Nếu có ticker thời gian bạn có thể bật lại
+    // setupDateTicker();
+
     loadReceipts();
 });
