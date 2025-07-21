@@ -65,7 +65,7 @@ function applyFilters() {
     console.log(`filteredReceipts length: ${filteredReceipts.length}`);
     renderReceiptsTable(filteredReceipts);
 }
-
+/*
 function renderReceiptsTable(receiptsToDisplay) {
     const receiptsBody = document.getElementById('receiptsBody');
     receiptsBody.innerHTML = '';
@@ -124,6 +124,52 @@ function renderReceiptsTable(receiptsToDisplay) {
         <td colspan="5" class="text-right font-bold py-2 px-4">Tổng cộng:</td>
         <td class="py-2 px-4 font-bold">${formatCurrency(grandTotal)}</td>
     `;
+}
+*/
+function renderReceiptTable(receipts) {
+  console.log("⏬ Dữ liệu truyền vào bảng:");
+  console.log(receipts); // 👉 kiểm tra dữ liệu từng dòng
+
+  const tbody = document.querySelector("#receiptsTable tbody");
+  tbody.innerHTML = "";
+
+  const grouped = {};
+  receipts.forEach(item => {
+    // Ghi log từng item để kiểm tra giá trị
+    console.log("📄 Item:", item);
+
+    const key = `${item.receiptDate}__${item.dailyName}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(item);
+  });
+
+  Object.keys(grouped).forEach(receiptKey => {
+    const [receiptDate, dailyName] = receiptKey.split("__");
+    const items = grouped[receiptKey];
+
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+      <td colspan="10" class="bg-gray-700 text-white font-semibold">
+        ▶️ Đại lý: ${dailyName} | Ngày: ${receiptDate}
+      </td>`;
+    tbody.appendChild(headerRow);
+
+    items.forEach(item => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td><input type="checkbox" class="receiptCheckbox" data-date="${item.receiptDate}" data-daily="${item.dailyName}"></td>
+        <td>${item.receiptDate}</td>
+        <td>${item.dailyName}</td>
+        <td>${item.itemName}</td>
+        <td>${item.itemUnit}</td>
+        <td>${item.itemQuantity}</td>
+        <td>${item.itemPrice} đ</td>
+        <td>${item.itemDiscount}%</td>
+        <td>${item.importPrice} đ</td>
+        <td>${item.totalItemAmount} đ</td>`;
+      tbody.appendChild(row);
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
