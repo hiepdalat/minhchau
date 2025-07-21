@@ -59,7 +59,7 @@ function applyFilters() {
     });
 
     console.log(`filteredReceipts length: ${filteredReceipts.length}`);
-    renderReceiptTable(filteredReceipts); // Đã sửa đúng tên hàm
+    renderReceiptsTable(filteredReceipts); // Đã sửa đúng tên hàm
 }
 
 function renderReceiptsTable(receipts) {
