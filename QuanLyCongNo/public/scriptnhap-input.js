@@ -38,17 +38,17 @@ async function loadReceipts() {
 }
 
 function applyFilters() {
-  const searchTerm = removeDiacritics(document.getElementById('searchInput').value.trim().toLowerCase());
-  const searchMonth = document.getElementById('monthInput').value.trim();
+  const searchTerm = removeDiacritics(document.getElementById('searchDailyNameInput')?.value.trim().toLowerCase() || '');
+  const searchMonth = document.getElementById('searchMonth')?.value || '';
 
-  console.log('applyFilters: searchTerm=\'' + searchTerm + '\', searchMonth=\'' + searchMonth + '\'');
+  console.log(`applyFilters: searchTerm='${searchTerm}', searchMonth='${searchMonth}'`);
 
   const filteredReceipts = allReceipts.filter(receipt => {
     const ngay = receipt.ngay ? new Date(receipt.ngay) : null;
     const monthMatch = !searchMonth || (ngay && ngay.toISOString().slice(0, 7) === searchMonth);
 
-    const dailyStr = removeDiacritics(receipt.daily || '');
-    const itemsStr = receipt.items.map(item => removeDiacritics(item.name || '')).join(' ');
+    const dailyStr = removeDiacritics(receipt.daily || '').toLowerCase();
+    const itemsStr = receipt.items.map(item => removeDiacritics(item.itemName || '')).join(' ').toLowerCase();
 
     const searchMatch = !searchTerm || dailyStr.includes(searchTerm) || itemsStr.includes(searchTerm);
 
