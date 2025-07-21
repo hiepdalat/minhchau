@@ -1,3 +1,6 @@
+function removeDiacritics(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
 function normalizeString(str) {
     if (typeof str !== 'string') return '';
     return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
@@ -35,31 +38,25 @@ async function loadReceipts() {
 }
 
 function applyFilters() {
-    const searchDailyNameInput = document.getElementById('searchDailyNameInput');
-    const searchMonthInput = document.getElementById('searchMonth');
+  const searchTerm = removeDiacritics(document.getElementById('searchInput').value.trim().toLowerCase());
+  const searchMonth = document.getElementById('monthInput').value.trim();
 
-    const searchTerm = searchDailyNameInput ? normalizeString(searchDailyNameInput.value) : '';
-    const searchMonth = searchMonthInput ? searchMonthInput.value : '';
+  console.log('applyFilters: searchTerm=\'' + searchTerm + '\', searchMonth=\'' + searchMonth + '\'');
 
-    console.log(`applyFilters: searchTerm='${searchTerm}', searchMonth='${searchMonth}'`);
-    console.log(`allReceipts length before filter: ${allReceipts.length}`);
+  const filteredReceipts = allReceipts.filter(receipt => {
+    const ngay = receipt.ngay ? new Date(receipt.ngay) : null;
+    const monthMatch = !searchMonth || (ngay && ngay.toISOString().slice(0, 7) === searchMonth);
 
-    const filteredReceipts = allReceipts.filter(item => {
-        const normalizedDailyName = normalizeString(item.dailyName);
-        const normalizedItemName = normalizeString(item.itemName);
-        const matchesName = searchTerm === '' || normalizedDailyName.includes(searchTerm) || normalizedItemName.includes(searchTerm);
+    const dailyStr = removeDiacritics(receipt.daily || '');
+    const itemsStr = receipt.items.map(item => removeDiacritics(item.name || '')).join(' ');
 
-        let matchesMonth = true;
-        if (searchMonth) {
-            const itemMonth = item.receiptDate ? item.receiptDate.substring(0, 7) : '';
-            matchesMonth = itemMonth === searchMonth;
-        }
+    const searchMatch = !searchTerm || dailyStr.includes(searchTerm) || itemsStr.includes(searchTerm);
 
-        return matchesName && matchesMonth;
-    });
+    return monthMatch && searchMatch;
+  });
 
-    console.log(`filteredReceipts length: ${filteredReceipts.length}`);
-    renderReceiptsTable(filteredReceipts); // Đã sửa đúng tên hàm
+  console.log('filteredReceipts length: ' + filteredReceipts.length);
+  renderReceiptsTable(filteredReceipts);
 }
 
 function renderReceiptsTable(receipts) {
