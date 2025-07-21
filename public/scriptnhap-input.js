@@ -146,6 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.open(detailURL, '_blank');
     });
 
-    setupDateTicker();
+    //setupDateTicker();
     loadReceipts();
 });
