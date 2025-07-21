@@ -50,7 +50,7 @@ async function loadReceipts() {
         applyFilters(); // Áp dụng bộ lọc và render lại bảng sau khi tải dữ liệu
     } catch (e) {
         console.error("Lỗi khi tải dữ liệu nhập hàng từ server:", e);
-@@ -79,9 +81,7 @@
+
     // Nhóm các mặt hàng theo phiếu nhập để tính tổng tiền phiếu và hiển thị gộp hàng
     const receiptsGrouped = {};
     receiptsToDisplay.forEach(item => {
@@ -61,7 +61,7 @@ async function loadReceipts() {
         if (!receiptsGrouped[receiptKey]) {
             receiptsGrouped[receiptKey] = {
                 dailyName: item.dailyName,
-@@ -97,7 +97,6 @@
+
     for (const key in receiptsGrouped) {
         let currentReceiptTotal = 0;
         receiptsGrouped[key].items.forEach(item => {
@@ -69,7 +69,7 @@ async function loadReceipts() {
             const itemPrice = parseFloat(item.itemPrice) || 0;
             const itemDiscount = parseFloat(item.itemDiscount) || 0;
             const itemQuantity = parseFloat(item.itemQuantity) || 0;
-@@ -116,16 +115,16 @@
+
 
         receipt.items.forEach((item, index) => {
             const row = receiptsBody.insertRow();
@@ -89,7 +89,7 @@ async function loadReceipts() {
 
             row.innerHTML = `
                 <td class="py-2 px-4"><input type="checkbox" class="receipt-checkbox" data-receipt-key="${key}"></td>
-@@ -157,14 +156,15 @@
+
     const searchTerm = searchDailyNameInput ? normalizeString(searchDailyNameInput.value) : '';
     const searchMonth = searchMonthInput ? searchMonthInput.value : ''; // YYYY-MM
 
@@ -107,7 +107,7 @@ async function loadReceipts() {
         let matchesMonth = true;
         if (searchMonth) {
             const itemMonth = item.receiptDate ? item.receiptDate.substring(0, 7) : '';
-@@ -173,6 +173,7 @@
+
         return matchesName && matchesMonth;
     });
 
@@ -115,7 +115,7 @@ async function loadReceipts() {
     renderReceiptsTable(filteredReceipts);
 }
 
-@@ -308,10 +309,9 @@
+
             let errorCount = 0;
 
             for (const key of selectedReceiptKeys) {
@@ -127,7 +127,7 @@ async function loadReceipts() {
                     errorCount++;
                     continue;
                 }
-@@ -325,21 +325,23 @@
+
                     );
 
                     if (!originalReceiptItem) {
@@ -154,7 +154,7 @@ async function loadReceipts() {
                     successCount++;
                 } catch (error) {
                     console.error(`Lỗi khi xóa phiếu nhập ${key}:`, error);
-@@ -351,7 +353,7 @@
+
                 await loadReceipts(); // Tải lại dữ liệu sau khi xóa thành công
                 Swal.fire('Hoàn tất!', `Đã xóa thành công ${successCount} phiếu nhập. ${errorCount > 0 ? `(${errorCount} phiếu nhập gặp lỗi)` : ''}`, 'success');
             } else {
@@ -163,7 +163,7 @@ async function loadReceipts() {
             }
         }
     });
-@@ -393,7 +395,6 @@
+
         cancelButtonText: 'Không'
     }).then((result) => {
         if (result.isConfirmed) {
@@ -171,7 +171,7 @@ async function loadReceipts() {
             window.location.href = '/logout';
         }
     });
-@@ -413,9 +414,10 @@
+
     loadReceipts();
 document.getElementById('viewDetailsBtn')?.addEventListener('click', () => {
     const selectedKeys = Array.from(document.querySelectorAll('.receipt-checkbox:checked'))
