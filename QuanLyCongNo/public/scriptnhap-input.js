@@ -3,12 +3,12 @@ function normalizeString(str) {
     return str.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 }
 
-function formatCurrency(amount) {
-    const numAmount = parseFloat(amount);
-    if (isNaN(numAmount)) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(0);
-    }
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(numAmount);
+function formatCurrency(value) {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0
+  }).format(value);
 }
 
 let allReceipts = [];
@@ -62,53 +62,74 @@ function applyFilters() {
     renderReceiptTable(filteredReceipts); // Đã sửa đúng tên hàm
 }
 
-function renderReceiptTable(receipts) {
-    console.log("⏬ Dữ liệu truyền vào bảng:");
-    console.log(receipts);
+function renderReceiptsTable(receipts) {
+  const tableBody = document.querySelector("#receiptsTable tbody");
+  tableBody.innerHTML = "";
 
-    const tbody = document.querySelector("#receiptsTable tbody");
-    if (!tbody) {
-        console.error("Không tìm thấy tbody của bảng receiptsTable.");
-        return;
-    }
-    tbody.innerHTML = "";
+  receipts.forEach((receipt, index) => {
+    const { daily, ngay, items } = receipt;
+    const formattedDate = new Date(ngay).toLocaleDateString("vi-VN");
 
-    const grouped = {};
-    receipts.forEach(item => {
-        console.log("📄 Item:", item);
+    // Tạo hàng header cho nhóm phiếu nhập
+    const groupRow = document.createElement("tr");
+    const groupCell = document.createElement("td");
+    groupCell.colSpan = 10;
+    groupCell.style.backgroundColor = "#1e293b";
+    groupCell.style.color = "#fff";
+    groupCell.textContent = `Đại lý: ${daily || "Không có"} | Ngày: ${formattedDate}`;
+    groupRow.appendChild(groupCell);
+    tableBody.appendChild(groupRow);
 
-        const key = `${item.receiptDate}__${item.dailyName}`;
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push(item);
+    items.forEach(item => {
+      const row = document.createElement("tr");
+
+      const tdCheck = document.createElement("td");
+      tdCheck.innerHTML = `<input type="checkbox">`;
+
+      const tdNgay = document.createElement("td");
+      tdNgay.textContent = formattedDate;
+
+      const tdDaily = document.createElement("td");
+      tdDaily.textContent = daily;
+
+      const tdTen = document.createElement("td");
+      tdTen.textContent = item.ten || "—";
+
+      const tdDvt = document.createElement("td");
+      tdDvt.textContent = item.dvt || "—";
+
+      const tdSl = document.createElement("td");
+      tdSl.textContent = item.sl || 0;
+
+      const tdGia = document.createElement("td");
+      tdGia.textContent = formatCurrency(item.gia || 0);
+
+      const tdCk = document.createElement("td");
+      tdCk.textContent = (item.ck || 0) + "%";
+
+      const giaNhap = (item.gia || 0) * (1 - (item.ck || 0) / 100);
+      const tdGiaNhap = document.createElement("td");
+      tdGiaNhap.textContent = formatCurrency(giaNhap);
+
+      const tdThanhTien = document.createElement("td");
+      tdThanhTien.textContent = formatCurrency(giaNhap * (item.sl || 0));
+
+      row.append(
+        tdCheck,
+        tdNgay,
+        tdDaily,
+        tdTen,
+        tdDvt,
+        tdSl,
+        tdGia,
+        tdCk,
+        tdGiaNhap,
+        tdThanhTien
+      );
+
+      tableBody.appendChild(row);
     });
-
-    Object.keys(grouped).forEach(receiptKey => {
-        const [receiptDate, dailyName] = receiptKey.split("__");
-        const items = grouped[receiptKey];
-
-        const headerRow = document.createElement("tr");
-        headerRow.innerHTML = `
-            <td colspan="10" class="bg-gray-700 text-white font-semibold">
-                ▶️ Đại lý: ${dailyName} | Ngày: ${receiptDate}
-            </td>`;
-        tbody.appendChild(headerRow);
-
-        items.forEach(item => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td><input type="checkbox" class="receipt-checkbox" data-receipt-key="${normalizeString(item.dailyName)}_${item.receiptDate}"></td>
-                <td>${item.receiptDate}</td>
-                <td>${item.dailyName}</td>
-                <td>${item.itemName}</td>
-                <td>${item.itemUnit}</td>
-                <td>${item.itemQuantity}</td>
-                <td>${formatCurrency(item.itemPrice)}</td>
-                <td>${item.itemDiscount || 0}%</td>
-                <td>${formatCurrency(item.importPrice)}</td>
-                <td>${formatCurrency(item.totalItemAmount)}</td>`;
-            tbody.appendChild(row);
-        });
-    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
