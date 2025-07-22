@@ -23,32 +23,31 @@ async function loadReceipts() {
     const data = await response.json();
 
     // ✅ Chuyển đổi từ receipts dạng nhóm sang từng mặt hàng
-    allReceipts = [];
-    data.forEach(receipt => {
-      const receiptDate = receipt.ngay?.substring(0, 10) || '';
-      const dailyName = receipt.daily;
+   allReceipts = [];
+data.forEach(receipt => {
+  const receiptDate = receipt.ngay?.substring(0, 10);
+  const dailyName = receipt.daily;
 
-      receipt.items.forEach(item => {
-        const itemPrice = parseFloat(item.itemPrice) || 0;
-        const itemQuantity = parseFloat(item.itemQuantity) || 0;
-        const itemDiscount = parseFloat(item.itemDiscount) || 0;
+  receipt.items.forEach(item => {
+    const itemPrice = parseFloat(item.itemPrice) || 0;
+    const itemQuantity = parseFloat(item.itemQuantity) || 0;
+    const itemDiscount = parseFloat(item.itemDiscount) || 0;
+    const importPrice = itemPrice * (1 - itemDiscount / 100);
+    const totalItemAmount = importPrice * itemQuantity;
 
-        const importPrice = itemPrice * (1 - itemDiscount / 100);
-        const totalItemAmount = importPrice * itemQuantity;
-
-        allReceipts.push({
-          receiptDate,
-          dailyName,
-          itemName: item.itemName,
-          itemUnit: item.itemUnit,
-          itemQuantity,
-          itemPrice,
-          itemDiscount,
-          importPrice,
-          totalItemAmount
-        });
-      });
+    allReceipts.push({
+      receiptDate,
+      dailyName,
+      itemName: item.itemName,
+      itemUnit: item.itemUnit,
+      itemQuantity,
+      itemPrice,
+      itemDiscount,
+      importPrice,
+      totalItemAmount
     });
+  });
+});
 
     console.log("✅ Chuyển đổi thành công. Số dòng hàng:", allReceipts.length);
     applyFilters();
@@ -79,50 +78,42 @@ function applyFilters() {
 }
 
 function renderReceiptsTable(receipts) {
-  console.log("⏬ Dữ liệu truyền vào bảng:");
-  console.log(receipts); // 👉 kiểm tra dữ liệu từng dòng
-
   const tbody = document.querySelector("#receiptsTable tbody");
-  if (!tbody) {
-    console.warn("Không tìm thấy tbody trong bảng #receiptsTable");
-    return;
-  }
-
   tbody.innerHTML = "";
 
   const grouped = {};
   receipts.forEach(item => {
-    const key = `${item.receiptDate}__${item.dailyName}`;
+    const date = item.receiptDate || '';
+    const name = item.dailyName || '';
+    const key = `${date}__${name}`;
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(item);
   });
 
   Object.keys(grouped).forEach(receiptKey => {
     const [receiptDate, dailyName] = receiptKey.split("__");
-    const items = grouped[receiptKey];
 
-    // ✅ Header chứa checkbox với data-daily và data-date
     const headerRow = document.createElement("tr");
     headerRow.innerHTML = `
-      <td colspan="10" class="bg-gray-700 text-white font-semibold px-4 py-2">
-        <input type="checkbox" class="receipt-checkbox mr-2" data-daily="${dailyName}" data-date="${receiptDate}">
-        ▶️ Đại lý: ${dailyName} | Ngày: ${receiptDate}
+      <td colspan="10" class="bg-gray-700 text-white font-semibold">
+        ▶️ Đại lý: ${dailyName || 'Không rõ'} | Ngày: ${receiptDate || 'Không rõ'}
       </td>`;
     tbody.appendChild(headerRow);
 
+    const items = grouped[receiptKey];
     items.forEach(item => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td></td>
-        <td>${item.receiptDate}</td>
-        <td>${item.dailyName}</td>
-        <td>${item.itemName}</td>
-        <td>${item.itemUnit}</td>
-        <td>${item.itemQuantity}</td>
-        <td>${item.itemPrice} đ</td>
-        <td>${item.itemDiscount}%</td>
-        <td>${item.importPrice} đ</td>
-        <td>${item.totalItemAmount} đ</td>`;
+        <td><input type="checkbox" class="receiptCheckbox" data-date="${item.receiptDate}" data-daily="${item.dailyName}"></td>
+        <td>${item.receiptDate || ''}</td>
+        <td>${item.dailyName || ''}</td>
+        <td>${item.itemName || ''}</td>
+        <td>${item.itemUnit || ''}</td>
+        <td>${item.itemQuantity || 0}</td>
+        <td>${formatCurrency(item.itemPrice)}</td>
+        <td>${item.itemDiscount || 0}%</td>
+        <td>${formatCurrency(item.importPrice)}</td>
+        <td>${formatCurrency(item.totalItemAmount)}</td>`;
       tbody.appendChild(row);
     });
   });
