@@ -81,56 +81,26 @@ function applyFilters() {
     renderReceiptsTable(filteredReceipts);
 }
 
-function renderReceiptsTable(receiptsToRender) {
-    const tbody = document.querySelector("#receiptsTable tbody");
-    if (!tbody) {
-        console.error("Error: tbody element not found.");
-        return;
-    }
-    tbody.innerHTML = "";
+function renderReceiptsTable(receipts) {
+  const tbody = document.querySelector('#receiptsTable tbody');
+  tbody.innerHTML = '';
 
-    const grouped = {};
-    receiptsToRender.forEach(item => {
-        const date = item.receiptDate || 'Không rõ ngày';
-        const name = item.dailyName || 'Không rõ đại lý';
-        // Use a unique key for grouping. The key itself contains the essential info.
-        const key = `${encodeURIComponent(name)}_${date}`; 
-
-        if (!grouped[key]) {
-            grouped[key] = {
-                receiptDate: date, // Make sure these are explicitly set
-                dailyName: name,   // Make sure these are explicitly set
-                items: []
-            };
-        }
-        grouped[key].items.push(item); // Push the entire item object
-    });
-
-    Object.keys(grouped).forEach(receiptKey => {
-        const group = grouped[receiptKey];
-        const headerRow = document.createElement("tr");
-        headerRow.innerHTML = `
-            <td colspan="10" class="bg-gray-700 text-white font-semibold">
-                ▶️ Đại lý: ${group.dailyName} | Ngày: ${group.receiptDate}
-            </td>`;
-        tbody.appendChild(headerRow);
-
-        group.items.forEach(item => { // 'item' here is the actual flattened item object
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
-                <td>${item.receiptDate || ''}</td>
-                <td>${item.dailyName || ''}</td>
-                <td>${item.itemName || ''}</td>
-                <td>${item.itemUnit || ''}</td>
-                <td>${item.itemQuantity || 0}</td>
-                <td>${formatCurrency(item.itemPrice)}</td>
-                <td>${item.itemDiscount || 0}%</td>
-                <td>${formatCurrency(item.importPrice)}</td>
-                <td>${formatCurrency(item.totalItemAmount)}</td>`;
-            tbody.appendChild(row);
-        });
-    });
+  receipts.forEach((item, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${encodeURIComponent(item.dailyName)}_${item.receiptDate}"></td>
+      <td>${new Date(item.receiptDate).toLocaleDateString('vi-VN')}</td>
+      <td>${item.dailyName || ''}</td>
+      <td>${item.itemName || ''}</td>
+      <td>${item.itemUnit || ''}</td>
+      <td>${item.itemQuantity || 0}</td>
+      <td>${formatCurrency(item.itemPrice)}</td>
+      <td>${item.itemDiscount || 0}%</td>
+      <td>${formatCurrency(item.importPrice)}</td>
+      <td>${formatCurrency(item.totalItemAmount)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 document.addEventListener('DOMContentLoaded', () => {
     // Add event listeners
