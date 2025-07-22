@@ -17,26 +17,45 @@ function formatCurrency(value) {
 let allReceipts = [];
 
 async function loadReceipts() {
-    console.log("Đang tải dữ liệu nhập hàng...");
-    try {
-        const response = await fetch('/api/nhaphang');
-        if (!response.ok) {
-            if (response.status === 401) {
-                console.warn("Chưa đăng nhập hoặc phiên hết hạn, chuyển hướng về trang đăng nhập.");
-                window.location.href = '/index.html';
-                return;
-            }
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        allReceipts = data;
-        console.log("Dữ liệu nhập hàng đã tải:", allReceipts.length, "mục.");
-        applyFilters();
-    } catch (e) {
-        console.error("Lỗi khi tải dữ liệu nhập hàng từ server:", e);
-    }
-}
+  try {
+    const response = await fetch('/api/nhaphang');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
 
+    // ✅ Chuyển đổi từ receipts dạng nhóm sang từng mặt hàng
+    allReceipts = [];
+    data.forEach(receipt => {
+      const receiptDate = receipt.ngay?.substring(0, 10) || '';
+      const dailyName = receipt.daily;
+
+      receipt.items.forEach(item => {
+        const itemPrice = parseFloat(item.itemPrice) || 0;
+        const itemQuantity = parseFloat(item.itemQuantity) || 0;
+        const itemDiscount = parseFloat(item.itemDiscount) || 0;
+
+        const importPrice = itemPrice * (1 - itemDiscount / 100);
+        const totalItemAmount = importPrice * itemQuantity;
+
+        allReceipts.push({
+          receiptDate,
+          dailyName,
+          itemName: item.itemName,
+          itemUnit: item.itemUnit,
+          itemQuantity,
+          itemPrice,
+          itemDiscount,
+          importPrice,
+          totalItemAmount
+        });
+      });
+    });
+
+    console.log("✅ Chuyển đổi thành công. Số dòng hàng:", allReceipts.length);
+    applyFilters();
+  } catch (e) {
+    console.error("Lỗi khi tải dữ liệu nhập hàng từ server:", e);
+  }
+}
 function applyFilters() {
   const searchTerm = removeDiacritics(document.getElementById('searchDailyNameInput')?.value.trim().toLowerCase() || '');
   const searchMonth = document.getElementById('searchMonth')?.value || '';
