@@ -87,15 +87,17 @@ function renderReceiptsTable(receipts) {
 
   receipts.forEach((item, index) => {
     const tr = document.createElement('tr');
+    const receiptKey = encodeURIComponent(item.dailyName) + '_' + item.receiptDate;
+
     tr.innerHTML = `
-      <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${encodeURIComponent(item.dailyName)}_${item.receiptDate}"></td>
+      <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
       <td>${new Date(item.receiptDate).toLocaleDateString('vi-VN')}</td>
-      <td>${item.dailyName || ''}</td>
-      <td>${item.itemName || ''}</td>
-      <td>${item.itemUnit || ''}</td>
-      <td>${item.itemQuantity || 0}</td>
+      <td>${item.dailyName}</td>
+      <td>${item.itemName}</td>
+      <td>${item.itemUnit}</td>
+      <td>${item.itemQuantity}</td>
       <td>${formatCurrency(item.itemPrice)}</td>
-      <td>${item.itemDiscount || 0}%</td>
+      <td>${item.itemDiscount}%</td>
       <td>${formatCurrency(item.importPrice)}</td>
       <td>${formatCurrency(item.totalItemAmount)}</td>
     `;
