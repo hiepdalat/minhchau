@@ -93,16 +93,17 @@ function renderReceiptsTable(receiptsToRender) {
     receiptsToRender.forEach(item => {
         const date = item.receiptDate || 'Không rõ ngày';
         const name = item.dailyName || 'Không rõ đại lý';
-        // Use a unique key for grouping, important for checkbox data
-        const key = `${encodeURIComponent(name)}_${date}`; // Encode name for URL safety if used in data attributes
+        // Use a unique key for grouping. The key itself contains the essential info.
+        const key = `${encodeURIComponent(name)}_${date}`; 
+
         if (!grouped[key]) {
             grouped[key] = {
-                receiptDate: date,
-                dailyName: name,
+                receiptDate: date, // Make sure these are explicitly set
+                dailyName: name,   // Make sure these are explicitly set
                 items: []
             };
         }
-        grouped[key].items.push(item);
+        grouped[key].items.push(item); // Push the entire item object
     });
 
     Object.keys(grouped).forEach(receiptKey => {
@@ -114,7 +115,7 @@ function renderReceiptsTable(receiptsToRender) {
             </td>`;
         tbody.appendChild(headerRow);
 
-        group.items.forEach(item => {
+        group.items.forEach(item => { // 'item' here is the actual flattened item object
             const row = document.createElement("tr");
             row.innerHTML = `
                 <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
