@@ -60,75 +60,73 @@ function applyFilters() {
 }
 
 function renderReceiptsTable(receipts) {
-  const tableBody = document.querySelector("#receiptsTable tbody");
-  tableBody.innerHTML = "";
+  console.log("⏬ Dữ liệu truyền vào bảng:");
+  console.log(receipts); // 👉 kiểm tra dữ liệu từng dòng
 
-  receipts.forEach((receipt, index) => {
-    const { daily, ngay, items } = receipt;
-    const formattedDate = new Date(ngay).toLocaleDateString("vi-VN");
+  const tbody = document.querySelector("#receiptsTable tbody");
+  if (!tbody) {
+    console.warn("Không tìm thấy tbody trong bảng #receiptsTable");
+    return;
+  }
 
-    // Tạo hàng header cho nhóm phiếu nhập
-    const groupRow = document.createElement("tr");
-    const groupCell = document.createElement("td");
-    groupCell.colSpan = 10;
-    groupCell.style.backgroundColor = "#1e293b";
-    groupCell.style.color = "#fff";
-    groupCell.textContent = `Đại lý: ${daily || "Không có"} | Ngày: ${formattedDate}`;
-    groupRow.appendChild(groupCell);
-    tableBody.appendChild(groupRow);
+  tbody.innerHTML = "";
+
+  const grouped = {};
+  receipts.forEach(item => {
+    const key = `${item.receiptDate}__${item.dailyName}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(item);
+  });
+
+  Object.keys(grouped).forEach(receiptKey => {
+    const [receiptDate, dailyName] = receiptKey.split("__");
+    const items = grouped[receiptKey];
+
+    // ✅ Header chứa checkbox với data-daily và data-date
+    const headerRow = document.createElement("tr");
+    headerRow.innerHTML = `
+      <td colspan="10" class="bg-gray-700 text-white font-semibold px-4 py-2">
+        <input type="checkbox" class="receipt-checkbox mr-2" data-daily="${dailyName}" data-date="${receiptDate}">
+        ▶️ Đại lý: ${dailyName} | Ngày: ${receiptDate}
+      </td>`;
+    tbody.appendChild(headerRow);
 
     items.forEach(item => {
       const row = document.createElement("tr");
-
-      const tdCheck = document.createElement("td");
-      tdCheck.innerHTML = `<input type="checkbox">`;
-
-      const tdNgay = document.createElement("td");
-      tdNgay.textContent = formattedDate;
-
-      const tdDaily = document.createElement("td");
-      tdDaily.textContent = daily;
-
-      const tdTen = document.createElement("td");
-      tdTen.textContent = item.ten || "—";
-
-      const tdDvt = document.createElement("td");
-      tdDvt.textContent = item.dvt || "—";
-
-      const tdSl = document.createElement("td");
-      tdSl.textContent = item.sl || 0;
-
-      const tdGia = document.createElement("td");
-      tdGia.textContent = formatCurrency(item.gia || 0);
-
-      const tdCk = document.createElement("td");
-      tdCk.textContent = (item.ck || 0) + "%";
-
-      const giaNhap = (item.gia || 0) * (1 - (item.ck || 0) / 100);
-      const tdGiaNhap = document.createElement("td");
-      tdGiaNhap.textContent = formatCurrency(giaNhap);
-
-      const tdThanhTien = document.createElement("td");
-      tdThanhTien.textContent = formatCurrency(giaNhap * (item.sl || 0));
-
-      row.append(
-        tdCheck,
-        tdNgay,
-        tdDaily,
-        tdTen,
-        tdDvt,
-        tdSl,
-        tdGia,
-        tdCk,
-        tdGiaNhap,
-        tdThanhTien
-      );
-
-      tableBody.appendChild(row);
+      row.innerHTML = `
+        <td></td>
+        <td>${item.receiptDate}</td>
+        <td>${item.dailyName}</td>
+        <td>${item.itemName}</td>
+        <td>${item.itemUnit}</td>
+        <td>${item.itemQuantity}</td>
+        <td>${item.itemPrice} đ</td>
+        <td>${item.itemDiscount}%</td>
+        <td>${item.importPrice} đ</td>
+        <td>${item.totalItemAmount} đ</td>`;
+      tbody.appendChild(row);
     });
   });
 }
+document.getElementById('viewDetailsBtn')?.addEventListener('click', () => {
+  const selected = Array.from(document.querySelectorAll('.receipt-checkbox:checked'));
 
+  if (selected.length !== 1) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Chọn 1 phiếu duy nhất',
+      text: 'Vui lòng chọn đúng 1 phiếu để xem chi tiết.'
+    });
+    return;
+  }
+
+  const checkbox = selected[0];
+  const daily = checkbox.dataset.daily;
+  const date = checkbox.dataset.date;
+
+  const detailURL = `/chi-tiet-phieu-nhap.html?daily=${encodeURIComponent(daily)}&ngay=${date}`;
+  window.open(detailURL, '_blank');
+});
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
     document.getElementById('searchDailyNameInput')?.addEventListener('input', applyFilters);
