@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # 6. Expose port Railway sẽ dùng (thường là 3000 hoặc PORT biến môi trường)
-EXPOSE 3000
+EXPOSE 8080
 
 # 7. Lệnh chạy server
 CMD ["npm", "start"]
