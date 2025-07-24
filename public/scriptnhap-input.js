@@ -57,6 +57,8 @@ function removeDiacritics(str) {
 }
 
         function applyFilters() {
+                    console.log("🧪 Tổng số dòng dữ liệu trước lọc:", allReceipts.length);
+console.log("🧪 allReceipts[0] =", allReceipts[0]);
             const searchTerm = removeDiacritics(document.getElementById('searchDailyNameInput')?.value.trim() || '');
             const searchMonth = document.getElementById('searchMonth')?.value || '';
 
@@ -74,7 +76,13 @@ function removeDiacritics(str) {
                 return monthMatch && searchMatch;
             });
 
-            console.log("✅ Số kết quả sau lọc:", filteredReceipts.length, '🧾 Một dòng đầu tiên:', filteredReceipts[0]);
+            console.log("✅ Số kết quả sau lọc:", filteredReceipts.length);
+
+if (filteredReceipts.length > 0) {
+    console.log("🧾 Một dòng đầu tiên rõ ràng:", JSON.stringify(filteredReceipts[0], null, 2));
+} else {
+    console.warn("⚠️ Không có dữ liệu sau lọc.");
+}
             renderReceiptsTable(filteredReceipts);
         }
 
