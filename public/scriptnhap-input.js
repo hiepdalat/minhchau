@@ -21,28 +21,29 @@ function removeDiacritics(str) {
 
         console.log("✅ Dữ liệu thô từ server:", data);
 
-        if (data.length > 0) {
-            console.log("🧪 Kiểm tra 1 dòng:", data[0]);
-        }
-
         allReceipts = [];
 
         data.forEach(row => {
-            const ngay = row.receiptDate;
-            const daily = row.dailyName;
+            const ngay = row.ngay;
+            const daily = row.daily;
 
-            allReceipts.push({
-                ngay,
-                daily,
-                tenhang: row.itemName,
-                dvt: row.itemUnit,
-                soluong: row.itemQuantity,
-                dongia: row.itemPrice,
-                ck: row.itemDiscount,
-                gianhap: row.importPrice,
-                thanhtien: row.totalItemAmount
-            });
-        }); 
+            // Kiểm tra nếu có danh sách mặt hàng
+            if (Array.isArray(row.items)) {
+                row.items.forEach(item => {
+                    allReceipts.push({
+                        ngay,
+                        daily,
+                        tenhang: item.itemName,
+                        dvt: item.itemUnit,
+                        soluong: item.itemQuantity,
+                        dongia: item.itemPrice,
+                        ck: item.itemDiscount,
+                        gianhap: item.importPrice,
+                        thanhtien: item.totalItemAmount
+                    });
+                });
+            }
+        });
 
         console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
         applyFilters();
