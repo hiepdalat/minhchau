@@ -21,29 +21,22 @@ function removeDiacritics(str) {
                 const data = await response.json();
 
                 allReceipts = [];
-                data.forEach(receipt => {
-                    const ngay = receipt.ngay?.substring(0, 10);
-                    const daily = receipt.daily;
+                data.forEach(row => {
+    const ngay = row.receiptDate;
+    const daily = row.dailyName;
 
-                    receipt.items.forEach(item => {
-                        const dongia = parseFloat(item.dongia) || 0;
-                        const soluong = parseFloat(item.soluong) || 0;
-                        const ck = parseFloat(item.ck) || 0;
-                        const gianhap = dongia * (1 - ck / 100);
-                        const thanhtien = gianhap * soluong;
-
-                        allReceipts.push({
-                            ngay,
-                            daily,
-                            tenhang: item.tenhang,
-                            dvt: item.dvt,
-                            soluong,
-                            dongia,
-                            ck,
-                            gianhap,
-                            thanhtien
-                        });
-                    });
+    allReceipts.push({
+        ngay,
+        daily,
+        tenhang: row.itemName,
+        dvt: row.itemUnit,
+        soluong: row.itemQuantity,
+        dongia: row.itemPrice,
+        ck: row.itemDiscount,
+        gianhap: row.importPrice,
+        thanhtien: row.totalItemAmount
+    });
+});
                 });
 
                 console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
