@@ -74,8 +74,9 @@ function removeDiacritics(str) {
 
                 return monthMatch && searchMatch;
             });
-console.log("🧾 Một dòng đầu tiên:", filteredReceipts[0]); // vừa thêm dòng này vào 
+
             console.log('✅ Số kết quả sau lọc:', filteredReceipts.length);
+                    console.log("🧾 Một dòng đầu tiên:", filteredReceipts[0]); // vừa thêm dòng này vào 
             renderReceiptsTable(filteredReceipts);
         }
 
