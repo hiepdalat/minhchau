@@ -24,6 +24,7 @@ function removeDiacritics(str) {
         allReceipts = [];
 
         data.forEach(row => {
+                    console.log("🔍 Một dòng items[0]:", JSON.stringify(row.items?.[0], null, 2));
     const ngay = row.ngay;
 const daily = row.daily;
 
@@ -45,10 +46,8 @@ const daily = row.daily;
         });
 
         console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
-                console.log("🌟 Mẫu dữ liệu (1 dòng):", JSON.stringify(allReceipts[0], null, 2));
-                if (allReceipts.length > 0) {
-    console.log("🧾 Một dòng allReceipts đầu tiên:", allReceipts[0]);
-}
+               
+                
         applyFilters();
     } catch (e) {
         console.error("❌ Lỗi khi tải dữ liệu:", e);
