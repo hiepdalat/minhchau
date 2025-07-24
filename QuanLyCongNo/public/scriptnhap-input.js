@@ -24,22 +24,21 @@ function removeDiacritics(str) {
         allReceipts = [];
 
         data.forEach(row => {
-                    console.log("🔍 Một dòng items[0]:", JSON.stringify(row.items?.[0], null, 2));
     const ngay = row.ngay;
-const daily = row.daily;
+    const daily = row.daily;
 
     if (Array.isArray(row.items)) {
         row.items.forEach(item => {
             allReceipts.push({
                 ngay,
                 daily,
-                tenhang: item.itemName,
-                dvt: item.itemUnit,
-                soluong: item.itemQuantity,
-                dongia: item.itemPrice,
-                ck: item.itemDiscount,
-                gianhap: item.importPrice,
-                thanhtien: item.totalItemAmount
+                tenhang: item.tenhang,
+                dvt: item.dvt,
+                soluong: item.soluong,
+                dongia: item.dongia,
+                ck: item.ck,
+                gianhap: item.gianhap || 0, // nếu không có thì mặc định 0
+                thanhtien: item.thanhtien || 0
             });
                 });
             }
