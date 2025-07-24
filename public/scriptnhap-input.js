@@ -13,44 +13,48 @@ function removeDiacritics(str) {
 
         let allReceipts = [];
 
-        async function loadReceipts() {
-            try {
-                // Adjust this URL if your API endpoint is different
-                const response = await fetch('/api/nhaphang');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
+       async function loadReceipts() {
+    try {
+        const response = await fetch('/api/nhaphang');
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
 
-                allReceipts = [];
-                data.forEach(row => {
-    const ngay = row.receiptDate;
-    const daily = row.dailyName;
+        console.log("✅ Dữ liệu thô từ server:", data);
 
-    allReceipts.push({
-        ngay,
-        daily,
-        tenhang: row.itemName,
-        dvt: row.itemUnit,
-        soluong: row.itemQuantity,
-        dongia: row.itemPrice,
-        ck: row.itemDiscount,
-        gianhap: row.importPrice,
-        thanhtien: row.totalItemAmount
-    });
-});
-                });
-
-                console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
-                applyFilters();
-            } catch (e) {
-                console.error("❌ Lỗi khi tải dữ liệu:", e);
-                // Optionally show an error to the user
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Lỗi tải dữ liệu',
-                    text: 'Không thể tải dữ liệu phiếu nhập hàng. Vui lòng thử lại sau.'
-                });
-            }
+        if (data.length > 0) {
+            console.log("🧪 Kiểm tra 1 dòng:", data[0]);
         }
+
+        allReceipts = [];
+
+        data.forEach(row => {
+            const ngay = row.receiptDate;
+            const daily = row.dailyName;
+
+            allReceipts.push({
+                ngay,
+                daily,
+                tenhang: row.itemName,
+                dvt: row.itemUnit,
+                soluong: row.itemQuantity,
+                dongia: row.itemPrice,
+                ck: row.itemDiscount,
+                gianhap: row.importPrice,
+                thanhtien: row.totalItemAmount
+            });
+        }); 
+
+        console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
+        applyFilters();
+    } catch (e) {
+        console.error("❌ Lỗi khi tải dữ liệu:", e);
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi tải dữ liệu',
+            text: 'Không thể tải dữ liệu phiếu nhập hàng. Vui lòng thử lại sau.'
+        });
+    }
+}
 
         function applyFilters() {
             const searchTerm = removeDiacritics(document.getElementById('searchDailyNameInput')?.value.trim() || '');
