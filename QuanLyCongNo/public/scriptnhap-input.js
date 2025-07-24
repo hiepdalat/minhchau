@@ -75,9 +75,11 @@ function removeDiacritics(str) {
             });
 
             console.log('✅ Số kết quả sau lọc:', filteredReceipts.length);
-            console.log("🔸 Before logging first receipt");
-                        console.log("🧾 Một dòng đầu tiên:", filteredReceipts[0]);
-                        console.log("🔸 After logging first receipt"); 
+            if (filteredReceipts.length > 0) {
+                console.log("🧾 Một dòng đầu tiên:", filteredReceipts[0]);
+            } else {
+                console.log("⚠️ Không có dữ liệu sau lọc.");
+            }
             renderReceiptsTable(filteredReceipts);
         }
 
