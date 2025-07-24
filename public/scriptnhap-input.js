@@ -24,23 +24,22 @@ function removeDiacritics(str) {
         allReceipts = [];
 
         data.forEach(row => {
-            const ngay = row.ngay;
-            const daily = row.daily;
+    const ngay = row.receiptDate;
+    const daily = row.dailyName;
 
-            // Kiểm tra nếu có danh sách mặt hàng
-            if (Array.isArray(row.items)) {
-                row.items.forEach(item => {
-                    allReceipts.push({
-                        ngay,
-                        daily,
-                        tenhang: item.itemName,
-                        dvt: item.itemUnit,
-                        soluong: item.itemQuantity,
-                        dongia: item.itemPrice,
-                        ck: item.itemDiscount,
-                        gianhap: item.importPrice,
-                        thanhtien: item.totalItemAmount
-                    });
+    if (Array.isArray(row.items)) {
+        row.items.forEach(item => {
+            allReceipts.push({
+                ngay,
+                daily,
+                tenhang: item.itemName,
+                dvt: item.itemUnit,
+                soluong: item.itemQuantity,
+                dongia: item.itemPrice,
+                ck: item.itemDiscount,
+                gianhap: item.importPrice,
+                thanhtien: item.totalItemAmount
+            });
                 });
             }
         });
