@@ -31,25 +31,24 @@ async function loadReceipts() {
             const dailyName = receipt.daily;
 
             receipt.items.forEach(item => {
-                const itemPrice = parseFloat(item.itemPrice) || 0;
-                const itemQuantity = parseFloat(item.itemQuantity) || 0;
-                const itemDiscount = parseFloat(item.itemDiscount) || 0;
+                const itemPrice = parseFloat(item.dongia) || 0;
+                const itemQuantity = parseFloat(item.soluong) || 0;
+                const itemDiscount = parseFloat(item.ck) || 0;
                 const importPrice = itemPrice * (1 - itemDiscount / 100);
                 const totalItemAmount = importPrice * itemQuantity;
 
-                allReceipts.push({
-                    receiptDate,
-                    dailyName,
-                    itemName: item.itemName,
-                    itemUnit: item.itemUnit,
-                    itemQuantity,
-                    itemPrice,
-                    itemDiscount,
-                    importPrice,
-                    totalItemAmount
-                });
-            });
-        });
+    allReceipts.push({
+        receiptDate,
+        dailyName,
+        itemName: item.tenhang,
+        itemUnit: item.dvt,
+        itemQuantity,
+        itemPrice,
+        itemDiscount,
+        importPrice,
+        totalItemAmount
+    });
+});
 
         console.log("✅ Chuyển đổi thành công. Số dòng hàng:", allReceipts.length);
         applyFilters(); // Apply filters immediately after loading data
