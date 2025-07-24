@@ -45,7 +45,9 @@ function removeDiacritics(str) {
         });
 
         console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
-                 console.log("🧾 Một dòng allReceipts đầu tiên:", allReceipts[0]);
+                if (allReceipts.length > 0) {
+    console.log("🧾 Một dòng allReceipts đầu tiên:", allReceipts[0]);
+}
         applyFilters();
     } catch (e) {
         console.error("❌ Lỗi khi tải dữ liệu:", e);
@@ -149,4 +151,5 @@ if (filteredReceipts.length > 0) {
             });
 
             loadReceipts();
+                   
         });
