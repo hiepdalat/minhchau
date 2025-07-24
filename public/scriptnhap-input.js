@@ -49,7 +49,7 @@ async function loadReceipts() {
         totalItemAmount
     });
 });
-
+        });
         console.log("✅ Chuyển đổi thành công. Số dòng hàng:", allReceipts.length);
         applyFilters(); // Apply filters immediately after loading data
     } catch (e) {
