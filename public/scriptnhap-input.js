@@ -74,12 +74,7 @@ function removeDiacritics(str) {
                 return monthMatch && searchMatch;
             });
 
-            console.log('✅ Số kết quả sau lọc:', filteredReceipts.length);
-                   if (filteredReceipts.length > 0) {
-                console.log("🧾 Một dòng đầu tiên:", filteredReceipts[0]);
-            } else {
-                console.log("⚠️ Không có dữ liệu sau lọc.");
-            }
+            console.log("✅ Số kết quả sau lọc:", filteredReceipts.length, '🧾 Một dòng đầu tiên:', filteredReceipts[0]);
             renderReceiptsTable(filteredReceipts);
         }
 
