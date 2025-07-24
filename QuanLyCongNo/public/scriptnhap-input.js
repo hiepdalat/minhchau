@@ -17,8 +17,14 @@ function removeDiacritics(str) {
             try {
                 // Adjust this URL if your API endpoint is different
                 const response = await fetch('/api/nhaphang');
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+               if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const data = await response.json();
+console.log("✅ Dữ liệu thô từ server:", data);
+
+if (data.length > 0) {
+    console.log("🧪 Kiểm tra 1 dòng:", data[0]);
+}
 
                 allReceipts = [];
                 data.forEach(row => {
