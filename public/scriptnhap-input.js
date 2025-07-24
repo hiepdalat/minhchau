@@ -24,8 +24,8 @@ function removeDiacritics(str) {
         allReceipts = [];
 
         data.forEach(row => {
-    const ngay = row.receiptDate;
-    const daily = row.dailyName;
+    const ngay = row.ngay;
+const daily = row.daily;
 
     if (Array.isArray(row.items)) {
         row.items.forEach(item => {
