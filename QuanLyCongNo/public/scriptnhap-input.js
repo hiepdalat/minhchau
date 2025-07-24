@@ -45,6 +45,7 @@ const daily = row.daily;
         });
 
         console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
+                console.log("🌟 Mẫu dữ liệu (1 dòng):", JSON.stringify(allReceipts[0], null, 2));
                 if (allReceipts.length > 0) {
     console.log("🧾 Một dòng allReceipts đầu tiên:", allReceipts[0]);
 }
