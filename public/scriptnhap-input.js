@@ -88,35 +88,60 @@ if (filteredReceipts.length > 0) {
             renderReceiptsTable(filteredReceipts);
         }
 
-        function renderReceiptsTable(receipts) {
-            const tbody = document.querySelector('#receiptsTable tbody');
-            if (!tbody) {
-                console.error("Error: tbody element with ID 'receiptsTable' not found.");
-                return;
-            }
-            tbody.innerHTML = '';
+       function renderFilteredResults(receipts) {
+    const grouped = {};
 
-            receipts.forEach((item) => {
-                const tr = document.createElement('tr');
-                // Ensure item.daily and item.ngay are not null/undefined before encoding
-                const receiptKey = `${encodeURIComponent(item.daily || '')}_${item.ngay || ''}`;
-
-
-                tr.innerHTML = `
-                    <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
-                    <td>${item.ngay ? new Date(item.ngay).toLocaleDateString('vi-VN') : ''}</td>
-                    <td>${item.daily || ''}</td>
-                    <td>${item.tenhang || ''}</td>
-                    <td>${item.dvt || ''}</td>
-                    <td>${item.soluong || 0}</td>
-                    <td>${formatCurrency(item.dongia || 0)}</td>
-                    <td>${(item.ck || 0)}%</td>
-                    <td>${formatCurrency(item.gianhap || 0)}</td>
-                    <td>${formatCurrency(item.thanhtien || 0)}</td>
-                `;
-                tbody.appendChild(tr);
-            });
+    // --- Gom nhóm theo daily + ngay (YYYY-MM-DD) ---
+    receipts.forEach(r => {
+        const dateStr = new Date(r.ngay).toISOString().split('T')[0];
+        const key = `${r.daily}_${dateStr}`;
+        if (!grouped[key]) {
+            grouped[key] = {
+                daily: r.daily,
+                ngay: dateStr,
+                items: [],
+                tongtien: 0
+            };
         }
+        r.items.forEach(item => {
+            grouped[key].items.push(item);
+            grouped[key].tongtien += item.thanhtien;
+        });
+    });
+
+    const tbody = document.getElementById('receiptsTableBody');
+    tbody.innerHTML = '';
+
+    const keys = Object.keys(grouped);
+    if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-2 text-gray-500">Không có kết quả phù hợp.</td></tr>`;
+        return;
+    }
+
+    keys.forEach((key, index) => {
+        const receipt = grouped[key];
+        const row = document.createElement('tr');
+
+        // Đảm bảo receiptKey khớp với code xem chi tiết
+        const encodedDaily = encodeURIComponent(receipt.daily);
+        const receiptKey = `${encodedDaily}_${receipt.ngay}`;
+
+        row.innerHTML = `
+            <td class="text-center">
+                <input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}">
+            </td>
+            <td>${index + 1}</td>
+            <td>${receipt.daily}</td>
+            <td>${new Date(receipt.ngay).toLocaleDateString('vi-VN')}</td>
+            <td>${receipt.items.length}</td>
+            <td class="text-right">${formatCurrency(receipt.tongtien)}</td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    });
+}
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
@@ -144,8 +169,8 @@ if (filteredReceipts.length > 0) {
 
                 const [dailyNameEncoded, receiptDate] = receiptKey.split('_');
                 const dailyName = decodeURIComponent(dailyNameEncoded);
-            const detailURL = `/print-receipt.html?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`;
-                
+
+                const detailURL = `/print-receipt.html?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`;
                 window.open(detailURL, '_blank');
             });
 
