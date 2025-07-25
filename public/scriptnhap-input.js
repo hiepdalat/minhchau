@@ -139,8 +139,6 @@ if (filteredReceipts.length > 0) {
 
         tbody.appendChild(row);
     });
-
-    });
 }
 
         document.addEventListener('DOMContentLoaded', () => {
