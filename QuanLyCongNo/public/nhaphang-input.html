@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi"> <head>
+<html lang="vi">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Phiếu Nhập Hàng</title>
@@ -7,133 +8,172 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Global Styles */
+        /* Global Styles for a softer, playful look */
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7f6; /* Light, calming background */
-            color: #333;
+            /* Nền gradient nhẹ nhàng, tươi sáng */
+            background: linear-gradient(135deg, #e0f2f7 0%, #c8e6f1 100%); 
+            color: #4a4a4a; /* Màu chữ mềm mại hơn */
             line-height: 1.6;
+            min-height: 100vh; /* Đảm bảo nền phủ toàn bộ trang */
+            display: flex; /* Dùng flexbox để căn giữa container */
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* Thêm padding cho body */
+            box-sizing: border-box; /* Quan trọng để padding không làm tràn */
         }
 
-        /* Container for overall page content */
+        /* Container for overall page content - thân thiện hơn */
         .container {
             max-width: 1200px;
-            margin: 30px auto;
-            padding: 25px;
+            width: 100%; /* Đảm bảo container co giãn */
+            margin: auto; /* Căn giữa */
+            padding: 30px;
             background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 20px; /* Bo tròn nhiều hơn */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Đổ bóng rõ nét nhưng mềm mại */
+            animation: fadeIn 0.8s ease-out; /* Hiệu ứng xuất hiện */
         }
 
-        /* Header Styling */
+        /* Animation cho container */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Styling - Màu sắc tươi tắn, font nổi bật */
         h1 {
             text-align: center;
-            color: #0056b3; /* A strong blue color */
-            margin-bottom: 25px;
-            font-size: 2.2em;
+            color: #6a5acd; /* Một tông màu tím lavender/xanh tím đáng yêu */
+            margin-bottom: 30px;
+            font-size: 2.6em; /* To hơn một chút */
             font-weight: 700;
-            border-bottom: 2px solid #eef;
-            padding-bottom: 15px;
+            border-bottom: 3px solid #e1bee7; /* Đường kẻ màu hồng/tím nhạt */
+            padding-bottom: 18px;
+            letter-spacing: 1px; /* Tăng khoảng cách chữ */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05); /* Bóng chữ nhẹ */
         }
 
-        /* Filter Section Styling */
+        /* Filter Section Styling - Gọn gàng, bo tròn */
         .filter-section {
             display: flex;
-            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-            gap: 15px; /* Spacing between filter groups and buttons */
-            margin-bottom: 25px;
-            align-items: flex-end; /* Align items to the bottom */
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            gap: 20px; /* Khoảng cách lớn hơn */
+            margin-bottom: 30px;
+            align-items: flex-end;
+            background-color: #f0f8ff; /* AliceBlue - màu xanh rất nhạt */
+            padding: 20px;
+            border-radius: 15px; /* Bo tròn nhiều */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Đổ bóng nhẹ */
         }
         .filter-group {
             display: flex;
             flex-direction: column;
-            flex: 1; /* Allow groups to grow */
-            min-width: 200px; /* Minimum width for each filter group */
+            flex: 1;
+            min-width: 220px; /* Tăng min-width */
         }
         .filter-group label {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 500;
-            color: #555;
-            font-size: 0.95em;
+            color: #607d8b; /* Xám xanh ấm */
+            font-size: 1em;
         }
         .filter-section input[type="text"],
         .filter-section input[type="month"] {
-            padding: 10px 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
-            width: 100%; /* Make inputs fill their container */
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            padding: 12px 15px; /* Thêm padding */
+            border: 2px solid #b3e5fc; /* Border màu xanh dương nhạt hơn */
+            border-radius: 10px; /* Bo tròn input */
+            font-size: 1.05em;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .filter-section input[type="text"]:focus,
         .filter-section input[type="month"]:focus {
-            border-color: #007bff;
+            border-color: #64b5f6; /* Xanh dương sáng hơn khi focus */
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.3); /* Hiệu ứng đổ bóng focus */
         }
 
-        /* Button Styling */
+        /* Button Styling - Đầy màu sắc và bo tròn */
         .filter-section button {
-            padding: 10px 20px;
-            background-color: #28a745; /* Green for action buttons */
+            padding: 12px 25px;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px; /* Bo tròn nút */
             cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            white-space: nowrap; /* Prevent text wrapping inside buttons */
+            font-size: 1.05em;
+            font-weight: 600;
+            transition: all 0.3s ease; /* Chuyển động mượt mà hơn */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Đổ bóng cho nút */
+            white-space: nowrap;
         }
-        .filter-section button:hover {
-            background-color: #218838; /* Darker green on hover */
-            transform: translateY(-2px);
+        #searchBtn {
+            background: linear-gradient(45deg, #87ceeb, #5ac8fa); /* Gradient xanh da trời */
         }
-        .filter-section button:active {
+        #searchBtn:hover {
+            background: linear-gradient(45deg, #5ac8fa, #87ceeb); /* Đảo gradient khi hover */
+            transform: translateY(-3px); /* Hiệu ứng nhấc nhẹ lên */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        #searchBtn:active {
             transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         #viewDetailsBtn {
-            background-color: #007bff; /* Blue for 'View Details' button */
+            background: linear-gradient(45deg, #b19cd9, #9c27b0); /* Gradient tím */
         }
         #viewDetailsBtn:hover {
-            background-color: #0056b3;
+            background: linear-gradient(45deg, #9c27b0, #b19cd9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        #viewDetailsBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* Table Container for Scrolling */
+        /* Table Container for Scrolling - Vẫn giữ chức năng cuộn, nhưng đẹp hơn */
         .table-container {
-            max-height: 450px; /* Increased height to accommodate more rows visually */
+            max-height: 500px; /* Tăng chiều cao tối đa */
             overflow-y: auto;
-            border: 1px solid #e0e0e0; /* Lighter border for the container */
-            border-radius: 8px;
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.05); /* subtle inner shadow */
+            border: 1px solid #cceeff; /* Border màu xanh nhạt */
+            border-radius: 15px; /* Bo tròn container bảng */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.03); /* Bóng trong nhẹ */
+            animation: slideInUp 0.8s ease-out forwards; /* Hiệu ứng xuất hiện */
+            animation-delay: 0.2s;
+            opacity: 0; /* Bắt đầu ẩn */
         }
 
-        /* Table Styling */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Table Styling - Sáng sủa, dễ đọc */
         table {
             width: 100%;
-            border-collapse: separate; /* Use separate for rounded corners on cells */
+            border-collapse: separate;
             border-spacing: 0;
-            margin-top: 0; /* Remove top margin as it's within .table-container */
-            background-color: #fff; /* Ensure table background is white */
+            background-color: #ffffff;
+            border-radius: 15px; /* Bo tròn cả bảng */
+            overflow: hidden; /* Quan trọng để bo góc hoạt động với border-collapse: separate */
         }
         table th, table td {
-            border: 1px solid #eee; /* Lighter border for cells */
-            padding: 12px 15px; /* More padding for better readability */
+            border: 1px solid #e0f2f7; /* Border rất nhạt, xanh nước biển */
+            padding: 14px 18px; /* Nhiều padding hơn */
             text-align: left;
-            vertical-align: middle; /* Center content vertically */
-            white-space: nowrap; /* Prevent text wrapping in cells (adjust if needed) */
+            vertical-align: middle;
+            font-size: 0.95em;
+            color: #4a4a4a;
         }
         table th {
-            background-color: #e9ecef; /* Light gray for header */
+            background-color: #d8f1f7; /* Nền header xanh pastel */
             font-weight: 700;
-            color: #495057;
+            color: #2196f3; /* Màu chữ header xanh dương */
             position: sticky;
             top: 0;
             z-index: 10;
@@ -143,16 +183,17 @@
         /* Style for checkbox column */
         table th:first-child, table td:first-child {
             text-align: center;
-            width: 50px; /* Fixed width for checkbox column */
+            width: 60px; /* Rộng hơn cho checkbox */
         }
 
-        /* Alternating row colors for better readability */
+        /* Alternating row colors - Màu sắc vui tươi */
         table tbody tr:nth-child(even) {
-            background-color: #f8fafd; /* Very light blue for even rows */
+            background-color: #f7feff; /* Rất nhạt, gần như trắng */
         }
         table tbody tr:hover {
-            background-color: #e2f0fb; /* Highlight row on hover */
+            background-color: #e3f2fd; /* Xanh nhạt khi hover */
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Đổ bóng nhẹ khi hover */
         }
 
         /* Specific column alignment for numbers */
@@ -164,14 +205,53 @@
             text-align: right;
         }
         table td:nth-child(8) { /* CK */
-            text-align: center; /* Center CK percentage */
+            text-align: center;
+            font-weight: 500;
+            color: #6c757d;
         }
 
-        /* Checkbox styling */
+        /* Checkbox styling - Lớn hơn và dễ bấm hơn */
         input[type="checkbox"].receiptCheckbox {
-            transform: scale(1.2); /* Slightly larger checkbox */
+            transform: scale(1.3); /* Lớn hơn rõ rệt */
             margin: 0;
             cursor: pointer;
+            accent-color: #87ceeb; /* Đổi màu checkbox mặc định */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 15px auto;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                min-width: unset;
+                width: 100%;
+            }
+            .filter-section button {
+                width: 100%;
+            }
+            table th, table td {
+                padding: 10px 12px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .filter-section {
+                padding: 15px;
+            }
+            table th, table td {
+                font-size: 0.85em;
+            }
         }
     </style>
 </head>
@@ -189,8 +269,8 @@
                 <label for="searchMonth">Lọc theo tháng</label>
                 <input type="month" id="searchMonth">
             </div>
-            <button id="searchBtn"> 🔍 Tìm Đại Lý</button>
-            <button id="viewDetailsBtn"> 🧾 Xem Chi Tiết Phiếu</button>
+            <button id="searchBtn">Tìm</button>
+            <button id="viewDetailsBtn">Xem Chi Tiết Phiếu</button>
         </div>
 
         <div class="table-container">
