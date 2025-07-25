@@ -88,7 +88,7 @@ if (filteredReceipts.length > 0) {
             renderReceiptsTable(filteredReceipts);
         }
 
-       function renderFilteredResults(receipts) {
+       function renderReceiptsTable(receipts) {
     const grouped = {};
 
     // Gom nhóm từng mặt hàng theo daily + ngay
