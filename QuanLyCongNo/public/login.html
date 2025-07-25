@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng Nhập - Chọn Server</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f5f5f5;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 32px;
+    }
+
+    .button {
+      padding: 14px 28px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .render {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .railway {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chọn môi trường truy cập</h1>
+  <button class="button render" onclick="window.location.href='https://minhchau.onrender.com/'">Render</button>
+  <button class="button railway" onclick="window.location.href='https://minhchau-production.up.railway.app/'">Railway</button>
+</body>
+</html>
