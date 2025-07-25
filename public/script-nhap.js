@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentItemsBody = document.getElementById('currentItemsBody');
     const totalAmountSpan = document.getElementById('totalAmount'); // Tổng tiền cho phiếu đang tạo
     const saveReceiptBtn = document.getElementById('saveReceiptBtn');
-    const searchDailyNameInput = document.getElementById('searchDailyName');
+    const searchDailyNameInput = document.getElementById('searchDailyName'); // This is now likely unused if you're using a select dropdown
+    const dailyNameSelect = document.getElementById('dailyNameSelect'); // Added for the dropdown
     const searchMonthInput = document.getElementById('searchMonth');
     const searchBtn = document.getElementById('searchBtn');
     const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
@@ -21,10 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const grandTotalAllItemsSpan = document.getElementById('grandTotalAllItems'); // Tổng tiền tất cả mặt hàng hiển thị
 
     const receiptsSectionCard = document.getElementById('receiptsSectionCard');
+    const inputScrollWrapper = document.getElementById("inputScrollWrapper"); // Get this element
 
     let currentReceiptItems = []; // Array to hold items for the current receipt being built
 
-    
     // Hàm loại bỏ dấu tiếng Việt
     function removeVietnameseTones(str) {
         return str.normalize("NFD")
@@ -32,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             .replace(/đ/g, "d").replace(/Đ/g, "D")
             .toLowerCase();
     }
-
 
     /**
      * Shows a SweetAlert2 message box.
@@ -111,23 +111,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         totalAmountSpan.textContent = formatCurrency(totalAmount);
 
-        // Hiển thị hoặc ẩn toàn bộ khung nhập hàng
-        const inputScrollWrapper = document.getElementById("inputScrollWrapper");
-        const saveReceiptButton = document.getElementById("saveReceiptBtn");
-
+        // Hiển thị hoặc ẩn toàn bộ khung nhập hàng và nút lưu
         if (currentReceiptItems.length > 0) {
             inputScrollWrapper.classList.remove('hidden');
-            saveReceiptButton.classList.remove('hidden');
+            saveReceiptBtn.classList.remove('hidden');
         } else {
             inputScrollWrapper.classList.add('hidden');
-            saveReceiptButton.classList.add('hidden');
+            saveReceiptBtn.classList.add('hidden');
         }
     }
 
     /**
      * Adds an item to the current receipt.
      */
-    addItemBtn.addEventListener('click', async () => { // Made async to await Swal.fire
+    addItemBtn.addEventListener('click', async () => {
         const tenhang = itemNameInput.value.trim();
         const dvt = itemUnitInput.value.trim();
         const soluong = parseInt(itemQuantityInput.value);
@@ -235,8 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 dailyNameInput.value = '';
                 receiptDateInput.value = new Date().toISOString().split('T')[0]; // Reset to current date
                 currentReceiptItems = [];
-                renderCurrentItems();
-                // Không gọi fetchAndRenderReceipts() ở đây để phần hiển thị vẫn ẩn
+                renderCurrentItems(); // This will hide the table/button if no items
             } else if (response.status === 401) {
                 await showCustomAlert('⚠️', 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'error');
                 setTimeout(() => window.location.href = '/index.html', 2000);
@@ -251,37 +247,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // ========== Hàm tải danh sách Đại Lý =============
-     async function loadDailyNamesToSelect() {
-    try {
-        const res = await fetch('/api/nhaphang');
-        if (!res.ok) throw new Error('Không lấy được danh sách phiếu nhập');
-        const data = await res.json();
+    async function loadDailyNamesToSelect() {
+        try {
+            const res = await fetch('/api/nhaphang');
+            if (!res.ok) throw new Error('Không lấy được danh sách phiếu nhập');
+            const data = await res.json();
 
-        const uniqueNames = [...new Set(data.map(r => r.daily).filter(Boolean))];
-        const select = document.getElementById('dailyNameSelect');
-        uniqueNames.sort().forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            option.textContent = name;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Lỗi khi tải danh sách đại lý:', error);
+            // Get unique daily names and sort them
+            const uniqueNames = [...new Set(data.map(r => r.daily).filter(Boolean))].sort();
+
+            // Clear existing options, keep the default "Chọn đại lý" option if it exists
+            dailyNameSelect.innerHTML = '<option value="">Chọn đại lý</option>';
+
+            uniqueNames.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                dailyNameSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Lỗi khi tải danh sách đại lý:', error);
+            // Optionally, show an alert if loading fails
+            // await showCustomAlert('Lỗi!', 'Không thể tải danh sách đại lý.', 'error');
+        }
     }
-}
-    // --- Sửa lại fetchAndRenderReceipts() để tìm kiếm không dấu ---
-  /*  async function fetchAndRenderReceipts() {
+
+    // --- fetchAndRenderReceipts() using the dropdown select ---
+    async function fetchAndRenderReceipts() {
         receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
-        const dailySearchRaw = searchDailyNameInput.value.trim();
-        const dailySearch = removeVietnameseTones(dailySearchRaw);
+
+        const selectedDaily = dailyNameSelect.value.trim();
         const monthSearch = searchMonthInput.value;
 
-        if (!dailySearch && !monthSearch) {
-            await showCustomAlert('Thiếu hoặc sai thông tin!', 'Vui lòng nhập tên đại lý hoặc chọn tháng để tìm kiếm.', 'error');
-            receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
+        if (!selectedDaily && !monthSearch) {
+            await showCustomAlert('⚠️', 'Vui lòng chọn tên đại lý và/hoặc chọn tháng để tìm kiếm.', 'error');
+            receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">⚠️ Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
             receiptsSectionCard.classList.add('hidden');
-            grandTotalAllItemsSpan.textContent = '0 ₫'; // Reset total on no search criteria
-            updateViewDetailsButtonState(); // Update button state
+            grandTotalAllItemsSpan.textContent = '0 ₫';
+            updateViewDetailsButtonState();
             return;
         }
 
@@ -300,7 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const receipts = await response.json();
 
             const filtered = receipts.filter(receipt => {
-                const matchName = !dailySearch || removeVietnameseTones(receipt.daily || '').includes(dailySearch);
+                const matchName = !selectedDaily || receipt.daily === selectedDaily;
                 const matchMonth = !monthSearch || (new Date(receipt.ngay)).toISOString().slice(0, 7) === monthSearch;
                 return matchName && matchMonth;
             });
@@ -311,8 +314,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (filtered.length === 0) {
                 receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
                 grandTotalAllItemsSpan.textContent = '0 ₫';
-                receiptsSectionCard.classList.add('hidden'); // Hide the section card if no results
-                updateViewDetailsButtonState(); // Update button state
+                receiptsSectionCard.classList.remove('hidden'); // Still show the card, but with no results
+                updateViewDetailsButtonState();
                 return;
             }
 
@@ -358,92 +361,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateViewDetailsButtonState(); // Update button state on error
         }
     }
-*/
-    // =========Chọn Đại Lý =============
-    async function fetchAndRenderReceipts() {
-    receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Đang tải dữ liệu...</td></tr>';
 
-    const selectedDaily = document.getElementById('dailyNameSelect').value.trim();
-    const monthSearch = searchMonthInput.value;
-
-    if (!selectedDaily && !monthSearch) {
-        await showCustomAlert('⚠️', 'Vui lòng chọn tên đại lý và tháng để tìm kiếm.', 'error');
-        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">⚠️ Vui lòng nhập tiêu chí tìm kiếm.</td></tr>';
-        receiptsSectionCard.classList.add('hidden');
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/nhaphang');
-        if (!response.ok) throw new Error('Lỗi khi tải dữ liệu');
-        const receipts = await response.json();
-
-        const filtered = receipts.filter(receipt => {
-            const matchName = !selectedDaily || receipt.daily === selectedDaily;
-            const matchMonth = !monthSearch || (new Date(receipt.ngay)).toISOString().slice(0, 7) === monthSearch;
-            return matchName && matchMonth;
-        });
-
-        receiptsBody.innerHTML = '';
-        let grandTotal = 0;
-
-        if (filtered.length === 0) {
-            receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4">Không tìm thấy phiếu nhập nào.</td></tr>';
-            grandTotalAllItemsSpan.textContent = '0 ₫';
-            receiptsSectionCard.classList.remove('hidden');
-            return;
-        }
-
-        receiptsSectionCard.classList.remove('hidden');
-
-        filtered.forEach(receipt => {
-            const receiptDate = new Date(receipt.ngay);
-            const formattedDate = receiptDate.toLocaleDateString('vi-VN', {
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
-
-            receipt.items.forEach((item) => {
-                const row = receiptsBody.insertRow();
-                row.dataset.receiptId = receipt._id;
-                row.dataset.itemId = item._id;
-
-                row.innerHTML = `
-                    <td class="py-2 px-4 border-b border-gray-700 text-center">
-                        <input type="checkbox" class="item-checkbox" data-receipt-id="${receipt._id}" data-item-id="${item._id}">
-                    </td>
-                    <td class="py-2 px-4 border-b border-gray-700">${formattedDate}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${receipt.daily}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${item.tenhang}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${item.dvt}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${item.soluong}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.dongia)}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${item.ck}%</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.gianhap)}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(item.thanhtien)}</td>
-                    <td class="py-2 px-4 border-b border-gray-700">${formatCurrency(receipt.tongtien)}</td>
-                `;
-                grandTotal += item.thanhtien;
-            });
-        });
-
-        grandTotalAllItemsSpan.textContent = formatCurrency(grandTotal);
-        updateViewDetailsButtonState();
-    } catch (error) {
-        console.error('Lỗi:', error);
-        receiptsBody.innerHTML = '<tr><td colspan="11" class="text-center py-4 text-red-500">Lỗi khi tải dữ liệu.</td></tr>';
-    }
-}
     // Event listener for search button
     searchBtn.addEventListener('click', fetchAndRenderReceipts);
 
     // Function to update the state of the "View Details" button
     function updateViewDetailsButtonState() {
         const checkedCheckboxes = document.querySelectorAll('.item-checkbox:checked');
-        if (checkedCheckboxes.length > 0) {
-            viewDetailsBtn.disabled = false;
-        } else {
-            viewDetailsBtn.disabled = true;
-        }
+        viewDetailsBtn.disabled = checkedCheckboxes.length === 0;
+        deleteSelectedBtn.disabled = checkedCheckboxes.length === 0; // Also disable delete button
     }
 
     // Event listener for any item checkbox change
@@ -561,42 +487,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- Date Ticker Logic (from existing style.css) ---
+    // --- Date Ticker Logic ---
     const dateTicker = document.getElementById('dateTicker');
     const tickerWrap = document.getElementById('tickerWrap');
 
-        function updateDateTicker() {
+    function updateDateTickerContent() {
         const now = new Date();
-          /* const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        const formattedDate = now.toLocaleDateString('vi-VN', options);
-        tickerWrap.textContent = formattedDate;
-    */
         const dateStr = now.toLocaleDateString('vi-VN', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-
-    const timeStr = now.toLocaleTimeString('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
-
-    const fullStr = `📅 ${dateStr} - 🕒 ${timeStr}`;
-    tickerWrap.textContent = fullStr;
-
-    // Gọi lại animateTicker mỗi khi cập nhật
-    animateTicker();
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const timeStr = now.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        const fullStr = `📅 ${dateStr} - 🕒 ${timeStr}`;
+        tickerWrap.textContent = fullStr;
     }
 
+    let animationFrameId;
+
     function animateTicker() {
-       // const tickerWidth = tickerWrap.offsetWidth;
-       // const containerWidth = dateTicker.offsetWidth;
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+        }
+
         const tickerWidth = tickerWrap.scrollWidth;
         const containerWidth = dateTicker.offsetWidth;
-        
+
         if (tickerWidth > containerWidth) {
             let position = containerWidth;
             function frame() {
@@ -605,23 +526,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                     position = containerWidth;
                 }
                 tickerWrap.style.transform = `translateX(${position}px)`;
-                requestAnimationFrame(frame);
+                animationFrameId = requestAnimationFrame(frame);
             }
             tickerWrap.style.willChange = "transform";
-            requestAnimationFrame(frame);
+            animationFrameId = requestAnimationFrame(frame);
         } else {
             tickerWrap.style.transform = `translateX(${(containerWidth - tickerWidth) / 2}px)`;
         }
     }
-        // Cập nhật liên tục mỗi giây
-        setInterval(updateDateTicker, 1000);
 
-        // Khởi tạo ngay khi load trang
-        document.addEventListener("DOMContentLoaded", updateDateTicker);
     // --- Initial Load ---
     async function init() {
         // Set current date for the receiptDate input
         receiptDateInput.value = new Date().toISOString().split('T')[0];
+
+        // Ensure current receipt input section and save button are hidden initially
+        inputScrollWrapper.classList.add('hidden');
+        saveReceiptBtn.classList.add('hidden');
 
         // Check user session
         try {
@@ -634,15 +555,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Session check failed:', error);
             await showCustomAlert('⚠️', 'Lỗi kết nối đến server. Vui lòng kiểm tra mạng và thử lại.', 'error');
         }
-        await loadDailyNamesToSelect(); // ✅ GỌI loaddata NGAY TRONG INIT
-        updateDateTicker();
-        animateTicker();
-        setInterval(updateDateTicker, 1000); // Update every second
 
-        // Đảm bảo phần hiển thị các phiếu nhập từ đại lý ẩn đi ban đầu
+        await loadDailyNamesToSelect(); // Load daily names for the dropdown
+
+        // Initialize and start date ticker
+        updateDateTickerContent();
+        animateTicker();
+        setInterval(updateDateTickerContent, 1000); // Update content every second
+
+        // Re-run animation on window resize
+        window.addEventListener('resize', () => {
+            updateDateTickerContent();
+            animateTicker();
+        });
+
+        // Ensure the search results section is hidden initially
         receiptsSectionCard.classList.add('hidden');
         grandTotalAllItemsSpan.textContent = '0 ₫';
-        updateViewDetailsButtonState(); // Đảm bảo nút xem chi tiết bị vô hiệu hóa khi chưa có gì được tải
+        updateViewDetailsButtonState(); // Ensure view details/delete buttons are disabled
     }
 
     init(); // Call initialization function
