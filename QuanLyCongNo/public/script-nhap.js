@@ -487,9 +487,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- Date Ticker Logic ---
+    // --- Date Ticker Logic (MODIFIED FOR NO SCROLLING) ---
     const dateTicker = document.getElementById('dateTicker');
     const tickerWrap = document.getElementById('tickerWrap');
+    let animationFrameId = null; // Keep this initialized
 
     function updateDateTickerContent() {
         const now = new Date();
@@ -506,33 +507,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         const fullStr = `📅 ${dateStr} - 🕒 ${timeStr}`;
         tickerWrap.textContent = fullStr;
-    }
 
-    let animationFrameId;
-
-    function animateTicker() {
+        // Immediately center the content after updating, and stop any running animation
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
         }
-
         const tickerWidth = tickerWrap.scrollWidth;
         const containerWidth = dateTicker.offsetWidth;
-
-        if (tickerWidth > containerWidth) {
-            let position = containerWidth;
-            function frame() {
-                position--;
-                if (position < -tickerWidth) {
-                    position = containerWidth;
-                }
-                tickerWrap.style.transform = `translateX(${position}px)`;
-                animationFrameId = requestAnimationFrame(frame);
-            }
-            tickerWrap.style.willChange = "transform";
-            animationFrameId = requestAnimationFrame(frame);
-        } else {
-            tickerWrap.style.transform = `translateX(${(containerWidth - tickerWidth) / 2}px)`;
-        }
+        tickerWrap.style.transform = `translateX(${(containerWidth - tickerWidth) / 2}px)`;
+        tickerWrap.style.willChange = "auto"; // Reset will-change property
     }
 
     // --- Initial Load ---
@@ -558,16 +542,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         await loadDailyNamesToSelect(); // Load daily names for the dropdown
 
-        // Initialize and start date ticker
+        // Initialize and update date ticker content immediately
         updateDateTickerContent();
-        animateTicker();
-        setInterval(updateDateTickerContent, 1000); // Update content every second
+        // Update content every second. No continuous animation needed if not scrolling.
+        setInterval(updateDateTickerContent, 1000);
 
-        // Re-run animation on window resize
-        window.addEventListener('resize', () => {
-            updateDateTickerContent();
-            animateTicker();
-        });
+        // Re-center on window resize
+        window.addEventListener('resize', updateDateTickerContent);
 
         // Ensure the search results section is hidden initially
         receiptsSectionCard.classList.add('hidden');
