@@ -89,55 +89,33 @@ if (filteredReceipts.length > 0) {
         }
 
        function renderReceiptsTable(receipts) {
-    const grouped = {};
+            const tbody = document.querySelector('#receiptsTable tbody');
+            if (!tbody) {
+                console.error("Error: tbody element with ID 'receiptsTable' not found.");
+                return;
+            }
+            tbody.innerHTML = '';
 
-    // Gom nhóm từng mặt hàng theo daily + ngay
-    receipts.forEach(r => {
-        const dateStr = new Date(r.ngay).toISOString().split('T')[0];
-        const key = `${r.daily}_${dateStr}`;
-        if (!grouped[key]) {
-            grouped[key] = {
-                daily: r.daily,
-                ngay: dateStr,
-                items: [],
-                tongtien: 0
-            };
-        }
+            receipts.forEach((item) => {
+                const tr = document.createElement('tr');
+                // Ensure item.daily and item.ngay are not null/undefined before encoding
+                const receiptKey = `${encodeURIComponent(item.daily || '')}_${item.ngay || ''}`;
 
-        grouped[key].items.push(r);
-        grouped[key].tongtien += r.thanhtien || 0;
-    });
 
-    const tbody = document.getElementById('receiptsTableBody');
-    tbody.innerHTML = '';
-
-    const keys = Object.keys(grouped);
-    if (keys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-2 text-gray-500">Không có kết quả phù hợp.</td></tr>`;
-        return;
-    }
-
-    keys.forEach((key, index) => {
-        const receipt = grouped[key];
-        const row = document.createElement('tr');
-
-        const encodedDaily = encodeURIComponent(receipt.daily);
-        const receiptKey = `${encodedDaily}_${receipt.ngay}`;
-
-        row.innerHTML = `
-            <td class="text-center">
-                <input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}">
-            </td>
-            <td>${index + 1}</td>
-            <td>${receipt.daily}</td>
-            <td>${new Date(receipt.ngay).toLocaleDateString('vi-VN')}</td>
-            <td>${receipt.items.length}</td>
-            <td class="text-right">${formatCurrency(receipt.tongtien)}</td>
-        `;
-
-        tbody.appendChild(row);
-    });
-}
+                tr.innerHTML = `
+                    <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
+                    <td>${item.ngay ? new Date(item.ngay).toLocaleDateString('vi-VN') : ''}</td>
+                    <td>${item.daily || ''}</td>
+                    <td>${item.tenhang || ''}</td>
+                    <td>${item.dvt || ''}</td>
+                    <td>${item.soluong || 0}</td>
+                    <td>${formatCurrency(item.dongia || 0)}</td>
+                    <td>${(item.ck || 0)}%</td>
+                    <td>${formatCurrency(item.gianhap || 0)}</td>
+                    <td>${formatCurrency(item.thanhtien || 0)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
