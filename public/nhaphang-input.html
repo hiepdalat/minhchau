@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Phiếu Nhập Hàng</title>
-   
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
-        /* Your CSS styles here */
+        /* Your existing CSS styles */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -25,7 +25,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
-            align-items: flex-end; /* Align items to the bottom */
+            align-items: flex-end;
         }
         .filter-group {
             display: flex;
@@ -33,6 +33,21 @@
         }
         .filter-group label {
             margin-bottom: 5px;
+        }
+
+        /* NEW CSS for scrollable table container */
+        .table-container {
+            max-height: 400px; /* Adjust this value as needed. For ~10 rows, consider 300-400px */
+            overflow-y: auto; /* Adds vertical scrollbar if content exceeds max-height */
+            border: 1px solid #ccc; /* Optional: adds a border around the scrollable area */
+            margin-top: 20px; /* To separate from filters */
+        }
+        /* Make table header stick when scrolling */
+        .table-container thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f2f2f2;
+            z-index: 10; /* Ensures header is above scrolling content */
         }
     </style>
 </head>
@@ -53,26 +68,27 @@
         <button id="viewDetailsBtn">Xem Chi Tiết Phiếu</button>
     </div>
 
-    <table id="receiptsTable">
-        <thead>
-            <tr>
-                <th>Chọn</th>
-                <th>Ngày</th>
-                <th>Đại lý</th>
-                <th>Tên hàng</th>
-                <th>ĐVT</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>CK</th>
-                <th>Giá nhập</th>
-                <th>Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="table-container">
+        <table id="receiptsTable">
+            <thead>
+                <tr>
+                    <th>Chọn</th>
+                    <th>Ngày</th>
+                    <th>Đại lý</th>
+                    <th>Tên hàng</th>
+                    <th>ĐVT</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>CK%</th>
+                    <th>Giá nhập</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
             </tbody>
-    </table>
-
+        </table>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="./scriptnhap-input.js"></script>
+    <script src="./scriptnhap-input.js"></script>
 </body>
 </html>
