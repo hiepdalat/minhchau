@@ -144,8 +144,8 @@ if (filteredReceipts.length > 0) {
 
                 const [dailyNameEncoded, receiptDate] = receiptKey.split('_');
                 const dailyName = decodeURIComponent(dailyNameEncoded);
-
-                const detailURL = `/print-receipt.html?daily=${encodeURIComponent(dailyName)}&ngay=${receiptDate}`;
+            const detailURL = `/print-receipt.html?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`;
+                
                 window.open(detailURL, '_blank');
             });
 
