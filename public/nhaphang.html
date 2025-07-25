@@ -3,223 +3,547 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Nhập Hàng</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7s0/QzY/3j+0qFzNlB3tFf+9D+J+Q+A+B+G+C+D+E+F+G+H+I+J+K+L+M+N+O+P+Q+R+S+T+U+V+W+X+Y+Z" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- SweetAlert2 CDN -->
+    <title>Quản Lý Nhập Hàng Dễ Thương</title> <link rel="stylesheet" href="style.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7s0/QzY/3j+0qFzNlB3tFf+9D+J+Q+A+B+G+C+D+E+F+G+H+I+J+K+L+M+N+O+P+Q+R+S+T+U+V+W+X+Y+Z" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* CSS riêng cho bảng "Mặt hàng đã nhập từ đại lý" trong nhaphang.html */
-        #receiptsTableWrapper { /* ID mới cho table-wrapper của bảng này */
-            max-height: 400px; /* Đặt chiều cao tối đa cho khung bảng */
-            overflow-y: auto;   /* Thêm thanh cuộn dọc khi nội dung vượt quá chiều cao */
-            border: 1px solid #4a5568; /* Viền cho khung cuộn */
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            
+        /* Global Styles for a cute and playful theme */
+        body.congno-body { /* Áp dụng riêng cho body có class congno-body */
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Nền gradient xanh dương/hồng pastel nhẹ nhàng */
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f7ff 50%, #fefcfb 100%); 
+            color: #4a4a4a; /* Màu chữ mềm mại hơn */
+            line-height: 1.6;
+            min-height: 100vh; /* Đảm bảo nền phủ toàn bộ trang */
+            display: flex; 
+            flex-direction: column; /* Sắp xếp các phần tử theo cột */
+            justify-content: flex-start; /* Bắt đầu từ trên xuống */
+            align-items: center;
+            padding-bottom: 20px; /* Thêm padding dưới cùng */
+            box-sizing: border-box; 
         }
 
-        #receiptsTableWrapper table th {
-            position: sticky; /* Giữ tiêu đề cố định khi cuộn */
-            top: 0;
-            z-index: 1; /* Đảm bảo tiêu đề nằm trên nội dung */
-            background-color: #4a5568; /* Giữ màu nền cho tiêu đề khi cuộn */
-            overflow-y: auto;
-          overflow-x: auto;
+        /* Header Styling - Nổi bật và thân thiện */
+        .header-container {
+            width: 100%;
+            background: linear-gradient(to right, #a7d9f7, #c1e3f9); /* Gradient xanh dương */
+            color: #333;
+            padding: 15px 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border-radius: 0 0 20px 20px; /* Bo tròn góc dưới */
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        #inputTableWrapper,
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1160px; /* Tương ứng với container */
+            margin-bottom: 10px;
+        }
+
+        .header-top h2 {
+            color: #007bff; /* Màu xanh dương thân thiện */
+            font-size: 2.2em;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-logout {
+            background-color: #ff99aa; /* Hồng cute */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-logout:hover {
+            background-color: #ff7788;
+            transform: translateY(-2px);
+        }
+
+        #dateTicker {
+            background-color: #fce4ec; /* Hồng pastel nhạt */
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.9em;
+            color: #d81b60; /* Màu chữ hồng đậm hơn */
+            font-weight: 500;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* Main Container - Nổi bật trên nền */
+        .container {
+            max-width: 1200px;
+            width: 95%; /* Chiếm phần lớn chiều rộng */
+            padding: 25px !important; /* Overriding p-4 if exists */
+            background-color: #ffffff;
+            border-radius: 20px; /* Bo tròn nhiều hơn */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Đổ bóng mềm mại */
+            animation: fadeIn 0.8s ease-out; /* Hiệu ứng xuất hiện */
+            margin-bottom: 20px; /* Khoảng cách với phần dưới cùng của body */
+        }
+
+        /* Animation cho container */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Sections - Trông gọn gàng và dễ thương */
+        .card {
+            background-color: #ffffff;
+            border-radius: 15px; /* Bo tròn các card con */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0f2f7; /* Viền xanh nhạt */
+            padding: 20px;
+            margin-bottom: 20px; /* Khoảng cách giữa các card */
+        }
+
+        .card h3 {
+            color: #6a5acd; /* Màu tím lavender đáng yêu */
+            font-size: 1.8em !important; /* Overriding text-lg */
+            font-weight: 700 !important; /* Overriding font-bold */
+            margin-bottom: 15px !important; /* Overriding mb-2 */
+            text-align: center;
+        }
+
+        /* Input/Form elements - Mềm mại và dễ nhìn */
+        .flex.flex-wrap.gap-2.items-end.mb-4 {
+            gap: 15px !important; /* Tăng khoảng cách giữa các trường input */
+        }
+
+        label {
+            color: #607d8b !important; /* Màu xám xanh ấm áp */
+            font-weight: 500 !important; /* Font medium */
+            margin-bottom: 5px; /* Khoảng cách với input */
+            display: block;
+            font-size: 0.95em !important; /* Text sm */
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        .dailyNameSelect {
+            width: 100% !important; /* Đảm bảo full width */
+            padding: 10px 12px !important; /* Overriding p-2 */
+            border: 2px solid #b3e5fc !important; /* Border xanh dương nhạt */
+            border-radius: 10px !important; /* Bo tròn nhiều */
+            background-color: #f7fcff !important; /* Nền xanh rất nhạt */
+            color: #4a4a4a !important; /* Màu chữ đen mềm mại */
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        .dailyNameSelect:focus {
+            border-color: #64b5f6 !important; /* Xanh dương sáng hơn khi focus */
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.3) !important; /* Hiệu ứng đổ bóng focus */
+        }
+        
+        .dailyNameSelect { /* Các thuộc tính cụ thể cho select */
+            height: auto !important; /* Bỏ height cố định để padding kiểm soát */
+            line-height: normal !important;
+            appearance: none; /* Bỏ style mặc định của hệ điều hành */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292%22%20height%3D%22292%22%3E%3Cpath%20fill%3D%22%234a4a4a%22%20d%3D%22M287%2069L146%20208%205%2069z%22%2F%3E%3C%2Fsvg%3E') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            background-size: 12px !important;
+            padding-right: 30px !important; /* Tạo không gian cho icon mũi tên */
+        }
+
+        .input-compact { /* Giữ max-width nhưng với style mới */
+            max-width: 250px; /* Điều chỉnh cho phù hợp */
+        }
+
+        /* Buttons - Năng động và có hiệu ứng */
+        button {
+            padding: 12px 20px !important; /* Overriding py-2 px-4 */
+            border-radius: 10px !important; /* Bo tròn nút */
+            font-size: 1.05em !important; /* Font size */
+            font-weight: 600 !important; /* Font weight */
+            transition: all 0.3s ease; /* Chuyển động mượt mà */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Đổ bóng nút */
+            white-space: nowrap; /* Tránh ngắt dòng */
+            display: flex; /* Dùng flexbox để căn giữa icon và chữ */
+            align-items: center;
+            justify-content: center;
+        }
+        button .fas, button .far { /* Style cho icon trong nút */
+            margin-right: 8px; /* Khoảng cách giữa icon và chữ */
+        }
+
+        #addItemBtn {
+            background: linear-gradient(45deg, #a8e6cf, #d4f8e5) !important; /* Xanh mint */
+            color: #2e8b57 !important;
+        }
+        #addItemBtn:hover {
+            background: linear-gradient(45deg, #d4f8e5, #a8e6cf) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
         #saveReceiptBtn {
-         /* display: none; */
-        max-height: 300px;
-          overflow-y: auto;
-          overflow-x: auto;
-          padding-right: 4px;
-         }
+            background: linear-gradient(45deg, #b3cde0, #8ecae6) !important; /* Xanh da trời nhạt */
+            color: #1b4e88 !important;
+        }
+        #saveReceiptBtn:hover {
+            background: linear-gradient(45deg, #8ecae6, #b3cde0) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        #searchBtn {
+            background: linear-gradient(45deg, #ffd1dc, #ffb6c1) !important; /* Hồng baby */
+            color: #d81b60 !important;
+        }
+        #searchBtn:hover {
+            background: linear-gradient(45deg, #ffb6c1, #ffd1dc) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        #viewDetailsBtn {
+            background: linear-gradient(45deg, #c7b0e6, #a567c9) !important; /* Tím pastel */
+            color: #6a5acd !important;
+        }
+        #viewDetailsBtn:hover {
+            background: linear-gradient(45deg, #a567c9, #c7b0e6) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        #deleteSelectedBtn {
+            background: linear-gradient(45deg, #ffadad, #ff6b6b) !important; /* Đỏ cam nhẹ nhàng */
+            color: #c0392b !important;
+        }
+        #deleteSelectedBtn:hover {
+            background: linear-gradient(45deg, #ff6b6b, #ffadad) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        
+        /* Table Wrappers - Thân thiện và cuộn được */
+        #receiptsTableWrapper,
+        #inputTableWrapper {
+            max-height: 400px; /* Chiều cao tối đa cho cuộn */
+            overflow-y: auto; 
+            overflow-x: hidden; /* Chỉ cuộn dọc, ẩn cuộn ngang */
+            border: 1px solid #cceeff !important; /* Viền xanh nhạt hơn */
+            border-radius: 15px !important; /* Bo tròn */
+            margin-bottom: 1rem;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.03); /* Bóng trong nhẹ */
+            animation: slideInUp 0.8s ease-out forwards; /* Hiệu ứng xuất hiện */
+            animation-delay: 0.3s;
+            opacity: 0; /* Ban đầu ẩn để có hiệu ứng */
+        }
+
         #inputScrollWrapper {
-  /*display: none; /* Ẩn mặc định */
-  max-height: 300px;
-  overflow-y: auto;
-  overflow-x: auto;
-  padding-right: 4px;
-}
-.dailyNameSelect {
-  height: 30px;              /* Cân với input */
-  padding: 0 12px;           /* Padding trái/phải, không thêm top/bottom */
-  font-size: 16px;
-  line-height: 1.5;          /* Đảm bảo chiều cao dòng phù hợp */
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #4a5568;
-  border-radius: 6px;
-  vertical-align: middle;    /* Canh giữa so với các thành phần khác */
-  appearance: auto;  
-}
-        .input-compact {
-  max-width: 180px;        /* hoặc 160px, điều chỉnh cho vừa */
-}
-        /* Đảm bảo các style chung của table vẫn được áp dụng từ style.css */
-        /* Ví dụ: table-layout: fixed; word-wrap: break-word; */
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden; /* Ẩn cuộn ngang */
+            padding-right: 8px !important; /* Thêm padding để scrollbar không che nội dung */
+        }
+        /* Keyframe cho hiệu ứng xuất hiện của bảng */
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Table Styling - Sáng sủa, dễ đọc, cute */
+        table {
+            width: 100%;
+            border-collapse: separate; /* Để bo góc của border-radius hoạt động */
+            border-spacing: 0; /* Bỏ khoảng cách giữa các ô */
+            background-color: #ffffff; /* Nền trắng cho bảng */
+            border-radius: 15px; /* Bo tròn cả bảng */
+            overflow: hidden; /* Cần thiết để bo góc cho bảng */
+        }
+
+        table th, table td {
+            border: 1px solid #e0f2f7; /* Viền xanh nước biển rất nhạt cho từng ô */
+            padding: 12px 15px; /* Padding lớn hơn */
+            text-align: left;
+            vertical-align: middle;
+            font-size: 0.95em;
+            color: #4a4a4a;
+            white-space: nowrap; /* Ngăn chặn ngắt dòng trong ô */
+        }
+
+        table thead th { /* Tiêu đề bảng cố định */
+            position: sticky;
+            top: 0;
+            z-index: 10; /* Đảm bảo tiêu đề luôn ở trên */
+            background-color: #d8f1f7 !important; /* Nền xanh pastel cho header */
+            color: #2196f3 !important; /* Màu chữ xanh dương cho header */
+            font-weight: 700 !important;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            padding-top: 15px; /* Thêm padding trên dưới cho header */
+            padding-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Bóng nhẹ dưới header */
+        }
+        
+        /* Căn giữa cho checkbox */
+        table th:first-child, table td:first-child {
+            text-align: center;
+            width: 50px; 
+        }
+
+        /* Alternating row colors for better readability - Màu sắc vui tươi */
+        table tbody tr:nth-child(even) {
+            background-color: #f7feff; /* Rất nhạt, gần như trắng */
+        }
+        table tbody tr:hover {
+            background-color: #e3f2fd; /* Xanh nhạt khi hover */
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Đổ bóng nhẹ khi hover */
+        }
+
+        /* Alignment for numeric columns */
+        table td:nth-child(6), /* SL */
+        table td:nth-child(7), /* Đơn giá */
+        table td:nth-child(8), /* CK(%) */
+        table td:nth-child(9), /* G-Nhập */
+        table td:nth-child(10), /* Thành tiền */
+        table td:nth-child(11) { /* Tổng tiền phiếu */
+            text-align: right;
+        }
+        table td:nth-child(8) { /* CK(%) */
+            text-align: center; /* Căn giữa % CK */
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        /* Footer của bảng */
+        table tfoot td {
+            background-color: #f0f8ff !important; /* Nền xanh nhạt cho footer */
+            color: #2196f3 !important;
+            font-weight: 700 !important;
+            border-top: 2px solid #b3e5fc !important;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+        #totalAmount, #grandTotalAllItems {
+            color: #4CAF50 !important; /* Màu xanh lá cây cho tổng tiền */
+            font-size: 1.1em;
+        }
+
+        /* Checkbox styling - Lớn hơn và dễ bấm hơn */
+        input[type="checkbox"] {
+            transform: scale(1.3); /* Lớn hơn rõ rệt */
+            margin: 0;
+            cursor: pointer;
+            accent-color: #87ceeb; /* Đổi màu checkbox mặc định sang xanh cute */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px !important;
+                width: 98%;
+            }
+            .header-top h2 {
+                font-size: 1.8em;
+            }
+            .btn-logout {
+                padding: 6px 10px;
+                font-size: 0.9em;
+            }
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px !important;
+                padding: 15px;
+            }
+            .filter-group {
+                min-width: unset;
+                width: 100%;
+            }
+            button {
+                width: 100%; /* Nút full width trên mobile */
+                margin-top: 5px; /* Khoảng cách giữa các nút */
+            }
+            table th, table td {
+                padding: 10px 8px; /* Giảm padding trên mobile */
+                font-size: 0.8em;
+            }
+            table th:first-child, table td:first-child {
+                width: 40px; 
+            }
+            .dailyNameSelect {
+                padding-right: 20px !important; /* Giảm padding cho icon mũi tên */
+                background-position: right 5px center !important;
+                background-size: 10px !important;
+            }
+        }
+        @media (max-width: 480px) {
+            .header-top h2 {
+                font-size: 1.5em;
+            }
+            .card h3 {
+                font-size: 1.5em !important;
+            }
+            input, select, button {
+                font-size: 0.9em !important;
+            }
+            table th, table td {
+                font-size: 0.75em;
+            }
+        }
     </style>
 </head>
 <body class="congno-body">
     <div class="header-container">
         <div class="header-top">
-            <h2>Nhập Hàng Vào Kho</h2>
-            <button class="btn-logout" onclick="logout()">👉 Đăng xuất</button>
+            <h2>🎉 Nhập Hàng Vào Kho 🎉</h2> <button class="btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Đăng xuất
+            </button>
         </div>
         <div id="dateTicker">
             <div id="tickerWrap"></div>
         </div>
     </div>
 
-    <div class="container p-4">
-        <!-- Input Section for New Receipt (Visible by default) -->
-        <div class="card mb-4">
-            <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập</h3>
+    <div class="container">
+        <div class="card">
+            <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập 📝</h3>
             <div class="flex flex-wrap gap-2 items-end mb-4">
                 <div class="flex-1 min-w-[120px]">
-                    <label for="dailyName" class="block text-sm font-medium text-gray-300">Tên đại lý:</label>
+                    <label for="dailyName">Tên đại lý:</label>
                     <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
                 
-                    <label for="receiptDate" class="block text-sm font-medium text-gray-300">Ngày:</label>
+                    <label for="receiptDate">Ngày:</label>
                     <input type="date" id="receiptDate" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
                 </div>
             </div>
 
-            <h3 class="text-lg font-bold mb-2">Thêm mặt hàng</h3>
+            <h3 class="text-lg font-bold mb-2">Thêm mặt hàng 📦</h3>
             <div class="flex flex-wrap gap-2 items-end mb-4">
                 <div class="flex-1 min-w-[120px]">
-                    <label for="itemName" class="block text-sm font-medium text-gray-300">Tên hàng:</label>
+                    <label for="itemName">Tên hàng:</label>
                     <input type="text" id="itemName" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
-               
-                    <label for="itemUnit" class="block text-sm font-medium text-gray-300">Đơn vị tính:</label>
+                
+                    <label for="itemUnit">Đơn vị tính:</label>
                     <input type="text" id="itemUnit" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
                 
-                    <label for="itemQuantity" class="block text-sm font-medium text-gray-300">Số lượng:</label>
+                    <label for="itemQuantity">Số lượng:</label>
                     <input type="number" id="itemQuantity" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
                 
-                    <label for="itemPrice" class="block text-sm font-medium text-gray-300">Đơn giá:</label>
+                    <label for="itemPrice">Đơn giá:</label>
                     <input type="number" id="itemPrice" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
                 
-                    <label for="itemDiscount" class="block text-sm font-medium text-gray-300">Chiết khấu (%):</label>
+                    <label for="itemDiscount">Chiết khấu (%):</label>
                     <input type="number" id="itemDiscount" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
                 </div>
                 <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5">
-                    <button id="addItemBtn" class="w-full py-2 px-4 rounded-md bg-green-600 hover:bg-green-700 transition-colors duration-200">
-                      ➕ Thêm món
+                    <button id="addItemBtn">
+                        <i class="fas fa-plus-circle"></i> Thêm món
                     </button>
                 </div>
             </div>
 
-            <!-- Table for Current Items in Receipt -->
-           <div id="inputScrollWrapper" class="hidden">
-            <div id="inputTableWrapper" class="table-wrapper mb-4">
-              <table  class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
-                    <thead>
-                        <tr>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tên hàng</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">ĐVT</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">SL</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đơn giá</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">CK(%)</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">G-Nhập</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Thành tiền</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Hành động</th>
-                        </tr>
-                    </thead>
-                    <tbody id="currentItemsBody" class="divide-y divide-gray-700">
-                        <!-- Items will be added here by JavaScript -->
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="6" class="py-2 px-4 text-right font-bold text-gray-300">Tổng tiền:</td>
-                            <td id="totalAmount" class="py-2 px-4 text-right font-bold text-green-400">0</td>
-                            <td></td>
-                        </tr>
-                    </tfoot>
-                </table>
+            <div id="inputScrollWrapper" class="hidden">
+                <div id="inputTableWrapper" class="table-wrapper mb-4">
+                    <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+                        <thead>
+                            <tr>
+                                <th>Tên hàng</th>
+                                <th>ĐVT</th>
+                                <th>SL</th>
+                                <th>Đơn giá</th>
+                                <th>CK(%)</th>
+                                <th>G-Nhập</th>
+                                <th>Thành tiền</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="currentItemsBody">
+                            </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="py-2 px-4 text-right font-bold text-gray-300">Tổng tiền:</td>
+                                <td id="totalAmount" class="py-2 px-4 text-right font-bold text-green-400">0</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <button id="saveReceiptBtn">
+                    <i class="fas fa-save"></i> Lưu phiếu nhập
+                </button>
             </div>
-            <button id="saveReceiptBtn" class="w-full py-2 px-4 rounded-md bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
-               💾 Lưu phiếu nhập
-            </button>
         </div>
-    </div>
 
-        <!-- Search and Display Section (Hidden initially) -->
         <div id="receiptsSectionCard" class="card hidden">
-            <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý</h3>
+            <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý 📋</h3>
             <div class="mb-4">
-                
-                   <!--
-                    <label for="searchDailyName" class="block text-sm font-medium text-gray-300">Tìm theo tên đại lý:</label>
-                    <input type="text" id="searchDailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
-               -->
-                    <!-- Ô chọn đại lý (thay thế ô tìm trước kia) -->
-                    <div class="flex items-center space-x-2">
-                        <select id="dailyNameSelect" class="dailyNameSelect">
-                             <option value="">-- Chọn đại lý --</option>
-                        </select>
+                <div class="flex items-end space-x-2 flex-wrap gap-2">
+                    <select id="dailyNameSelect" class="dailyNameSelect">
+                           <option value="">-- Chọn đại lý --</option>
+                    </select>
                     <label for="searchMonth" class="block text-sm font-medium text-gray-300">Tháng:</label>
                     <input type="month" id="searchMonth" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
-                <button id="searchBtn" class="w-full py-2 px-4 rounded-md bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
-                        🔍 Tìm 
+                    <button id="searchBtn">
+                        <i class="fas fa-search"></i> Tìm
                     </button>
                 </div>
             </div>
             
-                <div class="flex items-end space-x-2">
-                    
-                    <button id="viewDetailsBtn" class="w-full py-2 px-4 rounded-md bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200" >
-                        <i class="fas fa-eye mr-2"></i> Xem chi tiết phiếu nhập
-                    </button>
-                    <button id="deleteSelectedBtn" class="w-full py-2 px-4 rounded-md bg-red-600 hover:bg-red-700 transition-colors duration-200">
-                        🗑️ Xóa đã chọn
-                    </button>
-                </div>
+            <div class="flex items-end space-x-2 flex-wrap gap-2 mb-4">
+                <button id="viewDetailsBtn">
+                    <i class="fas fa-eye"></i> Xem chi tiết phiếu nhập
+                </button>
+                <button id="deleteSelectedBtn">
+                    <i class="fas fa-trash-alt"></i> Xóa đã chọn
+                </button>
             </div>
             
             <div id="receiptsTableWrapper" class="table-wrapper">
                 <table id="receiptsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
-                  
                     <thead>
                         <tr>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider"><input type="checkbox" id="selectAllReceipts"></th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Ngày</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đại lý</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tên hàng</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">ĐVT</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">SL</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Đơn giá</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">CK(%)</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">G-Nhập</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Thành tiền</th>
-                            <th class="py-2 px-4 bg-gray-700 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tổng tiền phiếu</th>
+                            <th><input type="checkbox" id="selectAllReceipts"></th>
+                            <th>Ngày</th>
+                            <th>Đại lý</th>
+                            <th>Tên hàng</th>
+                            <th>ĐVT</th>
+                            <th>SL</th>
+                            <th>Đơn giá</th>
+                            <th>CK(%)</th>
+                            <th>G-Nhập</th>
+                            <th>Thành tiền</th>
+                            <th>Tổng tiền phiếu</th>
                         </tr>
                     </thead>
-                    <tbody id="receiptsBody" class="divide-y divide-gray-700">
-                        <!-- Saved receipts items will be loaded here by JavaScript -->
-                    </tbody>
+                    <tbody id="receiptsBody">
+                        </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="10" class="py-2 px-4 text-right font-bold text-gray-300">Tổng tiền tất cả mặt hàng hiển thị:</td>
-                            <td id="grandTotalAllItems" class="py-2 px-4 text-right font-bold text-green-400">0</td>
+                            <td colspan="10">Tổng tiền tất cả mặt hàng hiển thị:</td>
+                            <td id="grandTotalAllItems">0</td>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
     </div>
-
-    <!-- The custom messageBox is no longer needed as SweetAlert2 handles it -->
-    <!-- <div id="messageBox" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-white max-w-sm w-full text-center">
-            <p id="messageText" class="mb-4 text-lg"></p>
-            <button id="messageBoxCloseBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Đóng</button>
-        </div>
-    </div> -->
 
     <script src="script-nhap.js"></script>
 </body>
