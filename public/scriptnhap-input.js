@@ -91,7 +91,7 @@ if (filteredReceipts.length > 0) {
        function renderFilteredResults(receipts) {
     const grouped = {};
 
-    // --- Gom nhóm theo daily + ngay (YYYY-MM-DD) ---
+    // Gom nhóm từng mặt hàng theo daily + ngay
     receipts.forEach(r => {
         const dateStr = new Date(r.ngay).toISOString().split('T')[0];
         const key = `${r.daily}_${dateStr}`;
@@ -103,10 +103,9 @@ if (filteredReceipts.length > 0) {
                 tongtien: 0
             };
         }
-        r.items.forEach(item => {
-            grouped[key].items.push(item);
-            grouped[key].tongtien += item.thanhtien;
-        });
+
+        grouped[key].items.push(r);
+        grouped[key].tongtien += r.thanhtien || 0;
     });
 
     const tbody = document.getElementById('receiptsTableBody');
@@ -122,7 +121,6 @@ if (filteredReceipts.length > 0) {
         const receipt = grouped[key];
         const row = document.createElement('tr');
 
-        // Đảm bảo receiptKey khớp với code xem chi tiết
         const encodedDaily = encodeURIComponent(receipt.daily);
         const receiptKey = `${encodedDaily}_${receipt.ngay}`;
 
