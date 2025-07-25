@@ -98,7 +98,9 @@ if (filteredReceipts.length > 0) {
 
     receipts.forEach((item) => {
         const tr = document.createElement('tr');
-        const receiptKey = `${encodeURIComponent(item.daily || '')}_${item.ngay || ''}`;
+const formattedDateForUrl = item.ngay ? new Date(item.ngay).toISOString().split('T')[0] : '';
+const receiptKey = `${encodeURIComponent(item.daily || '')}_${formattedDateForUrl}`;
+       // const receiptKey = `${encodeURIComponent(item.daily || '')}_${item.ngay || ''}`;
 
         tr.innerHTML = `
             <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
