@@ -1,93 +1,220 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="vi"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản Lý Phiếu Nhập Hàng</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Your existing CSS styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        /* Global Styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6; /* Light, calming background */
+            color: #333;
+            line-height: 1.6;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+
+        /* Container for overall page content */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-        th {
-            background-color: #f2f2f2;
+
+        /* Header Styling */
+        h1 {
+            text-align: center;
+            color: #0056b3; /* A strong blue color */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+            border-bottom: 2px solid #eef;
+            padding-bottom: 15px;
         }
+
+        /* Filter Section Styling */
         .filter-section {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: flex-end;
+            flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+            gap: 15px; /* Spacing between filter groups and buttons */
+            margin-bottom: 25px;
+            align-items: flex-end; /* Align items to the bottom */
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         .filter-group {
             display: flex;
             flex-direction: column;
+            flex: 1; /* Allow groups to grow */
+            min-width: 200px; /* Minimum width for each filter group */
         }
         .filter-group label {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95em;
+        }
+        .filter-section input[type="text"],
+        .filter-section input[type="month"] {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 100%; /* Make inputs fill their container */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        .filter-section input[type="text"]:focus,
+        .filter-section input[type="month"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
         }
 
-        /* NEW CSS for scrollable table container */
-        .table-container {
-            max-height: 400px; /* Adjust this value as needed. For ~10 rows, consider 300-400px */
-            overflow-y: auto; /* Adds vertical scrollbar if content exceeds max-height */
-            border: 1px solid #ccc; /* Optional: adds a border around the scrollable area */
-            margin-top: 20px; /* To separate from filters */
+        /* Button Styling */
+        .filter-section button {
+            padding: 10px 20px;
+            background-color: #28a745; /* Green for action buttons */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            white-space: nowrap; /* Prevent text wrapping inside buttons */
         }
-        /* Make table header stick when scrolling */
-        .table-container thead th {
+        .filter-section button:hover {
+            background-color: #218838; /* Darker green on hover */
+            transform: translateY(-2px);
+        }
+        .filter-section button:active {
+            transform: translateY(0);
+        }
+
+        #viewDetailsBtn {
+            background-color: #007bff; /* Blue for 'View Details' button */
+        }
+        #viewDetailsBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table Container for Scrolling */
+        .table-container {
+            max-height: 450px; /* Increased height to accommodate more rows visually */
+            overflow-y: auto;
+            border: 1px solid #e0e0e0; /* Lighter border for the container */
+            border-radius: 8px;
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.05); /* subtle inner shadow */
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: separate; /* Use separate for rounded corners on cells */
+            border-spacing: 0;
+            margin-top: 0; /* Remove top margin as it's within .table-container */
+            background-color: #fff; /* Ensure table background is white */
+        }
+        table th, table td {
+            border: 1px solid #eee; /* Lighter border for cells */
+            padding: 12px 15px; /* More padding for better readability */
+            text-align: left;
+            vertical-align: middle; /* Center content vertically */
+            white-space: nowrap; /* Prevent text wrapping in cells (adjust if needed) */
+        }
+        table th {
+            background-color: #e9ecef; /* Light gray for header */
+            font-weight: 700;
+            color: #495057;
             position: sticky;
             top: 0;
-            background-color: #f2f2f2;
-            z-index: 10; /* Ensures header is above scrolling content */
+            z-index: 10;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        /* Style for checkbox column */
+        table th:first-child, table td:first-child {
+            text-align: center;
+            width: 50px; /* Fixed width for checkbox column */
+        }
+
+        /* Alternating row colors for better readability */
+        table tbody tr:nth-child(even) {
+            background-color: #f8fafd; /* Very light blue for even rows */
+        }
+        table tbody tr:hover {
+            background-color: #e2f0fb; /* Highlight row on hover */
+            cursor: pointer;
+        }
+
+        /* Specific column alignment for numbers */
+        table td:nth-child(6), /* So luong */
+        table td:nth-child(7), /* Don gia */
+        table td:nth-child(8), /* CK */
+        table td:nth-child(9), /* Gia nhap */
+        table td:nth-child(10) { /* Thanh tien */
+            text-align: right;
+        }
+        table td:nth-child(8) { /* CK */
+            text-align: center; /* Center CK percentage */
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"].receiptCheckbox {
+            transform: scale(1.2); /* Slightly larger checkbox */
+            margin: 0;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <h1>QUẢN LÝ PHIẾU NHẬP HÀNG</h1>
+    <div class="container">
+        <h1>QUẢN LÝ PHIẾU NHẬP HÀNG</h1>
 
-    <div class="filter-section">
-        <div class="filter-group">
-            <label for="searchDailyNameInput">Tìm theo tên đại lý hoặc mặt hàng</label>
-            <input type="text" id="searchDailyNameInput" placeholder="Nhập tên...">
-        </div>
-        <div class="filter-group">
-            <label for="searchMonth">Lọc theo tháng</label>
-            <input type="month" id="searchMonth">
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="searchDailyNameInput">Tìm theo tên đại lý hoặc mặt hàng</label>
+                <input type="text" id="searchDailyNameInput" placeholder="Nhập tên...">
             </div>
-        <button id="searchBtn">Tìm</button>
-        <button id="viewDetailsBtn">Xem Chi Tiết Phiếu</button>
+            <div class="filter-group">
+                <label for="searchMonth">Lọc theo tháng</label>
+                <input type="month" id="searchMonth">
+            </div>
+            <button id="searchBtn"> 🔍 Tìm Đại Lý</button>
+            <button id="viewDetailsBtn"> 🧾 Xem Chi Tiết Phiếu</button>
+        </div>
+
+        <div class="table-container">
+            <table id="receiptsTable">
+                <thead>
+                    <tr>
+                        <th>Chọn</th>
+                        <th>Ngày</th>
+                        <th>Đại lý</th>
+                        <th>Tên hàng</th>
+                        <th>ĐVT</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>CK</th>
+                        <th>Giá nhập</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-    <div class="table-container">
-        <table id="receiptsTable">
-            <thead>
-                <tr>
-                    <th>Chọn</th>
-                    <th>Ngày</th>
-                    <th>Đại lý</th>
-                    <th>Tên hàng</th>
-                    <th>ĐVT</th>
-                    <th>Số lượng</th>
-                    <th>Đơn giá</th>
-                    <th>CK%</th>
-                    <th>Giá nhập</th>
-                    <th>Thành tiền</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-    </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./scriptnhap-input.js"></script>
 </body>
