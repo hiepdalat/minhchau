@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Nhập Hàng Dễ Thương</title> <link rel="stylesheet" href="style.css"> 
+    <title>Quản Lý Nhập Hàng Dễ Thương</title>
+    <link rel="stylesheet" href="style.css"> 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7s0/QzY/3j+0qFzNlB3tFf+9D+J+Q+A+B+G+C+D+E+F+G+H+I+J+K+L+M+N+O+P+Q+R+S+T+U+V+W+X+Y+Z" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         /* Global Styles for a cute and playful theme */
-        body.congno-body { /* Áp dụng riêng cho body có class congno-body */
+        body.congno-body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            /* Nền gradient xanh dương/hồng pastel nhẹ nhàng */
             background: linear-gradient(135deg, #f0f8ff 0%, #e6f7ff 50%, #fefcfb 100%); 
-            color: #4a4a4a; /* Màu chữ mềm mại hơn */
+            color: #4a4a4a;
             line-height: 1.6;
-            min-height: 100vh; /* Đảm bảo nền phủ toàn bộ trang */
+            min-height: 100vh;
             display: flex; 
-            flex-direction: column; /* Sắp xếp các phần tử theo cột */
-            justify-content: flex-start; /* Bắt đầu từ trên xuống */
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
-            padding-bottom: 20px; /* Thêm padding dưới cùng */
+            padding-bottom: 20px;
             box-sizing: border-box; 
         }
 
         /* Header Styling - Nổi bật và thân thiện */
         .header-container {
             width: 100%;
-            background: linear-gradient(to right, #a7d9f7, #c1e3f9); /* Gradient xanh dương */
+            background: linear-gradient(to right, #a7d9f7, #c1e3f9);
             color: #333;
             padding: 15px 25px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-            border-radius: 0 0 20px 20px; /* Bo tròn góc dưới */
+            border-radius: 0 0 20px 20px;
             margin-bottom: 20px;
             display: flex;
             flex-direction: column;
@@ -46,12 +46,12 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            max-width: 1160px; /* Tương ứng với container */
+            max-width: 1160px;
             margin-bottom: 10px;
         }
 
         .header-top h2 {
-            color: #007bff; /* Màu xanh dương thân thiện */
+            color: #007bff;
             font-size: 2.2em;
             font-weight: 700;
             margin: 0;
@@ -59,7 +59,7 @@
         }
 
         .btn-logout {
-            background-color: #ff99aa; /* Hồng cute */
+            background-color: #ff99aa;
             color: white;
             border: none;
             padding: 8px 15px;
@@ -76,11 +76,11 @@
         }
 
         #dateTicker {
-            background-color: #fce4ec; /* Hồng pastel nhạt */
+            background-color: #fce4ec;
             padding: 8px 15px;
             border-radius: 10px;
             font-size: 0.9em;
-            color: #d81b60; /* Màu chữ hồng đậm hơn */
+            color: #d81b60;
             font-weight: 500;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
@@ -88,13 +88,13 @@
         /* Main Container - Nổi bật trên nền */
         .container {
             max-width: 1200px;
-            width: 95%; /* Chiếm phần lớn chiều rộng */
-            padding: 25px !important; /* Overriding p-4 if exists */
+            width: 95%;
+            padding: 25px !important;
             background-color: #ffffff;
-            border-radius: 20px; /* Bo tròn nhiều hơn */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Đổ bóng mềm mại */
-            animation: fadeIn 0.8s ease-out; /* Hiệu ứng xuất hiện */
-            margin-bottom: 20px; /* Khoảng cách với phần dưới cùng của body */
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 0.8s ease-out;
+            margin-bottom: 20px;
         }
 
         /* Animation cho container */
@@ -106,44 +106,67 @@
         /* Card Sections - Trông gọn gàng và dễ thương */
         .card {
             background-color: #ffffff;
-            border-radius: 15px; /* Bo tròn các card con */
+            border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e0f2f7; /* Viền xanh nhạt */
+            border: 1px solid #e0f2f7;
             padding: 20px;
-            margin-bottom: 20px; /* Khoảng cách giữa các card */
+            margin-bottom: 20px;
         }
 
         .card h3 {
-            color: #6a5acd; /* Màu tím lavender đáng yêu */
-            font-size: 1.8em !important; /* Overriding text-lg */
-            font-weight: 700 !important; /* Overriding font-bold */
-            margin-bottom: 15px !important; /* Overriding mb-2 */
+            color: #6a5acd;
+            font-size: 1.8em !important;
+            font-weight: 700 !important;
+            margin-bottom: 15px !important;
             text-align: center;
         }
 
         /* Input/Form elements - Mềm mại và dễ nhìn */
-        .flex.flex-wrap.gap-2.items-end.mb-4 {
-            gap: 15px !important; /* Tăng khoảng cách giữa các trường input */
+        /* Grouping inputs horizontally */
+        .input-group-horizontal {
+            display: flex;
+            flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+            gap: 15px; /* Khoảng cách giữa các input */
+            margin-bottom: 15px; /* Khoảng cách giữa các nhóm input */
+            align-items: flex-end; /* Căn chỉnh theo đáy */
+        }
+        
+        .input-item {
+            flex: 1; /* Cho phép các input item co giãn */
+            min-width: 150px; /* Chiều rộng tối thiểu cho mỗi input */
+            display: flex;
+            flex-direction: column; /* Label trên input */
+            justify-content: flex-end; /* Căn chỉnh nội dung trong input-item */
+        }
+        
+        /* Đặc biệt cho nhóm nút */
+        .button-group-horizontal {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px; /* Khoảng cách với input cuối cùng */
+            align-items: center; /* Căn chỉnh các nút theo giữa */
+            justify-content: center; /* Căn giữa các nút */
         }
 
         label {
-            color: #607d8b !important; /* Màu xám xanh ấm áp */
-            font-weight: 500 !important; /* Font medium */
-            margin-bottom: 5px; /* Khoảng cách với input */
+            color: #607d8b !important;
+            font-weight: 500 !important;
+            margin-bottom: 5px;
             display: block;
-            font-size: 0.95em !important; /* Text sm */
+            font-size: 0.95em !important;
         }
 
         input[type="text"],
         input[type="date"],
         input[type="number"],
         .dailyNameSelect {
-            width: 100% !important; /* Đảm bảo full width */
-            padding: 10px 12px !important; /* Overriding p-2 */
-            border: 2px solid #b3e5fc !important; /* Border xanh dương nhạt */
-            border-radius: 10px !important; /* Bo tròn nhiều */
-            background-color: #f7fcff !important; /* Nền xanh rất nhạt */
-            color: #4a4a4a !important; /* Màu chữ đen mềm mại */
+            width: 100% !important;
+            padding: 10px 12px !important;
+            border: 2px solid #b3e5fc !important;
+            border-radius: 10px !important;
+            background-color: #f7fcff !important;
+            color: #4a4a4a !important;
             font-size: 1em;
             box-sizing: border-box;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -152,45 +175,45 @@
         input[type="date"]:focus,
         input[type="number"]:focus,
         .dailyNameSelect:focus {
-            border-color: #64b5f6 !important; /* Xanh dương sáng hơn khi focus */
+            border-color: #64b5f6 !important;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.3) !important; /* Hiệu ứng đổ bóng focus */
+            box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.3) !important;
         }
         
-        .dailyNameSelect { /* Các thuộc tính cụ thể cho select */
-            height: auto !important; /* Bỏ height cố định để padding kiểm soát */
+        .dailyNameSelect {
+            height: auto !important;
             line-height: normal !important;
-            appearance: none; /* Bỏ style mặc định của hệ điều hành */
+            appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292%22%20height%3D%22292%22%3E%3Cpath%20fill%3D%22%234a4a4a%22%20d%3D%22M287%2069L146%20208%205%2069z%22%2F%3E%3C%2Fsvg%3E') !important;
             background-repeat: no-repeat !important;
             background-position: right 10px center !important;
             background-size: 12px !important;
-            padding-right: 30px !important; /* Tạo không gian cho icon mũi tên */
+            padding-right: 30px !important;
         }
 
-        .input-compact { /* Giữ max-width nhưng với style mới */
-            max-width: 250px; /* Điều chỉnh cho phù hợp */
+        .input-compact {
+            max-width: 250px;
         }
 
         /* Buttons - Năng động và có hiệu ứng */
         button {
-            padding: 12px 20px !important; /* Overriding py-2 px-4 */
-            border-radius: 10px !important; /* Bo tròn nút */
-            font-size: 1.05em !important; /* Font size */
-            font-weight: 600 !important; /* Font weight */
-            transition: all 0.3s ease; /* Chuyển động mượt mà */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Đổ bóng nút */
-            white-space: nowrap; /* Tránh ngắt dòng */
-            display: flex; /* Dùng flexbox để căn giữa icon và chữ */
+            padding: 12px 20px !important;
+            border-radius: 10px !important;
+            font-size: 1.05em !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
-        button .fas, button .far { /* Style cho icon trong nút */
-            margin-right: 8px; /* Khoảng cách giữa icon và chữ */
+        button .fas, button .far {
+            margin-right: 8px;
         }
 
         #addItemBtn {
-            background: linear-gradient(45deg, #a8e6cf, #d4f8e5) !important; /* Xanh mint */
+            background: linear-gradient(45deg, #a8e6cf, #d4f8e5) !important;
             color: #2e8b57 !important;
         }
         #addItemBtn:hover {
@@ -200,8 +223,9 @@
         }
 
         #saveReceiptBtn {
-            background: linear-gradient(45deg, #b3cde0, #8ecae6) !important; /* Xanh da trời nhạt */
+            background: linear-gradient(45deg, #b3cde0, #8ecae6) !important;
             color: #1b4e88 !important;
+            margin-top: 20px; /* Đẩy nút lưu ra xa bảng một chút */
         }
         #saveReceiptBtn:hover {
             background: linear-gradient(45deg, #8ecae6, #b3cde0) !important;
@@ -210,7 +234,7 @@
         }
 
         #searchBtn {
-            background: linear-gradient(45deg, #ffd1dc, #ffb6c1) !important; /* Hồng baby */
+            background: linear-gradient(45deg, #ffd1dc, #ffb6c1) !important;
             color: #d81b60 !important;
         }
         #searchBtn:hover {
@@ -220,7 +244,7 @@
         }
 
         #viewDetailsBtn {
-            background: linear-gradient(45deg, #c7b0e6, #a567c9) !important; /* Tím pastel */
+            background: linear-gradient(45deg, #c7b0e6, #a567c9) !important;
             color: #6a5acd !important;
         }
         #viewDetailsBtn:hover {
@@ -230,7 +254,7 @@
         }
 
         #deleteSelectedBtn {
-            background: linear-gradient(45deg, #ffadad, #ff6b6b) !important; /* Đỏ cam nhẹ nhàng */
+            background: linear-gradient(45deg, #ffadad, #ff6b6b) !important;
             color: #c0392b !important;
         }
         #deleteSelectedBtn:hover {
@@ -242,25 +266,24 @@
         /* Table Wrappers - Thân thiện và cuộn được */
         #receiptsTableWrapper,
         #inputTableWrapper {
-            max-height: 400px; /* Chiều cao tối đa cho cuộn */
+            max-height: 400px;
             overflow-y: auto; 
-            overflow-x: hidden; /* Chỉ cuộn dọc, ẩn cuộn ngang */
-            border: 1px solid #cceeff !important; /* Viền xanh nhạt hơn */
-            border-radius: 15px !important; /* Bo tròn */
+            overflow-x: hidden;
+            border: 1px solid #cceeff !important;
+            border-radius: 15px !important;
             margin-bottom: 1rem;
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.03); /* Bóng trong nhẹ */
-            animation: slideInUp 0.8s ease-out forwards; /* Hiệu ứng xuất hiện */
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
+            animation: slideInUp 0.8s ease-out forwards;
             animation-delay: 0.3s;
-            opacity: 0; /* Ban đầu ẩn để có hiệu ứng */
+            opacity: 0;
         }
 
         #inputScrollWrapper {
             max-height: 300px;
             overflow-y: auto;
-            overflow-x: hidden; /* Ẩn cuộn ngang */
-            padding-right: 8px !important; /* Thêm padding để scrollbar không che nội dung */
+            overflow-x: hidden;
+            padding-right: 8px !important;
         }
-        /* Keyframe cho hiệu ứng xuất hiện của bảng */
         @keyframes slideInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -269,38 +292,37 @@
         /* Table Styling - Sáng sủa, dễ đọc, cute */
         table {
             width: 100%;
-            border-collapse: separate; /* Để bo góc của border-radius hoạt động */
-            border-spacing: 0; /* Bỏ khoảng cách giữa các ô */
-            background-color: #ffffff; /* Nền trắng cho bảng */
-            border-radius: 15px; /* Bo tròn cả bảng */
-            overflow: hidden; /* Cần thiết để bo góc cho bảng */
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
         }
 
         table th, table td {
-            border: 1px solid #e0f2f7; /* Viền xanh nước biển rất nhạt cho từng ô */
-            padding: 12px 15px; /* Padding lớn hơn */
+            border: 1px solid #e0f2f7;
+            padding: 12px 15px;
             text-align: left;
             vertical-align: middle;
             font-size: 0.95em;
             color: #4a4a4a;
-            white-space: nowrap; /* Ngăn chặn ngắt dòng trong ô */
+            white-space: nowrap;
         }
 
-        table thead th { /* Tiêu đề bảng cố định */
+        table thead th {
             position: sticky;
             top: 0;
-            z-index: 10; /* Đảm bảo tiêu đề luôn ở trên */
-            background-color: #d8f1f7 !important; /* Nền xanh pastel cho header */
-            color: #2196f3 !important; /* Màu chữ xanh dương cho header */
+            z-index: 10;
+            background-color: #d8f1f7 !important;
+            color: #2196f3 !important;
             font-weight: 700 !important;
             text-transform: uppercase;
             font-size: 0.85em;
-            padding-top: 15px; /* Thêm padding trên dưới cho header */
+            padding-top: 15px;
             padding-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); /* Bóng nhẹ dưới header */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        /* Căn giữa cho checkbox */
         table th:first-child, table td:first-child {
             text-align: center;
             width: 50px; 
@@ -308,32 +330,32 @@
 
         /* Alternating row colors for better readability - Màu sắc vui tươi */
         table tbody tr:nth-child(even) {
-            background-color: #f7feff; /* Rất nhạt, gần như trắng */
+            background-color: #f7feff;
         }
         table tbody tr:hover {
-            background-color: #e3f2fd; /* Xanh nhạt khi hover */
+            background-color: #e3f2fd;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Đổ bóng nhẹ khi hover */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         /* Alignment for numeric columns */
-        table td:nth-child(6), /* SL */
-        table td:nth-child(7), /* Đơn giá */
-        table td:nth-child(8), /* CK(%) */
-        table td:nth-child(9), /* G-Nhập */
-        table td:nth-child(10), /* Thành tiền */
-        table td:nth-child(11) { /* Tổng tiền phiếu */
+        table td:nth-child(6),
+        table td:nth-child(7),
+        table td:nth-child(8),
+        table td:nth-child(9),
+        table td:nth-child(10),
+        table td:nth-child(11) {
             text-align: right;
         }
-        table td:nth-child(8) { /* CK(%) */
-            text-align: center; /* Căn giữa % CK */
+        table td:nth-child(8) {
+            text-align: center;
             font-weight: 500;
             color: #6c757d;
         }
 
         /* Footer của bảng */
         table tfoot td {
-            background-color: #f0f8ff !important; /* Nền xanh nhạt cho footer */
+            background-color: #f0f8ff !important;
             color: #2196f3 !important;
             font-weight: 700 !important;
             border-top: 2px solid #b3e5fc !important;
@@ -341,16 +363,16 @@
             padding-bottom: 15px;
         }
         #totalAmount, #grandTotalAllItems {
-            color: #4CAF50 !important; /* Màu xanh lá cây cho tổng tiền */
+            color: #4CAF50 !important;
             font-size: 1.1em;
         }
 
         /* Checkbox styling - Lớn hơn và dễ bấm hơn */
         input[type="checkbox"] {
-            transform: scale(1.3); /* Lớn hơn rõ rệt */
+            transform: scale(1.3);
             margin: 0;
             cursor: pointer;
-            accent-color: #87ceeb; /* Đổi màu checkbox mặc định sang xanh cute */
+            accent-color: #87ceeb;
         }
 
         /* Responsive adjustments */
@@ -366,29 +388,26 @@
                 padding: 6px 10px;
                 font-size: 0.9em;
             }
-            .filter-section {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px !important;
-                padding: 15px;
+            .input-group-horizontal, .button-group-horizontal {
+                flex-direction: column; /* Chuyển về cột trên mobile */
+                align-items: stretch; /* Kéo giãn các input/button */
+                gap: 10px; /* Giảm khoảng cách */
             }
-            .filter-group {
-                min-width: unset;
-                width: 100%;
+            .input-item {
+                min-width: unset; /* Bỏ min-width trên mobile */
             }
             button {
                 width: 100%; /* Nút full width trên mobile */
-                margin-top: 5px; /* Khoảng cách giữa các nút */
             }
             table th, table td {
-                padding: 10px 8px; /* Giảm padding trên mobile */
+                padding: 10px 8px;
                 font-size: 0.8em;
             }
             table th:first-child, table td:first-child {
                 width: 40px; 
             }
             .dailyNameSelect {
-                padding-right: 20px !important; /* Giảm padding cho icon mũi tên */
+                padding-right: 20px !important;
                 background-position: right 5px center !important;
                 background-size: 10px !important;
             }
@@ -412,7 +431,8 @@
 <body class="congno-body">
     <div class="header-container">
         <div class="header-top">
-            <h2>🎉 Nhập Hàng Vào Kho 🎉</h2> <button class="btn-logout" onclick="logout()">
+            <h2>🎉 Quản Lý Nhập Hàng Dễ Thương 🎉</h2>
+            <button class="btn-logout" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> Đăng xuất
             </button>
         </div>
@@ -424,36 +444,38 @@
     <div class="container">
         <div class="card">
             <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập 📝</h3>
-            <div class="flex flex-wrap gap-2 items-end mb-4">
-                <div class="flex-1 min-w-[120px]">
+            <div class="input-group-horizontal"> <div class="input-item">
                     <label for="dailyName">Tên đại lý:</label>
-                    <input type="text" id="dailyName" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên đại lý">
-                
+                    <input type="text" id="dailyName" placeholder="Tên đại lý">
+                </div>
+                <div class="input-item">
                     <label for="receiptDate">Ngày:</label>
-                    <input type="date" id="receiptDate" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
+                    <input type="date" id="receiptDate">
                 </div>
             </div>
 
             <h3 class="text-lg font-bold mb-2">Thêm mặt hàng 📦</h3>
-            <div class="flex flex-wrap gap-2 items-end mb-4">
-                <div class="flex-1 min-w-[120px]">
+            <div class="input-group-horizontal"> <div class="input-item">
                     <label for="itemName">Tên hàng:</label>
-                    <input type="text" id="itemName" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="Tên hàng">
-                
-                    <label for="itemUnit">Đơn vị tính:</label>
-                    <input type="text" id="itemUnit" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" placeholder="vd: cái, kg, h">
-                
-                    <label for="itemQuantity">Số lượng:</label>
-                    <input type="number" id="itemQuantity" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="1" min="1">
-                
-                    <label for="itemPrice">Đơn giá:</label>
-                    <input type="number" id="itemPrice" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0">
-                
-                    <label for="itemDiscount">Chiết khấu (%):</label>
-                    <input type="number" id="itemDiscount" class="input-compact w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white" value="0" min="0" max="100">
+                    <input type="text" id="itemName" class="input-compact" placeholder="Tên hàng">
                 </div>
-                <div class="flex items-end col-span-1 sm:col-span-2 lg:col-span-5">
-                    <button id="addItemBtn">
+                <div class="input-item">
+                    <label for="itemUnit">Đơn vị tính:</label>
+                    <input type="text" id="itemUnit" class="input-compact" placeholder="vd: cái, kg, h">
+                </div>
+                <div class="input-item">
+                    <label for="itemQuantity">Số lượng:</label>
+                    <input type="number" id="itemQuantity" class="input-compact" value="1" min="1">
+                </div>
+                <div class="input-item">
+                    <label for="itemPrice">Đơn giá:</label>
+                    <input type="number" id="itemPrice" class="input-compact" value="0" min="0">
+                </div>
+                <div class="input-item">
+                    <label for="itemDiscount">Chiết khấu (%):</label>
+                    <input type="number" id="itemDiscount" class="input-compact" value="0" min="0" max="100">
+                </div>
+                <div class="input-item" style="flex: auto; min-width: 100px;"> <button id="addItemBtn">
                         <i class="fas fa-plus-circle"></i> Thêm món
                     </button>
                 </div>
@@ -478,8 +500,8 @@
                             </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="6" class="py-2 px-4 text-right font-bold text-gray-300">Tổng tiền:</td>
-                                <td id="totalAmount" class="py-2 px-4 text-right font-bold text-green-400">0</td>
+                                <td colspan="6">Tổng tiền:</td>
+                                <td id="totalAmount">0</td>
                                 <td></td>
                             </tr>
                         </tfoot>
@@ -493,21 +515,24 @@
 
         <div id="receiptsSectionCard" class="card hidden">
             <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý 📋</h3>
-            <div class="mb-4">
-                <div class="flex items-end space-x-2 flex-wrap gap-2">
+            <div class="input-group-horizontal"> <div class="input-item">
+                    <label for="dailyNameSelect">Chọn đại lý:</label>
                     <select id="dailyNameSelect" class="dailyNameSelect">
                            <option value="">-- Chọn đại lý --</option>
                     </select>
-                    <label for="searchMonth" class="block text-sm font-medium text-gray-300">Tháng:</label>
-                    <input type="month" id="searchMonth" class="w-full p-2 rounded-md bg-gray-700 border border-gray-600 text-white">
+                </div>
+                <div class="input-item">
+                    <label for="searchMonth">Tháng:</label>
+                    <input type="month" id="searchMonth">
+                </div>
+                <div class="input-item" style="flex: auto; min-width: 100px;">
                     <button id="searchBtn">
                         <i class="fas fa-search"></i> Tìm
                     </button>
                 </div>
             </div>
             
-            <div class="flex items-end space-x-2 flex-wrap gap-2 mb-4">
-                <button id="viewDetailsBtn">
+            <div class="button-group-horizontal"> <button id="viewDetailsBtn">
                     <i class="fas fa-eye"></i> Xem chi tiết phiếu nhập
                 </button>
                 <button id="deleteSelectedBtn">
