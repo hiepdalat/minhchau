@@ -89,65 +89,64 @@ if (filteredReceipts.length > 0) {
         }
 
        function renderReceiptsTable(receipts) {
-            const tbody = document.querySelector('#receiptsTable tbody');
-            if (!tbody) {
-                console.error("Error: tbody element with ID 'receiptsTable' not found.");
-                return;
-            }
-            tbody.innerHTML = '';
+    const tbody = document.querySelector('#receiptsTable tbody');
+    if (!tbody) {
+        console.error("Error: tbody element with ID 'receiptsTable' not found.");
+        return;
+    }
+    tbody.innerHTML = '';
 
-            receipts.forEach((item) => {
-                const tr = document.createElement('tr');
-                // Ensure item.daily and item.ngay are not null/undefined before encoding
-                const receiptKey = `${encodeURIComponent(item.daily || '')}_${item.ngay || ''}`;
+    receipts.forEach((item) => {
+        const tr = document.createElement('tr');
+        const receiptKey = `${encodeURIComponent(item.daily || '')}_${item.ngay || ''}`;
 
+        tr.innerHTML = `
+            <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
+            <td>${item.ngay ? new Date(item.ngay).toLocaleDateString('vi-VN') : ''}</td>
+            <td>${item.daily || ''}</td>
+            <td>${item.tenhang || ''}</td>
+            <td>${item.dvt || ''}</td>
+            <td>${item.soluong || 0}</td>
+            <td>${formatCurrency(item.dongia || 0)}</td>
+            <td>${(item.ck || 0)}%</td>
+            <td>${formatCurrency(item.gianhap || 0)}</td>
+            <td>${formatCurrency(item.thanhtien || 0)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+} // <-- ✅ thêm dấu đóng này
 
-                tr.innerHTML = `
-                    <td><input type="checkbox" class="receiptCheckbox" data-receipt-key="${receiptKey}"></td>
-                    <td>${item.ngay ? new Date(item.ngay).toLocaleDateString('vi-VN') : ''}</td>
-                    <td>${item.daily || ''}</td>
-                    <td>${item.tenhang || ''}</td>
-                    <td>${item.dvt || ''}</td>
-                    <td>${item.soluong || 0}</td>
-                    <td>${formatCurrency(item.dongia || 0)}</td>
-                    <td>${(item.ck || 0)}%</td>
-                    <td>${formatCurrency(item.gianhap || 0)}</td>
-                    <td>${formatCurrency(item.thanhtien || 0)}</td>
-                `;
-                tbody.appendChild(tr);
+// ✅ Đặt ngoài hàm render
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
+    document.getElementById('searchDailyNameInput')?.addEventListener('input', applyFilters);
+    document.getElementById('searchMonth')?.addEventListener('change', applyFilters);
+
+    document.getElementById('viewDetailsBtn')?.addEventListener('click', () => {
+        const selectedCheckboxes = Array.from(document.querySelectorAll('.receiptCheckbox:checked'));
+
+        if (selectedCheckboxes.length !== 1) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Chọn 1 phiếu duy nhất',
+                text: 'Vui lòng chọn đúng 1 phiếu để xem chi tiết.'
             });
+            return;
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('searchBtn')?.addEventListener('click', applyFilters);
-            document.getElementById('searchDailyNameInput')?.addEventListener('input', applyFilters);
-            document.getElementById('searchMonth')?.addEventListener('change', applyFilters);
+        const checkbox = selectedCheckboxes[0];
+        const receiptKey = checkbox.dataset.receiptKey;
+        if (!receiptKey) {
+            console.error("receiptKey is undefined.");
+            return;
+        }
 
-            document.getElementById('viewDetailsBtn')?.addEventListener('click', () => {
-                const selectedCheckboxes = Array.from(document.querySelectorAll('.receiptCheckbox:checked'));
+        const [dailyNameEncoded, receiptDate] = receiptKey.split('_');
+        const dailyName = decodeURIComponent(dailyNameEncoded);
 
-                if (selectedCheckboxes.length !== 1) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Chọn 1 phiếu duy nhất',
-                        text: 'Vui lòng chọn đúng 1 phiếu để xem chi tiết.'
-                    });
-                    return;
-                }
+        const detailURL = `/print-receipt.html?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`;
+        window.open(detailURL, '_blank');
+    });
 
-                const checkbox = selectedCheckboxes[0];
-                const receiptKey = checkbox.dataset.receiptKey;
-                if (!receiptKey) {
-                    console.error("receiptKey is undefined.");
-                    return;
-                }
-
-                const [dailyNameEncoded, receiptDate] = receiptKey.split('_');
-                const dailyName = decodeURIComponent(dailyNameEncoded);
-
-                const detailURL = `/print-receipt.html?daily=${encodeURIComponent(dailyName)}&date=${receiptDate}`;
-                window.open(detailURL, '_blank');
-            });
-
-            loadReceipts();
-                   
-        });
+    loadReceipts();
+});
