@@ -88,30 +88,26 @@
             transform: translateY(-2px);
         }
 
-        /* --- FIX 1: Date Ticker Display --- */
+        /* --- Updated FIX for Date Ticker Display --- */
         #dateTicker {
-            background-color: #33CCFF;
-            /* Responsive padding: use a smaller default padding and adjust with media queries */
-            padding: 8px 15px; /* Reduced for better mobile fit */
-            width: 100%; /* Ensure it takes full width of its parent header-container */
+            background-color: #e0f8ff; /* Màu nền dịu nhẹ hơn */
+            padding: 8px 15px; /* Giữ padding responsive */
+            width: 100%;
             border-radius: 10px;
             font-size: 0.9em;
-            color: #d81b60;
+            color: #2196f3; /* Màu chữ xanh dương dịu mắt hơn */
             font-weight: 500;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-            /* Use flexbox for robust centering */
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically (if needed for height) */
-            height: auto; /* Allow height to adjust based on content */
-            overflow: hidden; /* Hide any overflow if content is unexpectedly large */
+            display: flex; /* Dùng flexbox để căn giữa */
+            justify-content: center; /* Căn giữa nội dung theo chiều ngang */
+            align-items: center; /* Căn giữa nội dung theo chiều dọc (nếu có nhiều dòng) */
+            height: auto;
+            overflow: hidden;
         }
 
         #tickerWrap {
-            white-space: nowrap; /* Keep the date/time on a single line */
-            /* The JS handles the translateX for centering, so no additional CSS is needed here for that */
-            /* Ensure no conflicting width/height properties here */
-            display: inline-block; /* Essential for accurate scrollWidth in JS */
+            white-space: nowrap;
+            display: inline-block;
         }
 
         /* Main Container - Nổi bật trên nền */
@@ -292,13 +288,12 @@
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
-        /* --- FIX 3: Table Wrappers - Thân thiện và cuộn được --- */
-        /* Changed overflow-x to auto to allow horizontal scrolling */
+        /* Table Wrappers - Thân thiện và cuộn được */
         #receiptsTableWrapper,
         #inputTableWrapper {
             max-height: 400px;
             overflow-y: auto;
-            overflow-x: auto; /* Changed from hidden to auto */
+            overflow-x: auto;
             border: 1px solid #cceeff !important;
             border-radius: 15px !important;
             margin-bottom: 1rem;
@@ -312,11 +307,10 @@
         #inputScrollWrapper {
             max-height: 300px;
             overflow-y: auto;
-            overflow-x: auto; /* Changed from hidden to auto */
-            padding-right: 8px !important; /* Keep for scrollbar space */
+            overflow-x: auto;
+            padding-right: 8px !important;
             -webkit-overflow-scrolling: touch; /* Improves scrolling on iOS */
         }
-
         @keyframes slideInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -329,7 +323,7 @@
             border-spacing: 0;
             background-color: #ffffff;
             border-radius: 15px;
-            overflow: hidden; /* For rounded corners, but wrapper handles main scroll */
+            overflow: hidden;
             min-width: 800px; /* IMPORTANT: Ensures table has a minimum width for horizontal scrolling */
         }
 
@@ -340,7 +334,7 @@
             vertical-align: middle;
             font-size: 0.95em;
             color: #4a4a4a;
-            white-space: nowrap; /* Prevent text wrapping in cells by default, allowing horizontal scroll */
+            white-space: nowrap;
         }
 
         table thead th {
@@ -373,15 +367,15 @@
         }
 
         /* Alignment for numeric columns */
-        table td:nth-child(6), /* SL */
-        table td:nth-child(7), /* Đơn giá */
-        table td:nth-child(8), /* CK(%) */
-        table td:nth-child(9), /* G-Nhập */
-        table td:nth-child(10), /* Thành tiền */
-        table td:nth-child(11) { /* Tổng tiền phiếu (only for receiptsTable) */
+        table td:nth-child(6),
+        table td:nth-child(7),
+        table td:nth-child(8),
+        table td:nth-child(9),
+        table td:nth-child(10),
+        table td:nth-child(11) {
             text-align: right;
         }
-        table td:nth-child(8) { /* CK(%) */
+        table td:nth-child(8) {
             text-align: center;
             font-weight: 500;
             color: #6c757d;
@@ -415,44 +409,40 @@
                 padding: 15px !important;
                 width: 98%;
             }
-            /* --- FIX 2: Header and Logout Button on Mobile --- */
             .header-top {
-                flex-direction: column; /* Stack title and button vertically */
-                align-items: center; /* Center them when stacked */
+                flex-direction: column;
+                align-items: center;
                 text-align: center;
             }
             .header-top h2 {
                 font-size: 1.8em;
-                margin-bottom: 10px; /* Add space below title */
-                flex-grow: 0; /* Don't force it to grow */
-                width: 100%; /* Take full width to center text */
+                margin-bottom: 10px;
+                flex-grow: 0;
+                width: 100%;
             }
             .btn-logout {
                 padding: 6px 10px;
                 font-size: 0.9em;
-                width: auto; /* Maintain natural width */
-                margin-top: 5px; /* Add slight margin if stacking */
+                width: auto;
+                margin-top: 5px;
             }
 
-            /* --- Date Ticker (already adjusted, further refine if needed) --- */
             #dateTicker {
-                font-size: 0.85em; /* Slightly smaller font for mobile date/time */
-                padding: 8px 10px; /* Even less padding on very small screens */
+                font-size: 0.85em;
+                padding: 8px 10px;
             }
 
             .input-group-horizontal, .button-group-horizontal {
-                flex-direction: column; /* Chuyển về cột trên mobile */
-                align-items: stretch; /* Kéo giãn các input/button */
-                gap: 10px; /* Giảm khoảng cách */
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
             }
             .input-item {
-                min-width: unset; /* Bỏ min-width trên mobile */
+                min-width: unset;
             }
             button {
-                width: 100%; /* Nút full width trên mobile */
+                width: 100%;
             }
-
-            /* Tables on Mobile */
             table th, table td {
                 padding: 10px 8px;
                 font-size: 0.8em;
@@ -460,9 +450,8 @@
             table th:first-child, table td:first-child {
                 width: 40px;
             }
-            /* Reduced min-width for tables on smaller mobile screens */
             table {
-                min-width: 600px; /* Adjusted minimum width for mobile tables */
+                min-width: 600px;
             }
             .dailyNameSelect {
                 padding-right: 20px !important;
@@ -470,7 +459,6 @@
                 background-size: 10px !important;
             }
         }
-
         @media (max-width: 480px) {
             .header-top h2 {
                 font-size: 1.5em;
@@ -483,10 +471,10 @@
             }
             table th, table td {
                 font-size: 0.75em;
-                padding: 8px 6px; /* Even smaller padding */
+                padding: 8px 6px;
             }
             table {
-                min-width: 500px; /* Further reduced minimum width for very small screens */
+                min-width: 500px;
             }
             #dateTicker {
                 font-size: 0.8em;
