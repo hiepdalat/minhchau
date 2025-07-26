@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- Date Ticker Logic (MODIFIED FOR NO SCROLLING) ---
+    // --- Date Ticker Logic (MODIFIED FOR NO SCROLLING AND RESPONSIVE DISPLAY) ---
     const dateTicker = document.getElementById('dateTicker');
     const tickerWrap = document.getElementById('tickerWrap');
     let animationFrameId = null; // Keep this initialized
@@ -509,6 +509,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         tickerWrap.textContent = fullStr;
 
         // Immediately center the content after updating, and stop any running animation
+        // This centering logic depends on CSS for proper sizing, but we keep it
+        // to handle potential slight content width changes.
         if (animationFrameId) {
             cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
@@ -544,7 +546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Initialize and update date ticker content immediately
         updateDateTickerContent();
-        // Update content every second. No continuous animation needed if not scrolling.
+        // Update content every second.
         setInterval(updateDateTickerContent, 1000);
 
         // Re-center on window resize
