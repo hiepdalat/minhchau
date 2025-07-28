@@ -1,8 +1,20 @@
+/**
+ * Loại bỏ dấu tiếng Việt (diacritics) khỏi chuỗi và chuyển về chữ thường.
+ * @param {string} str - Chuỗi cần xử lý.
+ * @returns {string} Chuỗi đã được loại bỏ dấu và chuyển về chữ thường.
+ */
 function removeDiacritics(str) {
-    if (typeof str !== 'string') return '';
+    if (typeof str !== 'string') {
+        return '';
+    }
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
+/**
+ * Định dạng giá trị số thành tiền tệ Việt Nam Đồng (VND).
+ * @param {number} value - Giá trị số cần định dạng.
+ * @returns {string} Chuỗi tiền tệ đã định dạng.
+ */
 function formatCurrency(value) {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -12,45 +24,39 @@ function formatCurrency(value) {
 }
 
 let allReceipts = [];
-const INITIAL_ROW_LIMIT = 10; // <<-- Hằng số mới: giới hạn 10 hàng ban đầu
+const INITIAL_ROW_LIMIT = 10; // Giới hạn số lượng hàng ban đầu hiển thị
 
+/**
+ * Tải dữ liệu phiếu nhập hàng từ API và xử lý, sau đó hiển thị lên bảng.
+ */
 async function loadReceipts() {
     try {
         const response = await fetch('/api/nhaphang');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
 
-        console.log("✅ Dữ liệu thô từ server:", data);
-
-        allReceipts = [];
-
-        data.forEach(row => {
+        allReceipts = data.flatMap(row => {
             const ngay = row.ngay;
             const daily = row.daily;
-
-            if (Array.isArray(row.items)) {
-                row.items.forEach(item => {
-                    allReceipts.push({
-                        ngay,
-                        daily,
-                        tenhang: item.tenhang,
-                        dvt: item.dvt,
-                        soluong: item.soluong,
-                        dongia: item.dongia,
-                        ck: item.ck,
-                        gianhap: item.gianhap || 0,
-                        thanhtien: item.thanhtien || 0
-                    });
-                });
-            }
+            return Array.isArray(row.items) ? row.items.map(item => ({
+                ngay,
+                daily,
+                tenhang: item.tenhang,
+                dvt: item.dvt,
+                soluong: item.soluong,
+                dongia: item.dongia,
+                ck: item.ck,
+                gianhap: item.gianhap || 0,
+                thanhtien: item.thanhtien || 0
+            })) : [];
         });
 
-        console.log("✅ Dữ liệu đã tải:", allReceipts.length, "mặt hàng.");
-                
-        // Gọi applyFilters với cờ để chỉ hiển thị số lượng ban đầu
-        applyFilters(true); // <<-- Truyền true để chỉ thị đây là lần tải ban đầu
+        // Gọi applyFilters với cờ để chỉ hiển thị số lượng ban đầu khi tải trang
+        applyFilters(true);
     } catch (e) {
-        console.error("❌ Lỗi khi tải dữ liệu:", e);
+        console.error("Lỗi khi tải dữ liệu phiếu nhập hàng:", e);
         Swal.fire({
             icon: 'error',
             title: 'Lỗi tải dữ liệu',
@@ -59,16 +65,15 @@ async function loadReceipts() {
     }
 }
 
-// Thêm tham số `isInitialLoad`
-function applyFilters(isInitialLoad = false) { // <<-- Mặc định là false
-    console.log("🧪 Tổng số dòng dữ liệu trước lọc:", allReceipts.length);
-    console.log("🧪 allReceipts[0] =", allReceipts[0]);
+/**
+ * Áp dụng các bộ lọc (tìm kiếm theo tên đại lý/mặt hàng, theo tháng) và cập nhật bảng.
+ * @param {boolean} [isInitialLoad=false] - True nếu đây là lần tải trang ban đầu (để giới hạn số hàng hiển thị).
+ */
+function applyFilters(isInitialLoad = false) {
     const searchTerm = removeDiacritics(document.getElementById('searchDailyNameInput')?.value.trim() || '');
     const searchMonth = document.getElementById('searchMonth')?.value || '';
 
-    console.log(`🔍 Bộ lọc: từ khóa='${searchTerm}', tháng='${searchMonth}'`);
-
-    let filteredReceipts = allReceipts.filter(item => {
+    const filteredReceipts = allReceipts.filter(item => {
         const itemDate = item.ngay ? new Date(item.ngay) : null;
         const monthMatch = !searchMonth || (itemDate && itemDate.toISOString().slice(0, 7) === searchMonth);
 
@@ -80,34 +85,30 @@ function applyFilters(isInitialLoad = false) { // <<-- Mặc định là false
         return monthMatch && searchMatch;
     });
 
-    console.log("✅ Số kết quả sau lọc:", filteredReceipts.length);
-
-    if (filteredReceipts.length > 0) {
-        console.log("🧾 Một dòng đầu tiên rõ ràng:", JSON.stringify(filteredReceipts[0], null, 2));
-    } else {
-        console.warn("⚠️ Không có dữ liệu sau lọc.");
-    }
-
-    // Nếu là tải ban đầu và không có bộ lọc tìm kiếm nào, giới hạn số lượng hiển thị
+    // Nếu là tải ban đầu và không có bộ lọc nào được áp dụng, giới hạn số lượng hiển thị
     if (isInitialLoad && !searchTerm && !searchMonth) {
-        renderReceiptsTable(filteredReceipts.slice(0, INITIAL_ROW_LIMIT)); // <<-- Giới hạn ở đây
-        // Có thể thêm một thông báo "Hiển thị 10 dòng đầu tiên. Hãy dùng bộ lọc để xem thêm."
+        renderReceiptsTable(filteredReceipts.slice(0, INITIAL_ROW_LIMIT));
     } else {
-        renderReceiptsTable(filteredReceipts); // <<-- Hiển thị tất cả khi có bộ lọc
+        renderReceiptsTable(filteredReceipts);
     }
 }
 
+/**
+ * Render dữ liệu phiếu nhập hàng vào bảng HTML.
+ * @param {Array<Object>} receipts - Mảng các đối tượng phiếu nhập hàng cần hiển thị.
+ */
 function renderReceiptsTable(receipts) {
     const tbody = document.querySelector('#receiptsTable tbody');
     if (!tbody) {
-        console.error("Error: tbody element with ID 'receiptsTable' not found.");
+        console.error("Lỗi: Không tìm thấy phần tử tbody có ID 'receiptsTable'.");
         return;
     }
     tbody.innerHTML = '';
 
+    const fragment = document.createDocumentFragment();
+
     receipts.forEach((item) => {
         const tr = document.createElement('tr');
-        // Đảm bảo item.ngay là một chuỗi ngày hợp lệ trước khi tạo Date object
         const formattedDateForUrl = item.ngay ? new Date(item.ngay).toISOString().split('T')[0] : '';
         const receiptKey = `${encodeURIComponent(item.daily || '')}_${formattedDateForUrl}`;
 
@@ -123,15 +124,18 @@ function renderReceiptsTable(receipts) {
             <td>${formatCurrency(item.gianhap || 0)}</td>
             <td>${formatCurrency(item.thanhtien || 0)}</td>
         `;
-        tbody.appendChild(tr);
+        fragment.appendChild(tr);
     });
+    tbody.appendChild(fragment); // Chèn một lần để tối ưu hiệu suất
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('searchBtn')?.addEventListener('click', () => applyFilters(false)); // Khi bấm tìm, hiển thị tất cả
-    document.getElementById('searchDailyNameInput')?.addEventListener('input', () => applyFilters(false)); // Khi gõ, hiển thị tất cả
-    document.getElementById('searchMonth')?.addEventListener('change', () => applyFilters(false)); // Khi đổi tháng, hiển thị tất cả
+    // Gắn sự kiện cho các bộ lọc
+    document.getElementById('searchBtn')?.addEventListener('click', () => applyFilters(false));
+    document.getElementById('searchDailyNameInput')?.addEventListener('input', () => applyFilters(false));
+    document.getElementById('searchMonth')?.addEventListener('change', () => applyFilters(false));
 
+    // Gắn sự kiện cho nút xem chi tiết
     document.getElementById('viewDetailsBtn')?.addEventListener('click', () => {
         const selectedCheckboxes = Array.from(document.querySelectorAll('.receiptCheckbox:checked'));
 
@@ -147,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkbox = selectedCheckboxes[0];
         const receiptKey = checkbox.dataset.receiptKey;
         if (!receiptKey) {
-            console.error("receiptKey is undefined.");
+            console.error("Lỗi: receiptKey không xác định.");
             return;
         }
 
@@ -158,5 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.open(detailURL, '_blank');
     });
 
-    loadReceipts(); // Hàm này sẽ gọi applyFilters(true) ban đầu
+    // Tải dữ liệu khi DOM đã sẵn sàng
+    loadReceipts();
 });
