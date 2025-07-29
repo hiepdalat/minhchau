@@ -73,7 +73,7 @@ function applyFilters(isInitialLoad = false) {
     const searchTerm = removeDiacritics(document.getElementById('searchDailyNameInput')?.value.trim() || '');
     const searchMonth = document.getElementById('searchMonth')?.value || '';
 
-    const filteredReceipts = allReceipts.filter(item => {
+    let filteredReceipts = allReceipts.filter(item => {
         const itemDate = item.ngay ? new Date(item.ngay) : null;
         const monthMatch = !searchMonth || (itemDate && itemDate.toISOString().slice(0, 7) === searchMonth);
 
@@ -85,14 +85,25 @@ function applyFilters(isInitialLoad = false) {
         return monthMatch && searchMatch;
     });
 
-    // Nếu là tải ban đầu và không có bộ lọc nào được áp dụng, giới hạn số lượng hiển thị
+    // --- THÊM ĐOẠN CODE SẮP XẾP VÀO ĐÂY ---
+    // Sắp xếp dữ liệu theo ngày nhập giảm dần (mới nhất lên đầu)
+    // Nếu ngày giống nhau, có thể thêm tiêu chí phụ (ví dụ: tên đại lý, tên hàng)
+    filteredReceipts.sort((a, b) => {
+        const dateA = a.ngay ? new Date(a.ngay) : new Date(0); // Mặc định về 0 nếu không có ngày
+        const dateB = b.ngay ? new Date(b.ngay) : new Date(0);
+
+        // Sắp xếp giảm dần: ngày B - ngày A
+        return dateB.getTime() - dateA.getTime();
+    });
+    // --- KẾT THÚC ĐOẠN CODE SẮP XẾP ---
+
+
     if (isInitialLoad && !searchTerm && !searchMonth) {
         renderReceiptsTable(filteredReceipts.slice(0, INITIAL_ROW_LIMIT));
     } else {
         renderReceiptsTable(filteredReceipts);
     }
 }
-
 /**
  * Render dữ liệu phiếu nhập hàng vào bảng HTML.
  * @param {Array<Object>} receipts - Mảng các đối tượng phiếu nhập hàng cần hiển thị.
