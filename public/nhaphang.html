@@ -1,1273 +1,301 @@
 <!DOCTYPE html>
-
 <html lang="vi">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Quản Lý Nhập Hàng Dễ Thương</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-EkL7dHwZcUpb3qZNgMTtC2m0nSfpqlhXsXQojpb44Sl4q6nKOfShLTphEy9N1NVr1M9u5z1rE1GzUek7O4DUIg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-
-    <style>
-
-        /* Global Styles for a cute and playful theme */
-
-        body.congno-body {
-
-            font-family: 'Roboto', sans-serif;
-
-            margin: 0;
-
-            padding: 0;
-
-            background: linear-gradient(135deg, #f0f8ff 0%, #e6f7ff 50%, #fefcfb 100%);
-
-            color: #4a4a4a;
-
-            line-height: 1.6;
-
-            min-height: 100vh;
-
-            display: flex;
-
-            flex-direction: column;
-
-            justify-content: flex-start;
-
-            align-items: center;
-
-            padding-bottom: 20px;
-
-            box-sizing: border-box;
-
-        }
-
-
-
-        /* Header Styling - Nổi bật và thân thiện */
-
-        .header-container {
-
-            width: 100%;
-
-            background: linear-gradient(to right, #a7d9f7, #c1e3f9);
-
-            color: #333;
-
-            padding: 15px 25px;
-
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-
-            border-radius: 0 0 20px 20px;
-
-            margin-bottom: 20px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-        }
-
-
-
-        .header-top {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            width: 100%;
-
-            max-width: 1160px;
-
-            margin-bottom: 10px;
-
-            /* Allow wrapping on smaller screens for better layout */
-
-            flex-wrap: wrap;
-
-            gap: 10px; /* Space between title and button */
-
-        }
-
-
-
-        .header-top h2 {
-
-            color: #007bff;
-
-            font-size: 2.2em;
-
-            font-weight: 700;
-
-            margin: 0;
-
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
-
-            /* Prevent shrinking too much */
-
-            flex-shrink: 0;
-
-            /* Allow text to wrap if title is very long on mobile */
-
-            word-break: break-word;
-
-            text-align: center; /* Center on small screens if it takes full width */
-
-            flex-grow: 1; /* Allow it to grow, but not consume all space if button is present */
-
-        }
-
-
-
-        .btn-logout {
-
-            background-color: #ff99aa;
-
-            color: white;
-
-            border: none;
-
-            padding: 8px 15px;
-
-            border-radius: 8px;
-
-            cursor: pointer;
-
-            font-size: 1em;
-
-            font-weight: 500;
-
-            transition: background-color 0.3s ease, transform 0.2s ease;
-
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-
-            /* Ensure button has natural width, not stretching */
-
-            width: auto;
-
-            white-space: nowrap; /* Prevent text wrapping within button */
-
-            flex-shrink: 0; /* Prevent it from shrinking too much */
-
-        }
-
-        .btn-logout:hover {
-
-            background-color: #ff7788;
-
-            transform: translateY(-2px);
-
-        }
-
-
-
-        /* --- Updated FIX for Date Ticker Display --- */
-
-        #dateTicker {
-
-            background-color: #e0f8ff; /* Màu nền dịu nhẹ hơn */
-
-            padding: 8px 15px; /* Giữ padding responsive */
-
-            width: 100%;
-
-            border-radius: 10px;
-
-            font-size: 0.9em;
-
-            color: #2196f3; /* Màu chữ xanh dương dịu mắt hơn */
-
-            font-weight: 500;
-
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-
-            display: flex; /* Dùng flexbox để căn giữa */
-
-            justify-content: center; /* Căn giữa nội dung theo chiều ngang */
-
-            align-items: center; /* Căn giữa nội dung theo chiều dọc (nếu có nhiều dòng) */
-
-            height: auto;
-
-            overflow: hidden;
-
-        }
-
-
-
-        #tickerWrap {
-
-            white-space: nowrap;
-
-            display: inline-block;
-
-        }
-
-
-
-        /* Main Container - Nổi bật trên nền */
-
-        .container {
-
-            max-width: 1200px;
-
-            width: 95%;
-
-            padding: 25px !important;
-
-            background-color: #ffffff;
-
-            border-radius: 20px;
-
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-
-            animation: fadeIn 0.8s ease-out;
-
-            margin-bottom: 20px;
-
-        }
-
-
-
-        /* Animation cho container */
-
-        @keyframes fadeIn {
-
-            from { opacity: 0; transform: translateY(20px); }
-
-            to { opacity: 1; transform: translateY(0); }
-
-        }
-
-
-
-        /* Card Sections - Trông gọn gàng và dễ thương */
-
-        .card {
-
-            background-color: #ffffff;
-
-            border-radius: 15px;
-
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-
-            border: 1px solid #e0f2f7;
-
-            padding: 20px;
-
-            margin-bottom: 20px;
-
-        }
-
-
-
-        .card h3 {
-
-            color: #6a5acd;
-
-            font-size: 1.8em !important;
-
-            font-weight: 700 !important;
-
-            margin-bottom: 15px !important;
-
-            text-align: center;
-
-        }
-
-
-
-        /* Input/Form elements - Mềm mại và dễ nhìn */
-
-        /* Grouping inputs horizontally */
-
-        .input-group-horizontal {
-
-            display: flex;
-
-            flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
-
-            gap: 15px; /* Khoảng cách giữa các input */
-
-            margin-bottom: 15px; /* Khoảng cách giữa các nhóm input */
-
-            align-items: flex-end; /* Căn chỉnh theo đáy */
-
-        }
-
-
-
-        .input-item {
-
-            flex: 1; /* Cho phép các input item co giãn */
-
-            min-width: 150px; /* Chiều rộng tối thiểu cho mỗi input */
-
-            display: flex;
-
-            flex-direction: column; /* Label trên input */
-
-            justify-content: flex-end; /* Căn chỉnh nội dung trong input-item */
-
-        }
-
-
-
-        /* Đặc biệt cho nhóm nút */
-
-        .button-group-horizontal {
-
-            display: flex;
-
-            flex-wrap: wrap;
-
-            gap: 15px;
-
-            margin-top: 15px; /* Khoảng cách với input cuối cùng */
-
-            align-items: center; /* Căn chỉnh các nút theo giữa */
-
-            justify-content: center; /* Căn giữa các nút */
-
-        }
-
-
-
-        label {
-
-            color: #607d8b !important;
-
-            font-weight: 500 !important;
-
-            margin-bottom: 5px;
-
-            display: block;
-
-            font-size: 0.95em !important;
-
-        }
-
-
-
-        input[type="text"],
-
-        input[type="date"],
-
-        input[type="number"],
-
-        .dailyNameSelect {
-
-            width: 100% !important;
-
-            padding: 10px 12px !important;
-
-            border: 2px solid #b3e5fc !important;
-
-            border-radius: 10px !important;
-
-            background-color: #f7fcff !important;
-
-            color: #4a4a4a !important;
-
-            font-size: 1em;
-
-            box-sizing: border-box;
-
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-
-        }
-
-        input[type="text"]:focus,
-
-        input[type="date"]:focus,
-
-        input[type="number"]:focus,
-
-        .dailyNameSelect:focus {
-
-            border-color: #64b5f6 !important;
-
-            outline: none;
-
-            box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.3) !important;
-
-        }
-
-
-
-        .dailyNameSelect {
-
-            height: auto !important;
-
-            line-height: normal !important;
-
-            appearance: none;
-
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292%22%20height%3D%22292%22%3E%3Cpath%20fill%3D%22%234a4a4a%22%20d%3D%22M287%2069L146%20208%205%2069z%22%2F%3E%3C%2Fsvg%3E') !important;
-
-            background-repeat: no-repeat !important;
-
-            background-position: right 10px center !important;
-
-            background-size: 12px !important;
-
-            padding-right: 30px !important;
-
-        }
-
-
-
-        .input-compact {
-
-            max-width: 250px;
-
-        }
-
-
-
-        /* Buttons - Năng động và có hiệu ứng */
-
-        button {
-
-            padding: 12px 20px !important;
-
-            border-radius: 10px !important;
-
-            font-size: 1.05em !important;
-
-            font-weight: 600 !important;
-
-            transition: all 0.3s ease;
-
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-
-            white-space: nowrap;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-        }
-
-        button .fas, button .far {
-
-            margin-right: 8px;
-
-        }
-
-
-
-        #addItemBtn {
-
-            background: linear-gradient(45deg, #a8e6cf, #d4f8e5) !important;
-
-            color: #2e8b57 !important;
-
-        }
-
-        #addItemBtn:hover {
-
-            background: linear-gradient(45deg, #d4f8e5, #a8e6cf) !important;
-
-            transform: translateY(-3px);
-
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-
-        }
-
-
-
-        #saveReceiptBtn {
-
-            background: linear-gradient(45deg, #b3cde0, #8ecae6) !important;
-
-            color: #1b4e88 !important;
-
-            margin-top: 20px; /* Đẩy nút lưu ra xa bảng một chút */
-
-        }
-
-        #saveReceiptBtn:hover {
-
-            background: linear-gradient(45deg, #8ecae6, #b3cde0) !important;
-
-            transform: translateY(-3px);
-
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-
-        }
-
-
-
-        #searchBtn {
-
-            background: linear-gradient(45deg, #ffd1dc, #ffb6c1) !important;
-
-            color: #d81b60 !important;
-
-        }
-
-        #searchBtn:hover {
-
-            background: linear-gradient(45deg, #ffb6c1, #ffd1dc) !important;
-
-            transform: translateY(-3px);
-
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-
-        }
-
-
-
-        #viewDetailsBtn {
-
-            background: linear-gradient(45deg, #c7b0e6, #a567c9) !important;
-
-            color: #6a5acd !important;
-
-        }
-
-        #viewDetailsBtn:hover {
-
-            background: linear-gradient(45deg, #a567c9, #c7b0e6) !important;
-
-            transform: translateY(-3px);
-
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-
-        }
-
-
-
-        #deleteSelectedBtn {
-
-            background: linear-gradient(45deg, #ffadad, #ff6b6b) !important;
-
-            color: #c0392b !important;
-
-        }
-
-        #deleteSelectedBtn:hover {
-
-            background: linear-gradient(45deg, #ff6b6b, #ffadad) !important;
-
-            transform: translateY(-3px);
-
-            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-
-        }
-
-
-
-        /* Table Wrappers - Thân thiện và cuộn được */
-
-        #receiptsTableWrapper,
-
-        #inputTableWrapper {
-
-            max-height: 400px;
-
-            overflow-y: auto;
-
-            overflow-x: auto;
-
-            border: 1px solid #cceeff !important;
-
-            border-radius: 15px !important;
-
-            margin-bottom: 1rem;
-
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
-
-            animation: slideInUp 0.8s ease-out forwards;
-
-            animation-delay: 0.3s;
-
-            opacity: 0;
-
-            -webkit-overflow-scrolling: touch; /* Improves scrolling on iOS */
-
-        }
-
-
-
-        #inputScrollWrapper {
-
-            max-height: 300px;
-
-            overflow-y: auto;
-
-            overflow-x: auto;
-
-            padding-right: 8px !important;
-
-            -webkit-overflow-scrolling: touch; /* Improves scrolling on iOS */
-
-        }
-
-        @keyframes slideInUp {
-
-            from { opacity: 0; transform: translateY(20px); }
-
-            to { opacity: 1; transform: translateY(0); }
-
-        }
-
-
-
-        /* Table Styling - Sáng sủa, dễ đọc, cute */
-
-        table {
-
-            width: 100%;
-
-            border-collapse: separate;
-
-            border-spacing: 0;
-
-            background-color: #ffffff;
-
-            border-radius: 15px;
-
-            overflow: hidden;
-
-            min-width: 800px; /* IMPORTANT: Ensures table has a minimum width for horizontal scrolling */
-
-        }
-
-
-
-        table th, table td {
-
-            border: 1px solid #e0f2f7;
-
-            padding: 12px 15px;
-
-            text-align: left;
-
-            vertical-align: middle;
-
-            font-size: 0.95em;
-
-            color: #4a4a4a;
-
-            white-space: nowrap;
-
-        }
-
-
-
-        table thead th {
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 10;
-
-            background-color: #d8f1f7 !important;
-
-            color: #2196f3 !important;
-
-            font-weight: 700 !important;
-
-            text-transform: uppercase;
-
-            font-size: 0.85em;
-
-            padding-top: 15px;
-
-            padding-bottom: 15px;
-
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-
-        }
-
-
-
-        table th:first-child, table td:first-child {
-
-            text-align: center;
-
-            width: 50px;
-
-        }
-
-
-
-        /* Alternating row colors for better readability - Màu sắc vui tươi */
-
-        table tbody tr:nth-child(even) {
-
-            background-color: #f7feff;
-
-        }
-
-        table tbody tr:hover {
-
-            background-color: #e3f2fd;
-
-            cursor: pointer;
-
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-
-        }
-
-
-
-        /* Alignment for numeric columns */
-
-        table td:nth-child(6),
-
-        table td:nth-child(7),
-
-        table td:nth-child(8),
-
-        table td:nth-child(9),
-
-        table td:nth-child(10),
-
-        table td:nth-child(11) {
-
-            text-align: right;
-
-        }
-
-        table td:nth-child(8) {
-
-            text-align: center;
-
-            font-weight: 500;
-
-            color: #6c757d;
-
-        }
-
-
-
-        /* Footer của bảng */
-
-        table tfoot td {
-
-            background-color: #f0f8ff !important;
-
-            color: #2196f3 !important;
-
-            font-weight: 700 !important;
-
-            border-top: 2px solid #b3e5fc !important;
-
-            padding-top: 15px;
-
-            padding-bottom: 15px;
-
-        }
-
-        #totalAmount, #grandTotalAllItems {
-
-            color: #4CAF50 !important;
-
-            font-size: 1.1em;
-
-        }
-
-
-
-        /* Checkbox styling - Lớn hơn và dễ bấm hơn */
-
-        input[type="checkbox"] {
-
-            transform: scale(1.3);
-
-            margin: 0;
-
-            cursor: pointer;
-
-            accent-color: #87ceeb;
-
-        }
-
-
-
-        /* Responsive adjustments */
-
-        @media (max-width: 768px) {
-
-            .container {
-
-                padding: 15px !important;
-
-                width: 98%;
-
-            }
-
-            .header-top {
-
-                flex-direction: column;
-
-                align-items: center;
-
-                text-align: center;
-
-            }
-
-            .header-top h2 {
-
-                font-size: 1.8em;
-
-                margin-bottom: 10px;
-
-                flex-grow: 0;
-
-                width: 100%;
-
-            }
-
-            .btn-logout {
-
-                padding: 6px 10px;
-
-                font-size: 0.9em;
-
-                width: auto;
-
-                margin-top: 5px;
-
-            }
-
-
-
-            #dateTicker {
-
-                font-size: 0.85em;
-
-                padding: 8px 10px;
-
-            }
-
-
-
-            .input-group-horizontal, .button-group-horizontal {
-
-                flex-direction: column;
-
-                align-items: stretch;
-
-                gap: 10px;
-
-            }
-
-            .input-item {
-
-                min-width: unset;
-
-            }
-
-            button {
-
-                width: 100%;
-
-            }
-
-            table th, table td {
-
-                padding: 10px 8px;
-
-                font-size: 0.8em;
-
-            }
-
-            table th:first-child, table td:first-child {
-
-                width: 40px;
-
-            }
-
-            table {
-
-                min-width: 600px;
-
-            }
-
-            .dailyNameSelect {
-
-                padding-right: 20px !important;
-
-                background-position: right 5px center !important;
-
-                background-size: 10px !important;
-
-            }
-
-        }
-
-        @media (max-width: 480px) {
-
-            .header-top h2 {
-
-                font-size: 1.5em;
-
-            }
-
-            .card h3 {
-
-                font-size: 1.5em !important;
-
-            }
-
-            input, select, button {
-
-                font-size: 0.9em !important;
-
-            }
-
-            table th, table td {
-
-                font-size: 0.75em;
-
-                padding: 8px 6px;
-
-            }
-
-            table {
-
-                min-width: 500px;
-
-            }
-
-            #dateTicker {
-
-                font-size: 0.8em;
-
-                padding: 5px 8px;
-
-            }
-
-        }
-
-    </style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Phiếu Nhập Hàng</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles for a softer, playful look */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Nền gradient nhẹ nhàng, tươi sáng */
+            background: linear-gradient(135deg, #e0f2f7 0%, #c8e6f1 100%); 
+            color: #4a4a4a; /* Màu chữ mềm mại hơn */
+            line-height: 1.6;
+            min-height: 100vh; /* Đảm bảo nền phủ toàn bộ trang */
+            display: flex; /* Dùng flexbox để căn giữa container */
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* Thêm padding cho body */
+            box-sizing: border-box; /* Quan trọng để padding không làm tràn */
+        }
+
+        /* Container for overall page content - thân thiện hơn */
+        .container {
+            max-width: 1200px;
+            width: 100%; /* Đảm bảo container co giãn */
+            margin: auto; /* Căn giữa */
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 20px; /* Bo tròn nhiều hơn */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Đổ bóng rõ nét nhưng mềm mại */
+            animation: fadeIn 0.8s ease-out; /* Hiệu ứng xuất hiện */
+        }
+
+        /* Animation cho container */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Styling - Màu sắc tươi tắn, font nổi bật */
+        h1 {
+            text-align: center;
+            color: #6a5acd; /* Một tông màu tím lavender/xanh tím đáng yêu */
+            margin-bottom: 30px;
+            font-size: 2.6em; /* To hơn một chút */
+            font-weight: 700;
+            border-bottom: 3px solid #e1bee7; /* Đường kẻ màu hồng/tím nhạt */
+            padding-bottom: 18px;
+            letter-spacing: 1px; /* Tăng khoảng cách chữ */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05); /* Bóng chữ nhẹ */
+        }
+
+        /* Filter Section Styling - Gọn gàng, bo tròn */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px; /* Khoảng cách lớn hơn */
+            margin-bottom: 30px;
+            align-items: flex-end;
+            background-color: #f0f8ff; /* AliceBlue - màu xanh rất nhạt */
+            padding: 20px;
+            border-radius: 15px; /* Bo tròn nhiều */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Đổ bóng nhẹ */
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 220px; /* Tăng min-width */
+        }
+        .filter-group label {
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: #607d8b; /* Xám xanh ấm */
+            font-size: 1em;
+        }
+        .filter-section input[type="text"],
+        .filter-section input[type="month"] {
+            padding: 12px 15px; /* Thêm padding */
+            border: 2px solid #b3e5fc; /* Border màu xanh dương nhạt hơn */
+            border-radius: 10px; /* Bo tròn input */
+            font-size: 1.05em;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .filter-section input[type="text"]:focus,
+        .filter-section input[type="month"]:focus {
+            border-color: #64b5f6; /* Xanh dương sáng hơn khi focus */
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.3); /* Hiệu ứng đổ bóng focus */
+        }
+
+        /* Button Styling - Đầy màu sắc và bo tròn */
+        .filter-section button {
+            padding: 12px 25px;
+            color: white;
+            border: none;
+            border-radius: 10px; /* Bo tròn nút */
+            cursor: pointer;
+            font-size: 1.05em;
+            font-weight: 600;
+            transition: all 0.3s ease; /* Chuyển động mượt mà hơn */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Đổ bóng cho nút */
+            white-space: nowrap;
+        }
+        #searchBtn {
+            background: linear-gradient(45deg, #87ceeb, #5ac8fa); /* Gradient xanh da trời */
+        }
+        #searchBtn:hover {
+            background: linear-gradient(45deg, #5ac8fa, #87ceeb); /* Đảo gradient khi hover */
+            transform: translateY(-3px); /* Hiệu ứng nhấc nhẹ lên */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        #searchBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #viewDetailsBtn {
+            background: linear-gradient(45deg, #b19cd9, #9c27b0); /* Gradient tím */
+        }
+        #viewDetailsBtn:hover {
+            background: linear-gradient(45deg, #9c27b0, #b19cd9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        #viewDetailsBtn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Table Container for Scrolling - Vẫn giữ chức năng cuộn, nhưng đẹp hơn */
+        .table-container {
+            max-height: 500px; /* Tăng chiều cao tối đa */
+            overflow-y: auto;
+            border: 1px solid #cceeff; /* Border màu xanh nhạt */
+            border-radius: 15px; /* Bo tròn container bảng */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.03); /* Bóng trong nhẹ */
+            animation: slideInUp 0.8s ease-out forwards; /* Hiệu ứng xuất hiện */
+            animation-delay: 0.2s;
+            opacity: 0; /* Bắt đầu ẩn */
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Table Styling - Sáng sủa, dễ đọc */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: #ffffff;
+            border-radius: 15px; /* Bo tròn cả bảng */
+            overflow: hidden; /* Quan trọng để bo góc hoạt động với border-collapse: separate */
+        }
+        table th, table td {
+            border: 1px solid #e0f2f7; /* Border rất nhạt, xanh nước biển */
+            padding: 14px 18px; /* Nhiều padding hơn */
+            text-align: left;
+            vertical-align: middle;
+            font-size: 0.95em;
+            color: #4a4a4a;
+        }
+        table th {
+            background-color: #d8f1f7; /* Nền header xanh pastel */
+            font-weight: 700;
+            color: #2196f3; /* Màu chữ header xanh dương */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        /* Style for checkbox column */
+        table th:first-child, table td:first-child {
+            text-align: center;
+            width: 60px; /* Rộng hơn cho checkbox */
+        }
+
+        /* Alternating row colors - Màu sắc vui tươi */
+        table tbody tr:nth-child(even) {
+            background-color: #f7feff; /* Rất nhạt, gần như trắng */
+        }
+        table tbody tr:hover {
+            background-color: #e3f2fd; /* Xanh nhạt khi hover */
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* Đổ bóng nhẹ khi hover */
+        }
+
+        /* Specific column alignment for numbers */
+        table td:nth-child(6), /* So luong */
+        table td:nth-child(7), /* Don gia */
+        table td:nth-child(8), /* CK */
+        table td:nth-child(9), /* Gia nhap */
+        table td:nth-child(10) { /* Thanh tien */
+            text-align: right;
+        }
+        table td:nth-child(8) { /* CK */
+            text-align: center;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        /* Checkbox styling - Lớn hơn và dễ bấm hơn */
+        input[type="checkbox"].receiptCheckbox {
+            transform: scale(1.3); /* Lớn hơn rõ rệt */
+            margin: 0;
+            cursor: pointer;
+            accent-color: #87ceeb; /* Đổi màu checkbox mặc định */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 15px auto;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                min-width: unset;
+                width: 100%;
+            }
+            .filter-section button {
+                width: 100%;
+            }
+            table th, table td {
+                padding: 10px 12px;
+            }
+        }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .filter-section {
+                padding: 15px;
+            }
+            table th, table td {
+                font-size: 0.85em;
+            }
+        }
+    </style>
 </head>
-
-<body class="congno-body">
-
-     <div class="container card">
-
-    <div class="header-container">
-
-        <div class="header-top">
-
-            <h2>🎉 Quản Lý Nhập Hàng 🎉</h2>
-
-            <button class="btn-logout" onclick="logout()">
-
-                <i class="fas fa-sign-out-alt"></i> Đăng xuất
-
-            </button>
-
-        </div>
-
-        <div id="dateTicker">
-
-            <div id="tickerWrap"></div>
-
-        </div>
-
-    </div>
-
-     </div>
-
-    
-
-    <div class="container">
-
-        <div class="card">
-
-            <h3 class="text-lg font-bold mb-2">Thông tin phiếu nhập 📝</h3>
-
-            <div class="input-group-horizontal">
-
-                <div class="input-item">
-
-                    <label for="dailyName">Tên đại lý:</label>
-
-                    <input type="text" id="dailyName" placeholder="Tên đại lý">
-
-                </div>
-
-                <div class="input-item">
-
-                    <label for="receiptDate">Ngày:</label>
-
-                    <input type="date" id="receiptDate">
-
-                </div>
-
-            </div>
-
-
-
-            <h3 class="text-lg font-bold mb-2">Thêm mặt hàng 📦</h3>
-
-            <div class="input-group-horizontal">
-
-                <div class="input-item">
-
-                    <label for="itemName">Tên hàng:</label>
-
-                    <input type="text" id="itemName" class="input-compact" placeholder="Tên hàng">
-
-                </div>
-
-                <div class="input-item">
-
-                    <label for="itemUnit">Đơn vị tính:</label>
-
-                    <input type="text" id="itemUnit" class="input-compact" placeholder="vd: cái, kg, h">
-
-                </div>
-
-                <div class="input-item">
-
-                    <label for="itemQuantity">Số lượng:</label>
-
-                    <input type="number" id="itemQuantity" class="input-compact" value="1" min="1">
-
-                </div>
-
-                <div class="input-item">
-
-                    <label for="itemPrice">Đơn giá:</label>
-
-                    <input type="number" id="itemPrice" class="input-compact" value="0" min="0">
-
-                </div>
-
-                <div class="input-item">
-
-                    <label for="itemDiscount">Chiết khấu (%):</label>
-
-                    <input type="number" id="itemDiscount" class="input-compact" value="0" min="0" max="100">
-
-                </div>
-
-                <div class="input-item" style="flex: auto; min-width: 100px;">
-
-                    <button id="addItemBtn">
-
-                        <i class="fas fa-plus-circle"></i> Thêm món
-
-                    </button>
-
-                </div>
-
-            </div>
-
-
-
-            <div id="inputScrollWrapper" class="hidden">
-
-                <div id="inputTableWrapper" class="table-wrapper mb-4">
-
-                    <table class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
-
-                        <thead>
-
-                            <tr>
-
-                                <th>Tên hàng</th>
-
-                                <th>ĐVT</th>
-
-                                <th>SL</th>
-
-                                <th>Đơn giá</th>
-
-                                <th>CK(%)</th>
-
-                                <th>G-Nhập</th>
-
-                                <th>Thành tiền</th>
-
-                                <th>Hành động</th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody id="currentItemsBody">
-
-                            </tbody>
-
-                        <tfoot>
-
-                            <tr>
-
-                                <td colspan="6">Tổng tiền:</td>
-
-                                <td id="totalAmount">0</td>
-
-                                <td></td>
-
-                            </tr>
-
-                        </tfoot>
-
-                    </table>
-
-                </div>
-
-                <button id="saveReceiptBtn" class="hidden">
-
-                    <i class="fas fa-save"></i> Lưu phiếu nhập
-
-                </button>
-
-            </div>
-
-        </div>
-
-
-
-        <div id="receiptsSectionCard" class="card hidden">
-
-            <h3 class="text-lg font-bold mb-2">Mặt hàng đã nhập từ đại lý 📋</h3>
-
-            <div class="input-group-horizontal">
-
-                <div class="input-item">
-
-                    <label for="dailyNameSelect">Chọn đại lý:</label>
-
-                    <select id="dailyNameSelect" class="dailyNameSelect">
-
-                        <option value="">-- Chọn đại lý --</option>
-
-                    </select>
-
-                </div>
-
-                <div class="input-item">
-
-                    <label for="searchMonth">Tháng:</label>
-
-                    <input type="month" id="searchMonth">
-
-                </div>
-
-                <div class="input-item" style="flex: auto; min-width: 100px;">
-
-                    <button id="searchBtn">
-
-                        <i class="fas fa-search"></i> Tìm
-
-                    </button>
-
-                </div>
-
-            </div>
-
-
-
-            <div class="button-group-horizontal">
-
-                <button id="viewDetailsBtn">
-
-                    <i class="fas fa-eye"></i> Xem chi tiết phiếu nhập
-
-                </button>
-
-                <button id="deleteSelectedBtn">
-
-                    <i class="fas fa-trash-alt"></i> Xóa đã chọn
-
-                </button>
-
-            </div>
-
-
-
-            <div id="receiptsTableWrapper" class="table-wrapper">
-
-                <table id="receiptsTable" class="min-w-full bg-gray-800 rounded-lg overflow-hidden">
-
-                    <thead>
-
-                        <tr>
-
-                            <th><input type="checkbox" id="selectAllReceipts"></th>
-
-                            <th>Ngày</th>
-
-                            <th>Đại lý</th>
-
-                            <th>Tên hàng</th>
-
-                            <th>ĐVT</th>
-
-                            <th>SL</th>
-
-                            <th>Đơn giá</th>
-
-                            <th>CK(%)</th>
-
-                            <th>G-Nhập</th>
-
-                            <th>Thành tiền</th>
-
-                            <th>Tổng tiền phiếu</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="receiptsBody">
-
-                        </tbody>
-
-                    <tfoot>
-
-                        <tr>
-
-                            <td colspan="10">Tổng tiền tất cả mặt hàng hiển thị:</td>
-
-                            <td id="grandTotalAllItems">0</td>
-
-                        </tr>
-
-                    </tfoot>
-
-                </table>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <script src="script-nhap.js"></script>
-
+<body>
+
+    <div class="container">
+        <h1>QUẢN LÝ PHIẾU NHẬP HÀNG</h1>
+
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="searchDailyNameInput">Tìm theo tên đại lý hoặc mặt hàng</label>
+                <input type="text" id="searchDailyNameInput" placeholder="Nhập tên...">
+            </div>
+            <div class="filter-group">
+                <label for="searchMonth">Lọc theo tháng</label>
+                <input type="month" id="searchMonth">
+            </div>
+            <button id="searchBtn">Tìm</button>
+            <button id="viewDetailsBtn">Xem Chi Tiết Phiếu</button>
+        </div>
+
+        <div class="table-container">
+            <table id="receiptsTable">
+                <thead>
+                    <tr>
+                        <th>Chọn</th>
+                        <th>Ngày</th>
+                        <th>Đại lý</th>
+                        <th>Tên hàng</th>
+                        <th>ĐVT</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>CK</th>
+                        <th>Giá nhập</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./scriptnhap-input.js"></script>
 </body>
-
 </html>
