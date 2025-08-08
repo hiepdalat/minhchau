@@ -382,7 +382,7 @@ function loadData() {
         });
 }
 
-function inDanhSach(watermarkURL) {
+function inDanhSach(watermarkURL = null) {
     const rows = [];
     let stt = 1;
     let tong = 0;
@@ -674,7 +674,7 @@ function inDanhSach(watermarkURL) {
                 </table>
                 <div class="watermark-inside">
                     <img src="${logoURL}" alt="Logo">
-                    <img src="${watermarkURL}" alt="Watermark">
+                    ${watermarkURL ? `<img src="${watermarkURL}" alt="Watermark">` : ''}
                     
                 </div>
             </div>
