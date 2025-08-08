@@ -513,7 +513,7 @@ function inDanhSach() {
     const ngayIn = new Date().toLocaleDateString('vi-VN');
     const chu = numberToVietnamese(tong);
     const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
-
+    const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/watermark.png';
     // Tự động điều chỉnh size watermark
     const watermarkSize = rows.length <= 5 ? 260 :
         rows.length <= 10 ? 350 :
@@ -667,7 +667,8 @@ function inDanhSach() {
                     </tfoot>
                 </table>
                 <div class="watermark-inside">
-                    <img src="${logoURL}" alt="Watermark">
+                    <img src="${watermarkURL}" alt="Watermark">
+                    
                 </div>
             </div>
             <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
