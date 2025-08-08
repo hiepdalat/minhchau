@@ -363,7 +363,11 @@ function thanhToan() {
 
         Promise.all(reqs).then(() => {
             loadDataAndRender(); // Load lại bảng sau thanh toán
-            setTimeout(() => inDanhSach(), 500); // In danh sách sau khi đã cập nhật DOM
+            setTimeout(() => 
+                {
+                const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png';
+                inDanhSach(watermarkURL);
+            }, 500);
         });
     });
 }
@@ -378,7 +382,7 @@ function loadData() {
         });
 }
 
-function inDanhSach() {
+function inDanhSach(watermarkURL) {
     const rows = [];
     let stt = 1;
     let tong = 0;
@@ -513,7 +517,9 @@ function inDanhSach() {
     const ngayIn = new Date().toLocaleDateString('vi-VN');
     const chu = numberToVietnamese(tong);
     const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
-    const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/watermark.png';
+    
+    
+    
     // Tự động điều chỉnh size watermark
     const watermarkSize = rows.length <= 5 ? 260 :
         rows.length <= 10 ? 350 :
@@ -667,6 +673,7 @@ function inDanhSach() {
                     </tfoot>
                 </table>
                 <div class="watermark-inside">
+                    <img src="${logoURL}" alt="Logo">
                     <img src="${watermarkURL}" alt="Watermark">
                     
                 </div>
