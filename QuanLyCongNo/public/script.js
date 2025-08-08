@@ -722,6 +722,69 @@ function capNhatTongCong() {
 }
 
 
+// ===================== MODULE: NHẬP HÀNG =====================
+function initNhapHang() {
+    console.log('🔁 Trang nhập hàng');
+
+    document.getElementById('btnThemHang')?.addEventListener('click', () => {
+        const maHang = document.getElementById('maHang').value.trim();
+        const tenHang = document.getElementById('tenHang').value.trim();
+        const soLuong = parseFloat(document.getElementById('soLuongNhap').value);
+        const donGia = parseFloat(document.getElementById('donGiaNhap').value);
+
+        if (!maHang || !tenHang || isNaN(soLuong) || isNaN(donGia)) {
+            Swal.fire('Thiếu thông tin', 'Vui lòng nhập đầy đủ thông tin hàng hóa', 'warning');
+            return;
+        }
+
+        fetch('/api/kho/nhap', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    maHang,
+                    tenHang,
+                    soLuong,
+                    donGia
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                Swal.fire('Thành công', data.message || 'Đã nhập hàng thành công!', 'success');
+                document.getElementById('maHang').value = '';
+                document.getElementById('tenHang').value = '';
+                document.getElementById('soLuongNhap').value = '';
+                document.getElementById('donGiaNhap').value = '';
+                taiDanhSachKho();
+            });
+    });
+
+    window.addEventListener('load', () => {
+        taiDanhSachKho();
+    });
+}
+
+function taiDanhSachKho() {
+    fetch('/api/kho')
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById('bangKho');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            data.forEach((item, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${item.maHang}</td>
+                    <td>${item.tenHang}</td>
+                    <td>${item.soLuong}</td>
+                    <td>${item.donGia}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+}
 
 // ===================== MODULE: BÁN HÀNG =====================
 function initBanHang() {
