@@ -362,11 +362,10 @@ function thanhToan() {
         });
 
         Promise.all(reqs).then(() => {
-            loadDataAndRender(); // Load lại bảng sau thanh toán
-            setTimeout(() => 
-                {
-                const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png';
-                inDanhSach(watermarkURL);
+            const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png';
+            inDanhSach(watermarkURL); // in ngay khi vẫn còn checkbox được chọn
+            setTimeout(() => {
+            loadDataAndRender(); // in xong mới load lại bảng
             }, 500);
         });
     });
