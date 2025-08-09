@@ -323,7 +323,7 @@ function xoaDaChon() {
     });
 }
 // Cần một biến toàn cục hoặc truyền logoURL vào inDanhSach để đảm bảo tính linh hoạt
-const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
+const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png';
 function thanhToan() {
     const chks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
     if (chks.length === 0)
