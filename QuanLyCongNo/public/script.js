@@ -646,7 +646,7 @@ function inDanhSach(watermarkURL = null) {
                     </tfoot>
                 </table>
                 <div class="watermark-inside">
-                    <img src="${watermarkToShow}" alt="Watermark">
+                   <img src="${watermarkToShow}" alt="Watermark">
                 </div>
             </div>
             <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
