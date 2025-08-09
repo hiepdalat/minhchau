@@ -322,8 +322,7 @@ function xoaDaChon() {
         Promise.all(reqs).then(() => loadDataAndRender());
     });
 }
-// Cần một biến toàn cục hoặc truyền logoURL vào inDanhSach để đảm bảo tính linh hoạt
-const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png';
+
 function thanhToan() {
     const chks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
     if (chks.length === 0)
@@ -510,7 +509,8 @@ function inDanhSach(watermarkURL = null) {
     const ngayIn = new Date().toLocaleDateString('vi-VN');
     const chu = numberToVietnamese(tong);
     const watermarkToShow = watermarkURL ? watermarkURL : logoURL;
-       
+    // Cần một biến toàn cục hoặc truyền logoURL vào inDanhSach để đảm bảo tính linh hoạt
+    const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png';   
     // Tự động điều chỉnh size watermark
     const watermarkSize = rows.length <= 5 ? 260 :
         rows.length <= 10 ? 350 :
