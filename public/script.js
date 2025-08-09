@@ -362,7 +362,7 @@ function thanhToan() {
         });
 
         Promise.all(reqs).then(() => {
-           const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png';
+            const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png';
             inDanhSach(watermarkURL); // in ngay khi vẫn còn checkbox được chọn
             setTimeout(() => {
             loadDataAndRender(); // in xong mới load lại bảng
@@ -381,7 +381,7 @@ function loadData() {
         });
 }
 
-function inDanhSach(watermarkURL = null) {
+function inDanhSach() {
     const rows = [];
     let stt = 1;
     let tong = 0;
@@ -517,6 +517,7 @@ function inDanhSach(watermarkURL = null) {
     const chu = numberToVietnamese(tong);
     const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
     
+    const watermarkURL = "https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png"; 
     
     
     // Tự động điều chỉnh size watermark
@@ -671,10 +672,8 @@ function inDanhSach(watermarkURL = null) {
                         </tr>
                     </tfoot>
                 </table>
-                <div class="watermark-inside">
-                    <img src="${logoURL}" alt="Logo">
+                 <div class="watermark-inside">
                     ${watermarkURL ? `<img src="${watermarkURL}" alt="Watermark">` : ''}
-                    
                 </div>
             </div>
             <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
