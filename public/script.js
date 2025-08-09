@@ -686,14 +686,14 @@ function inDanhSach(watermarkURL = null) {
                     NGƯỜI BÁN HÀNG<br>Ngày ${ngayIn}<br>(Ký, ghi rõ họ tên)
                 </div>
             </div>
-;
+`;
 if (watermarkURL) {
     html += `<img src="${watermarkURL}" 
                  style="position: fixed; top: 50%; left: 50%;
                         transform: translate(-50%, -50%);
                         opacity: 0.15; width: 400px; z-index: -1;">`;
 }
-html +=
+html += `
             <script>window.print();</script>
         </body>
         </html>
