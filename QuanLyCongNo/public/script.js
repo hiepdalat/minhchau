@@ -508,9 +508,9 @@ function inDanhSach(watermarkURL = null) {
     
     const ngayIn = new Date().toLocaleDateString('vi-VN');
     const chu = numberToVietnamese(tong);
+
+     const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png';
     const watermarkToShow = watermarkURL ? watermarkURL : logoURL;
-    // Cần một biến toàn cục hoặc truyền logoURL vào inDanhSach để đảm bảo tính linh hoạt
-    const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/logomc.png';   
     // Tự động điều chỉnh size watermark
     const watermarkSize = rows.length <= 5 ? 260 :
         rows.length <= 10 ? 350 :
@@ -658,7 +658,11 @@ function inDanhSach(watermarkURL = null) {
                     NGƯỜI BÁN HÀNG<br>Ngày ${ngayIn}<br>(Ký, ghi rõ họ tên)
                 </div>
             </div>
-            <script>window.print();<\/script>
+        <script>
+            const img = new Image();
+            img.src = '${watermarkToShow}';
+            img.onload = function() { window.print(); };
+        <\/script>
         </body>
         </html>
     `;
