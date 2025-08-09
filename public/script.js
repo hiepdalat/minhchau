@@ -322,13 +322,13 @@ function xoaDaChon() {
         Promise.all(reqs).then(() => loadDataAndRender());
     });
 }
-
+// Cần một biến toàn cục hoặc truyền logoURL vào inDanhSach để đảm bảo tính linh hoạt
+const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
 function thanhToan() {
     const chks = document.querySelectorAll('#ds input[type="checkbox"]:checked');
     if (chks.length === 0)
         return Swal.fire('⚠️ Chưa chọn dòng nào', '', 'warning');
 
-    // Kiểm tra nếu có dòng nào đã thanh toán
     const daThanhToan = Array.from(chks).some(chk => {
         const row = chk.closest('tr');
         return row.classList.contains('row-paid');
@@ -363,14 +363,13 @@ function thanhToan() {
 
         Promise.all(reqs).then(() => {
             const watermarkURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png';
-            inDanhSach(watermarkURL); // in ngay khi vẫn còn checkbox được chọn
+            inDanhSach(watermarkURL); // Truyền watermark "Đã thanh toán"
             setTimeout(() => {
-            loadDataAndRender(); // in xong mới load lại bảng
+                loadDataAndRender();
             }, 500);
         });
     });
 }
-
 function loadData() {
     return fetch('/api/congno')
         .then(res => res.json())
@@ -385,8 +384,7 @@ function inDanhSach(watermarkURL = null) {
     const rows = [];
     let stt = 1;
     let tong = 0;
-    let tenKhachHang = ''; // <-- Biến để lưu tên khách hàng
-
+    let tenKhachHang = '';
     const checkedRows = document.querySelectorAll('#ds input[type="checkbox"]:checked');
 
     if (checkedRows.length === 0) {
@@ -394,13 +392,11 @@ function inDanhSach(watermarkURL = null) {
         return;
     }
 
-    // Lấy tên khách hàng từ dòng đầu tiên được chọn
     const firstCheckedRow = checkedRows[0].closest('tr');
     if (firstCheckedRow) {
         tenKhachHang = firstCheckedRow.querySelectorAll('td')[1]?.innerText.trim() || '';
     }
 
-    // Kiểm tra nếu có nhiều khách hàng được chọn
     let conflictCustomers = false;
     for (const chk of checkedRows) {
         const tr = chk.closest('tr');
@@ -415,7 +411,6 @@ function inDanhSach(watermarkURL = null) {
         Swal.fire('⚠️ Lỗi: Không thể in hóa đơn cho nhiều khách hàng khác nhau cùng lúc.', 'Vui lòng chỉ chọn các mục của một khách hàng.', 'warning');
         return;
     }
-
 
     checkedRows.forEach(chk => {
         const tr = chk.closest('tr');
@@ -436,7 +431,7 @@ function inDanhSach(watermarkURL = null) {
             </tr>
         `);
     });
-
+    
     function numberToVietnamese(number) {
         if (typeof number !== 'number' || isNaN(number)) return 'Số không hợp lệ';
         if (number === 0) return 'Không đồng chẵn';
@@ -511,21 +506,17 @@ function inDanhSach(watermarkURL = null) {
         }
         return chu.charAt(0).toUpperCase() + chu.slice(1) + ' chẵn';
     }
-
-
+    
     const ngayIn = new Date().toLocaleDateString('vi-VN');
     const chu = numberToVietnamese(tong);
-    const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
     const watermarkToShow = watermarkURL ? watermarkURL : logoURL;
-    
-    
-    
+       
     // Tự động điều chỉnh size watermark
     const watermarkSize = rows.length <= 5 ? 260 :
         rows.length <= 10 ? 350 :
         rows.length <= 20 ? 300 : 360;
 
-    let html = `
+     let html = `
         <html>
         <head>
             <meta charset="UTF-8">
@@ -537,84 +528,69 @@ function inDanhSach(watermarkURL = null) {
                     color: #000;
                     position: relative;
                 }
-
                 .header {
                     display: flex;
                     align-items: flex-start;
                     gap: 16px;
                     margin-bottom: 8px;
                 }
-
                 .header img {
                     height: 120px;
                     margin-right: 8px;
                 }
-
                 .company-info {
                     font-size: 14px;
                     line-height: 1.5;
                 }
-
                 .company-info h1 {
                     margin: 0;
                     color: #d00;
                     font-size: 20px;
                 }
-
                 h2 {
                     text-align: center;
                     color: red;
                     margin: 10px 0 4px 0;
                     font-size: 20px;
                 }
-
                 .info div {
                     margin: 6px 0;
                 }
-
                 .dots-line {
                     border-bottom: 1px dotted #000;
                     display: inline-block;
                     width: 85%;
                     margin-left: 10px;
                 }
-
                 table {
                     width: 100%;
                     border-collapse: collapse;
                     margin-top: 16px;
                 }
-
                 th, td {
                     border: 1px solid #000;
                     padding: 6px;
                     text-align: center;
                     font-size: 14px;
                 }
-
                 tfoot td {
                     font-weight: bold;
                 }
-
                 .amount-text {
                     margin-top: 16px;
                     font-style: italic;
                 }
-
                 .sign {
                     display: flex;
                     justify-content: space-between;
                     margin-top: 40px;
                 }
-
                 .sign div {
                     text-align: center;
                 }
-
                 .table-container {
                     position: relative;
                 }
-
                 .watermark-inside {
                     position: absolute;
                     top: 50%;
@@ -624,9 +600,8 @@ function inDanhSach(watermarkURL = null) {
                     pointer-events: none;
                     z-index: 0;
                 }
-
                 .watermark-inside img {
-                    width: 220px;
+                    width: ${watermarkSize}px;
                 }
             </style>
         </head>
@@ -641,12 +616,10 @@ function inDanhSach(watermarkURL = null) {
                     <div>STK: 9973778279 – Vietcomcombank – Dương Xuân Hiệp</div>
                 </div>
             </div>
-
             <h2>HÓA ĐƠN BÁN HÀNG</h2>
             <div style="text-align: center; font-size: 14px; color: #000; margin-top: -8px;">
                 Ngày: ${ngayIn}
             </div>
-
             <div class="info">
                 <div><strong>Người mua hàng:</strong><span class="dots-line">${tenKhachHang}</span></div>
                 <div><strong>Địa chỉ:</strong><span class="dots-line"></span></div>
@@ -672,12 +645,11 @@ function inDanhSach(watermarkURL = null) {
                         </tr>
                     </tfoot>
                 </table>
-                 <div class="watermark-inside">
-                    ${watermarkToShow ? `<img src="${watermarkToShow}" alt="Watermark">` : ''}
+                <div class="watermark-inside">
+                    <img src="${watermarkToShow}" alt="Watermark">
                 </div>
             </div>
             <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
-
             <div class="sign">
                 <div>
                     NGƯỜI MUA HÀNG<br>(Ký, ghi rõ họ tên)
@@ -686,21 +658,11 @@ function inDanhSach(watermarkURL = null) {
                     NGƯỜI BÁN HÀNG<br>Ngày ${ngayIn}<br>(Ký, ghi rõ họ tên)
                 </div>
             </div>
-`;
-
-    // Nếu có watermark thì thêm vào HTML
-    if (watermarkURL) {
-        html += `<img src="${watermarkURL}" class="watermark" alt="Watermark">`;
-    }
-
-    // Kết thúc HTML
-    html += `
             <script>window.print();<\/script>
         </body>
         </html>
     `;
 
-    // Mở cửa sổ in
     const printWindow = window.open('', '_blank');
     printWindow.document.open();
     printWindow.document.write(html);
