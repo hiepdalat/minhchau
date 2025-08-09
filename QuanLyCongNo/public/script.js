@@ -381,7 +381,7 @@ function loadData() {
         });
 }
 
-function inDanhSach() {
+function inDanhSach(watermarkURL = null) {
     const rows = [];
     let stt = 1;
     let tong = 0;
@@ -516,8 +516,8 @@ function inDanhSach() {
     const ngayIn = new Date().toLocaleDateString('vi-VN');
     const chu = numberToVietnamese(tong);
     const logoURL = 'https://raw.githubusercontent.com/hiepdalat/minhchau/main/public/logomc.png';
+    const watermarkToShow = watermarkURL ? watermarkURL : logoURL;
     
-    const watermarkURL = "https://raw.githubusercontent.com/hiepdalat/minhchau/main/QuanLyCongNo/public/watermark.png"; 
     
     
     // Tự động điều chỉnh size watermark
@@ -673,7 +673,7 @@ function inDanhSach() {
                     </tfoot>
                 </table>
                  <div class="watermark-inside">
-                    ${watermarkURL ? `<img src="${watermarkURL}" alt="Watermark">` : ''}
+                    ${watermarkToShow ? `<img src="${watermarkToShow}" alt="Watermark">` : ''}
                 </div>
             </div>
             <div class="amount-text">Số tiền viết bằng chữ: ${chu}</div>
