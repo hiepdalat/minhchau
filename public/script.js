@@ -525,7 +525,7 @@ function inDanhSach(watermarkURL = null) {
         rows.length <= 10 ? 350 :
         rows.length <= 20 ? 300 : 360;
 
-    const html = `
+    let html = `
         <html>
         <head>
             <meta charset="UTF-8">
@@ -687,21 +687,24 @@ function inDanhSach(watermarkURL = null) {
                 </div>
             </div>
 `;
-if (watermarkURL) {
-    html += `<img src="${watermarkURL}" 
-                 style="position: fixed; top: 50%; left: 50%;
-                        transform: translate(-50%, -50%);
-                        opacity: 0.15; width: 400px; z-index: -1;">`;
-}
-html += `
-            <script>window.print();</script>
+
+    // Nếu có watermark thì thêm vào HTML
+    if (watermarkURL) {
+        html += `<img src="${watermarkURL}" class="watermark" alt="Watermark">`;
+    }
+
+    // Kết thúc HTML
+    html += `
+            <script>window.print();<\/script>
         </body>
         </html>
     `;
 
-    const win = window.open('', '_blank');
-    win.document.write(html);
-    win.document.close();
+    // Mở cửa sổ in
+    const printWindow = window.open('', '_blank');
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
 }
 
 function capNhatTongCong() {
