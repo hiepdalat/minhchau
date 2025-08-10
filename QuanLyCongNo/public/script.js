@@ -421,7 +421,7 @@ function inDanhSach(watermarkURL = null) {
         const dongia = parseFloat(dongiaStr.replace(/\./g, '').replace(/,/g, '')) || 0;
         const thanhtien = dongia * parseFloat(sl) || 0;
         tong += thanhtien;
-        rows.push(
+        rows.push(`
             <tr>
                 <td>${stt++}</td>
                 <td>${noidung}</td>
@@ -429,7 +429,7 @@ function inDanhSach(watermarkURL = null) {
                 <td>${dongia.toLocaleString()}</td>
                 <td>${thanhtien.toLocaleString()}</td>
             </tr>
-        );
+        `);
     });
     
     function numberToVietnamese(number) {
