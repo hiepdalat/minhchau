@@ -392,15 +392,28 @@ function inDanhSach(watermarkURL = null) {
         return;
     }
 
+    // Hàm chuẩn hóa tên khách hàng
+    const normalizeName = (name) => {
+        return name
+            .trim()                // bỏ khoảng trắng đầu/cuối
+            .replace(/\s+/g, ' ')  // gộp nhiều khoảng trắng về 1
+            .toLowerCase();        // không phân biệt hoa/thường
+    };
+
+    // Lấy tên khách hàng đầu tiên và chuẩn hóa
     const firstCheckedRow = checkedRows[0].closest('tr');
     if (firstCheckedRow) {
-        tenKhachHang = firstCheckedRow.querySelectorAll('td')[1]?.innerText.trim() || '';
+        const rawName = firstCheckedRow.querySelectorAll('td')[1]?.innerText || '';
+        tenKhachHang = normalizeName(rawName);
     }
 
+    // Kiểm tra xem có tên khách hàng khác nhau không
     let conflictCustomers = false;
     for (const chk of checkedRows) {
         const tr = chk.closest('tr');
-        const currentCustomerName = tr.querySelectorAll('td')[1]?.innerText.trim() || '';
+        const rawName = tr.querySelectorAll('td')[1]?.innerText || '';
+        const currentCustomerName = normalizeName(rawName);
+
         if (tenKhachHang && currentCustomerName !== tenKhachHang) {
             conflictCustomers = true;
             break;
@@ -408,10 +421,15 @@ function inDanhSach(watermarkURL = null) {
     }
 
     if (conflictCustomers) {
-        Swal.fire('⚠️ Lỗi: Không thể in hóa đơn cho nhiều khách hàng khác nhau cùng lúc.', 'Vui lòng chỉ chọn các mục của một khách hàng.', 'warning');
+        Swal.fire(
+            '⚠️ Lỗi: Không thể in hóa đơn cho nhiều khách hàng khác nhau cùng lúc.',
+            'Vui lòng chỉ chọn các mục của một khách hàng.',
+            'warning'
+        );
         return;
     }
 
+    // Xử lý dữ liệu để in
     checkedRows.forEach(chk => {
         const tr = chk.closest('tr');
         const cells = tr.querySelectorAll('td');
