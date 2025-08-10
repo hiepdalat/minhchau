@@ -194,7 +194,8 @@ function initCongNo() {
     });
     document.getElementById('btnXoa')?.addEventListener('click', xoaDaChon);
     document.getElementById('btnThanhToan')?.addEventListener('click', thanhToan);
-    document.getElementById('btnIn')?.addEventListener('click', inDanhSach); // Gán sự kiện inDanhSach
+    document.getElementById('btnIn')?.addEventListener('click', () => inDanhSach());
+    //document.getElementById('btnIn')?.addEventListener('click', inDanhSach); // Gán sự kiện inDanhSach
     document.getElementById('btnThem')?.addEventListener('click', themMon);
 
     loadDataAndRender();
